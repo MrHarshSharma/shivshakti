@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #FEFBF5;
+  /* Cream / Warm Beige */
+  --foreground: #4A3737;
+  /* Deep Cocoa Brown */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Vibrant Accents */
+  --saffron: #FF9933;
+  /* Royal Saffron */
+  --magenta: #D946EF;
+  /* Rani Pink */
+  --emerald: #10B981;
+  /* Emerald Green */
+  --gold: #FFC107;
+  /* Bright Gold */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-playfair), serif;
+  color: #2D1B1B;
+  /* Darker brown for headings */
+}
+
+.font-cinzel {
+  font-family: var(--font-cinzel), serif;
+}
+
+/* Utility Classes for Colors */
+.text-saffron {
+  color: var(--saffron);
+}
+
+.bg-saffron {
+  background-color: var(--saffron);
+}
+
+.text-magenta {
+  color: var(--magenta);
+}
+
+.bg-magenta {
+  background-color: var(--magenta);
+}
+
+.text-emerald {
+  color: var(--emerald);
+}
+
+.bg-emerald {
+  background-color: var(--emerald);
 }
