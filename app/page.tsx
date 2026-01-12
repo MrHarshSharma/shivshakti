@@ -34,7 +34,7 @@ export default function Home() {
                 Handmade with Love
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-cinzel font-bold tracking-tight mb-6 text-[#2D1B1B] leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-7xl font-cinzel font-bold tracking-tight mb-6 text-[#2D1B1B] leading-tight">
               Celebrate Life's <span className="text-magenta relative inline-block">
                 Colors
                 <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">

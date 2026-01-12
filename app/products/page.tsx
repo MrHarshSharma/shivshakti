@@ -27,7 +27,7 @@ export default function ProductsPage() {
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="mb-20 text-center">
-                    <h1 className="text-4xl md:text-6xl font-cinzel text-[#2D1B1B] mb-6">The Collection</h1>
+                    <h1 className="text-2xl md:text-4xl lg:text-6xl font-cinzel text-[#2D1B1B] mb-6">The Collection</h1>
                     <p className="text-[#4A3737]/80 font-playfair text-lg max-w-2xl mx-auto">
                         Explore our carefully curated selection of heritage artifacts and textiles, ensuring a touch of luxury in every detail.
                     </p>

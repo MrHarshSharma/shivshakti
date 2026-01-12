@@ -35,12 +35,12 @@ export default function ProductCard({ product }: { product: Product }) {
                     )}
                 </div>
 
-                <div className="p-6 text-center">
-                    <p className="text-saffron text-xs font-bold uppercase tracking-[0.2em] mb-2">{product.category}</p>
-                    <h3 className="font-playfair text-xl text-[#2D1B1B] group-hover:text-magenta transition-colors mb-2 leading-tight font-bold">
+                <div className="p-4 md:p-6 text-center">
+                    <p className="text-saffron text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] mb-1 md:mb-2 text-ellipsis overflow-hidden whitespace-nowrap">{product.category}</p>
+                    <h3 className="font-playfair text-sm md:text-xl text-[#2D1B1B] group-hover:text-magenta transition-colors mb-1 md:mb-2 leading-tight font-bold line-clamp-2">
                         {product.name}
                     </h3>
-                    <p className="text-[#4A3737]/80 font-medium font-sans">
+                    <p className="text-[#4A3737]/80 text-sm md:text-base font-medium font-sans">
                         ₹{product.price}
                     </p>
                 </div>

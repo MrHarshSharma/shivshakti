@@ -71,11 +71,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             </span>
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl font-cinzel text-[#2D1B1B] mb-6 leading-tight">
+                        <h1 className="text-2xl md:text-5xl font-cinzel text-[#2D1B1B] mb-4 md:mb-6 leading-tight">
                             {product.name}
                         </h1>
-                        <div className="flex items-center gap-4 mb-8">
-                            <span className="text-3xl text-[#4A3737] font-bold">
+                        <div className="flex items-center gap-4 mb-6 md:mb-8">
+                            <span className="text-2xl md:text-3xl text-[#4A3737] font-bold">
                                 ₹{product.price}
                             </span>
                             <div className="flex text-gold">
@@ -92,30 +92,30 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         <div className="space-y-8">
                             {/* Quantity Selector */}
                             <div className="flex items-center gap-4">
-                                <span className="text-sm font-bold uppercase tracking-wider text-[#4A3737]">Quantity</span>
+                                <span className="text-xs md:text-sm font-bold uppercase tracking-wider text-[#4A3737]">Quantity</span>
                                 <div className="flex items-center border border-orange-200 rounded-full bg-white shadow-sm">
                                     <button
                                         onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                        className="p-3 hover:text-magenta transition-colors"
+                                        className="p-2 md:p-3 hover:text-magenta transition-colors"
                                         disabled={quantity <= 1}
                                     >
-                                        <Minus className="h-4 w-4" />
+                                        <Minus className="h-3 w-3 md:h-4 md:w-4" />
                                     </button>
-                                    <span className="w-8 text-center font-bold text-[#2D1B1B]">{quantity}</span>
+                                    <span className="w-6 md:w-8 text-center text-sm md:text-base font-bold text-[#2D1B1B]">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(q => q + 1)}
-                                        className="p-3 hover:text-saffron transition-colors"
+                                        className="p-2 md:p-3 hover:text-saffron transition-colors"
                                     >
-                                        <Plus className="h-4 w-4" />
+                                        <Plus className="h-3 w-3 md:h-4 md:w-4" />
                                     </button>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleAddToCart}
-                                className="w-full md:w-auto px-12 py-5 bg-saffron text-white font-bold tracking-widest uppercase hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-orange-300/50 flex items-center justify-center gap-3 rounded-full"
+                                className="w-full md:w-auto px-8 py-3 md:px-12 md:py-5 bg-saffron text-white text-sm md:text-base font-bold tracking-widest uppercase hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-orange-300/50 flex items-center justify-center gap-2 md:gap-3 rounded-full"
                             >
-                                <ShoppingCart className="h-5 w-5" /> Add to Cart
+                                <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" /> Add to Cart
                             </button>
 
                             <div className="pt-8 border-t border-orange-100 grid grid-cols-2 gap-8 text-xs text-[#4A3737]/60 uppercase tracking-widest font-bold">
