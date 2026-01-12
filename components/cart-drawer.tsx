@@ -2,12 +2,23 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
+import { useState } from 'react'
 
 export default function CartDrawer() {
-    const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, cartTotal } = useCart()
+    const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
+    const [isOrderPlaced, setIsOrderPlaced] = useState(false)
+
+    const handleCheckout = () => {
+        setIsOrderPlaced(true)
+        clearCart()
+        setTimeout(() => {
+            setIsOrderPlaced(false)
+            toggleCart()
+        }, 3000)
+    }
 
     return (
         <AnimatePresence>
@@ -38,9 +49,23 @@ export default function CartDrawer() {
                             </button>
                         </div>
 
-                        {/* Cart Items */}
+                        {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                            {items.length === 0 ? (
+                            {isOrderPlaced ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                                    >
+                                        <CheckCircle className="h-24 w-24 text-emerald-500" />
+                                    </motion.div>
+                                    <div>
+                                        <h3 className="font-cinzel text-2xl text-[#2D1B1B] mb-2">Order Placed!</h3>
+                                        <p className="font-playfair text-[#4A3737]">Thank you for shopping with Shivshakti.</p>
+                                    </div>
+                                </div>
+                            ) : items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">
                                     <ShoppingBag className="h-16 w-16 text-saffron" />
                                     <p className="font-playfair text-xl text-[#4A3737]">Your cart is empty</p>
@@ -92,13 +117,16 @@ export default function CartDrawer() {
                         </div>
 
                         {/* Footer */}
-                        {items.length > 0 && (
+                        {!isOrderPlaced && items.length > 0 && (
                             <div className="p-6 border-t border-orange-100 bg-white">
                                 <div className="flex justify-between items-center mb-6">
                                     <span className="font-playfair text-lg text-[#4A3737]">Subtotal</span>
                                     <span className="font-cinzel text-2xl font-bold text-[#2D1B1B]">₹{cartTotal}</span>
                                 </div>
-                                <button className="w-full py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm">
+                                <button
+                                    onClick={handleCheckout}
+                                    className="w-full py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm"
+                                >
                                     Proceed to Checkout
                                 </button>
                             </div>
