@@ -1,17 +1,38 @@
 
+'use client'
+
+import React, { useState, useEffect } from 'react'
 import { products } from '@/data/products'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart, Star, Sparkles } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Star, Sparkles, Minus, Plus } from 'lucide-react'
+import { useCart } from '@/context/cart-context'
 
 // Correctly typing params as a Promise for Next.js 15
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+    const { addToCart } = useCart()
+    const [quantity, setQuantity] = useState(1)
+
+    // Unwrap params using React.use() or async/await pattern if this was a server component,
+    // but since we need 'use client' for state, we need to handle async params carefully.
+    // In Next.js 15 client components, params is a promise.
+    const [id, setId] = useState<string | null>(null)
+
+    useEffect(() => {
+        params.then((resolvedParams) => setId(resolvedParams.id))
+    }, [params])
+
+    if (!id) return null; // Loading state
+
     const product = products.find((p) => p.id === id)
 
     if (!product) {
         notFound()
+    }
+
+    const handleAddToCart = () => {
+        addToCart(product, quantity)
     }
 
     return (
@@ -55,7 +76,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                         </h1>
                         <div className="flex items-center gap-4 mb-8">
                             <span className="text-3xl text-[#4A3737] font-bold">
-                                ${product.price}
+                                ₹{product.price}
                             </span>
                             <div className="flex text-gold">
                                 {[...Array(5)].map((_, i) => (
@@ -68,8 +89,32 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                             {product.description}
                         </p>
 
-                        <div className="space-y-6">
-                            <button className="w-full md:w-auto px-12 py-5 bg-saffron text-white font-bold tracking-widest uppercase hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-orange-300/50 flex items-center justify-center gap-3 rounded-full">
+                        <div className="space-y-8">
+                            {/* Quantity Selector */}
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm font-bold uppercase tracking-wider text-[#4A3737]">Quantity</span>
+                                <div className="flex items-center border border-orange-200 rounded-full bg-white shadow-sm">
+                                    <button
+                                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                        className="p-3 hover:text-magenta transition-colors"
+                                        disabled={quantity <= 1}
+                                    >
+                                        <Minus className="h-4 w-4" />
+                                    </button>
+                                    <span className="w-8 text-center font-bold text-[#2D1B1B]">{quantity}</span>
+                                    <button
+                                        onClick={() => setQuantity(q => q + 1)}
+                                        className="p-3 hover:text-saffron transition-colors"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleAddToCart}
+                                className="w-full md:w-auto px-12 py-5 bg-saffron text-white font-bold tracking-widest uppercase hover:bg-orange-600 transition-all duration-300 shadow-lg hover:shadow-orange-300/50 flex items-center justify-center gap-3 rounded-full"
+                            >
                                 <ShoppingCart className="h-5 w-5" /> Add to Cart
                             </button>
 

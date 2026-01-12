@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FEFBF5]">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-36 md:pt-40">
         {/* Background Patterns */}
         <div className="absolute inset-0 z-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-saffron rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
@@ -84,22 +84,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Banner */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Hampers', 'Sweets', 'Decor', 'Wellness'].map((cat, i) => (
-              <div key={cat} className="group relative h-40 rounded-2xl overflow-hidden cursor-pointer">
-                <div className={`absolute inset-0 ${['bg-orange-100', 'bg-pink-100', 'bg-green-100', 'bg-yellow-100'][i]} transition-colors group-hover:bg-[#2D1B1B]`} />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="font-cinzel text-2xl font-bold text-[#2D1B1B] group-hover:text-white transition-colors">{cat}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Featured Collection */}
       <section className="py-24 bg-[#FEFBF5]">
         <div className="container mx-auto px-4">
@@ -108,14 +92,15 @@ export default function Home() {
             <div className="w-24 h-1 bg-gradient-to-r from-saffron to-magenta mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.slice(0, 3).map((product, index) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+            {products.slice(0, 3).map((product, index, array) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
+                className={index === array.length - 1 && array.length % 2 !== 0 ? 'col-span-2 md:col-span-1' : ''}
               >
                 <ProductCard product={product} />
               </motion.div>

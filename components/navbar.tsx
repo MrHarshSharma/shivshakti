@@ -1,7 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 import { ShoppingCart, User } from 'lucide-react'
+import { useCart } from '@/context/cart-context'
 
 export default function Navbar() {
+    const { toggleCart, cartCount } = useCart()
+
     return (
         <nav className="fixed top-0 z-50 w-full border-b border-orange-100/50 bg-[#FEFBF5]/80 backdrop-blur-md transition-all shadow-sm">
             <div className="container mx-auto flex h-24 items-center justify-between px-6">
@@ -25,14 +30,21 @@ export default function Navbar() {
 
                 {/* Icons */}
                 <div className="flex items-center gap-6">
-                    <button className="text-[#4A3737] hover:text-magenta transition-colors bg-white p-2 rounded-full shadow-sm hover:shadow-md">
-                        <User className="h-5 w-5" />
-                    </button>
-                    <button className="relative text-[#4A3737] hover:text-saffron transition-colors bg-white p-2 rounded-full shadow-sm hover:shadow-md">
+                    <button
+                        onClick={toggleCart}
+                        className="relative text-[#4A3737] hover:text-saffron transition-colors bg-white p-2 rounded-full shadow-sm hover:shadow-md"
+                    >
                         <ShoppingCart className="h-5 w-5" />
-                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-magenta text-[10px] font-bold text-white shadow-sm">
-                            0
-                        </span>
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-magenta text-[10px] font-bold text-white shadow-sm">
+                                {cartCount}
+                            </span>
+                        )}
+                        {cartCount === 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-magenta text-[10px] font-bold text-white shadow-sm">
+                                0
+                            </span>
+                        )}
                     </button>
                 </div>
             </div>

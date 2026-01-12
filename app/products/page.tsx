@@ -48,10 +48,14 @@ export default function ProductsPage() {
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"
                 >
-                    {products.map((product) => (
-                        <motion.div key={product.id} variants={item}>
+                    {products.map((product, index, array) => (
+                        <motion.div
+                            key={product.id}
+                            variants={item}
+                            className={index === array.length - 1 && array.length % 2 !== 0 ? 'col-span-2 md:col-span-1 lg:col-span-1' : ''}
+                        >
                             <ProductCard product={product} />
                         </motion.div>
                     ))}
