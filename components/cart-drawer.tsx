@@ -5,19 +5,125 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Minus, Plus, ShoppingBag, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function CartDrawer() {
     const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
     const [isOrderPlaced, setIsOrderPlaced] = useState(false)
+    const [showCustomerForm, setShowCustomerForm] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [customerData, setCustomerData] = useState({
+        name: '',
+        phone: '',
+        address: ''
+    })
+    const [errors, setErrors] = useState({
+        name: '',
+        phone: '',
+        address: ''
+    })
+    const [submitError, setSubmitError] = useState('')
 
-    const handleCheckout = () => {
-        setIsOrderPlaced(true)
-        clearCart()
-        setTimeout(() => {
-            setIsOrderPlaced(false)
-            toggleCart()
-        }, 3000)
+    // Load customer data from localStorage on mount
+    useEffect(() => {
+        const savedCustomerData = localStorage.getItem('shivshakti_customer_data')
+        if (savedCustomerData) {
+            try {
+                const parsedData = JSON.parse(savedCustomerData)
+                setCustomerData(parsedData)
+            } catch (error) {
+                console.error('Error loading customer data:', error)
+            }
+        }
+    }, [])
+
+    const validateForm = () => {
+        const newErrors = {
+            name: '',
+            phone: '',
+            address: ''
+        }
+        let isValid = true
+
+        if (!customerData.name.trim()) {
+            newErrors.name = 'Name is required'
+            isValid = false
+        }
+
+        if (!customerData.phone.trim()) {
+            newErrors.phone = 'Phone number is required'
+            isValid = false
+        } else if (!/^\d{10}$/.test(customerData.phone)) {
+            newErrors.phone = 'Phone number must be exactly 10 digits'
+            isValid = false
+        }
+
+        if (!customerData.address.trim()) {
+            newErrors.address = 'Address is required'
+            isValid = false
+        }
+
+        setErrors(newErrors)
+        return isValid
+    }
+
+    const handleProceedToCheckout = () => {
+        setShowCustomerForm(true)
+    }
+
+    const handleBackToCart = () => {
+        setShowCustomerForm(false)
+        setErrors({ name: '', phone: '', address: '' })
+    }
+
+    const handleCheckout = async () => {
+        if (!validateForm()) return
+
+        setIsSubmitting(true)
+        setSubmitError('')
+
+        try {
+            // Submit order to API
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: customerData.name,
+                    phone: customerData.phone,
+                    address: customerData.address,
+                    items: items
+                }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to place order')
+            }
+
+            // Save customer data to localStorage
+            localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
+
+            // Dispatch custom event to notify navbar
+            window.dispatchEvent(new Event('customerDataUpdated'))
+
+            // Show success message
+            setIsOrderPlaced(true)
+            clearCart()
+            setTimeout(() => {
+                setIsOrderPlaced(false)
+                setShowCustomerForm(false)
+                toggleCart()
+            }, 3000)
+
+        } catch (error) {
+            console.error('Order submission error:', error)
+            setSubmitError(error instanceof Error ? error.message : 'Failed to place order. Please try again.')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
@@ -63,6 +169,100 @@ export default function CartDrawer() {
                                     <div>
                                         <h3 className="font-cinzel text-2xl text-[#2D1B1B] mb-2">Order Placed!</h3>
                                         <p className="font-playfair text-[#4A3737]">Thank you for shopping with Shivshakti.</p>
+                                    </div>
+                                </div>
+                            ) : showCustomerForm ? (
+                                <div className="h-full flex flex-col justify-center space-y-6">
+                                    <div>
+                                        <h3 className="font-cinzel text-2xl text-[#2D1B1B] mb-2">Customer Information</h3>
+                                        <p className="font-playfair text-sm text-[#4A3737]">Please provide your details to complete the order</p>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {/* Name Field */}
+                                        <div>
+                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                Full Name *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={customerData.name}
+                                                onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
+                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.name
+                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                    }`}
+                                                placeholder="Enter your full name"
+                                            />
+                                            {errors.name && (
+                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.name}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Phone Field */}
+                                        <div>
+                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                Phone Number *
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                value={customerData.phone}
+                                                onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.phone
+                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                    }`}
+                                                placeholder="10-digit phone number"
+                                                maxLength={10}
+                                            />
+                                            {errors.phone && (
+                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.phone}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Address Field */}
+                                        <div>
+                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                Delivery Address *
+                                            </label>
+                                            <textarea
+                                                value={customerData.address}
+                                                onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
+                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
+                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                    }`}
+                                                placeholder="Enter your complete delivery address"
+                                                rows={3}
+                                            />
+                                            {errors.address && (
+                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.address}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Error Message */}
+                                    {submitError && (
+                                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                            <p className="text-red-600 text-sm font-playfair">{submitError}</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex gap-3 pt-4">
+                                        <button
+                                            onClick={handleBackToCart}
+                                            disabled={isSubmitting}
+                                            className="flex-1 py-3 border-2 border-[#2D1B1B] text-[#2D1B1B] font-bold uppercase tracking-widest hover:bg-[#2D1B1B] hover:text-white transition-colors rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Back
+                                        </button>
+                                        <button
+                                            onClick={handleCheckout}
+                                            disabled={isSubmitting}
+                                            className="flex-1 py-3 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isSubmitting ? 'Placing Order...' : 'Place Order'}
+                                        </button>
                                     </div>
                                 </div>
                             ) : items.length === 0 ? (
@@ -117,14 +317,14 @@ export default function CartDrawer() {
                         </div>
 
                         {/* Footer */}
-                        {!isOrderPlaced && items.length > 0 && (
+                        {!isOrderPlaced && !showCustomerForm && items.length > 0 && (
                             <div className="p-6 border-t border-orange-100 bg-white">
                                 <div className="flex justify-between items-center mb-6">
                                     <span className="font-playfair text-lg text-[#4A3737]">Subtotal</span>
                                     <span className="font-cinzel text-2xl font-bold text-[#2D1B1B]">₹{cartTotal}</span>
                                 </div>
                                 <button
-                                    onClick={handleCheckout}
+                                    onClick={handleProceedToCheckout}
                                     className="w-full py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm"
                                 >
                                     Proceed to Checkout

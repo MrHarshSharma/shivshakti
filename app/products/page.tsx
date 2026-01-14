@@ -43,18 +43,17 @@ export default function ProductsPage() {
                     <button className="bg-white text-[#4A3737] hover:bg-orange-100 hover:text-saffron px-6 py-2 rounded-full shadow-sm transition-all whitespace-nowrap">Dry Fruits</button>
                 </div>
 
-                {/* Product Grid */}
+                {/* Product List */}
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"
+                    className="flex flex-col gap-6 max-w-5xl mx-auto"
                 >
-                    {products.map((product, index, array) => (
+                    {products.map((product) => (
                         <motion.div
                             key={product.id}
                             variants={item}
-                            className={index === array.length - 1 && array.length % 2 !== 0 ? 'col-span-2 md:col-span-1 lg:col-span-1' : ''}
                         >
                             <ProductCard product={product} />
                         </motion.div>
