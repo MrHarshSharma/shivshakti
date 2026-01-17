@@ -6,6 +6,8 @@ import { X, Minus, Plus, ShoppingBag, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useState, useEffect } from 'react'
+import { sendOrderConfirmationEmail } from '@/utils/emailjs'
+import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
 
 export default function CartDrawer() {
     const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
@@ -74,6 +76,7 @@ export default function CartDrawer() {
     const handleBackToCart = () => {
         setShowCustomerForm(false)
         setErrors({ name: '', phone: '', address: '' })
+        setSubmitError('')
     }
 
     const handleCheckout = async () => {
@@ -83,45 +86,143 @@ export default function CartDrawer() {
         setSubmitError('')
 
         try {
-            // Submit order to API
-            const response = await fetch('/api/orders', {
+            // Load Razorpay script
+            const scriptLoaded = await loadRazorpayScript()
+            if (!scriptLoaded) {
+                throw new Error('Failed to load Razorpay. Please try again.')
+            }
+
+            // Create Razorpay order
+            const orderResponse = await fetch('/api/razorpay/create-order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    name: customerData.name,
-                    phone: customerData.phone,
-                    address: customerData.address,
-                    items: items
+                    amount: cartTotal,
+                    currency: 'INR',
+                    customerName: customerData.name,
+                    customerPhone: customerData.phone,
                 }),
             })
 
-            const data = await response.json()
+            const orderData = await orderResponse.json()
 
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to place order')
+            if (!orderResponse.ok) {
+                throw new Error(orderData.error || 'Failed to create payment order')
             }
 
-            // Save customer data to localStorage
-            localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
+            // Configure Razorpay checkout
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: 'Shivshakti',
+                description: 'Order Payment',
+                order_id: orderData.orderId,
+                prefill: {
+                    name: customerData.name,
+                    contact: customerData.phone,
+                },
+                theme: {
+                    color: '#D97706', // saffron color
+                },
+                handler: async (response: RazorpayResponse) => {
+                    try {
+                        // Verify payment
+                        const verifyResponse = await fetch('/api/razorpay/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        })
 
-            // Dispatch custom event to notify navbar
-            window.dispatchEvent(new Event('customerDataUpdated'))
+                        const verifyData = await verifyResponse.json()
 
-            // Show success message
-            setIsOrderPlaced(true)
-            clearCart()
-            setTimeout(() => {
-                setIsOrderPlaced(false)
-                setShowCustomerForm(false)
-                toggleCart()
-            }, 3000)
+                        if (!verifyResponse.ok || !verifyData.verified) {
+                            throw new Error('Payment verification failed')
+                        }
+
+                        // Create order after successful payment
+                        const createOrderResponse = await fetch('/api/orders', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: customerData.name,
+                                phone: customerData.phone,
+                                address: customerData.address,
+                                items: items,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                            }),
+                        })
+
+                        const createOrderData = await createOrderResponse.json()
+
+                        if (!createOrderResponse.ok) {
+                            throw new Error(createOrderData.error || 'Failed to create order')
+                        }
+
+                        // Send order confirmation email (don't block on failure)
+                        sendOrderConfirmationEmail({
+                            name: customerData.name,
+                            order_id: createOrderData.orderId,
+                            orders: items.map(item => ({
+                                name: item.name,
+                                price: item.price,
+                                units: item.quantity
+                            })),
+                            cost: {
+                                total: cartTotal,
+                                shipping: 0,
+                                tax: 0
+                            }
+                        }).catch(err => console.error('Email sending failed:', err))
+
+                        // Save customer data to localStorage
+                        localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
+
+                        // Dispatch custom event to notify navbar
+                        window.dispatchEvent(new Event('customerDataUpdated'))
+
+                        // Show success message
+                        setIsOrderPlaced(true)
+                        setIsSubmitting(false)
+                        clearCart()
+                        setTimeout(() => {
+                            setIsOrderPlaced(false)
+                            setShowCustomerForm(false)
+                            toggleCart()
+                        }, 3000)
+
+                    } catch (error) {
+                        console.error('Order creation error:', error)
+                        setSubmitError(error instanceof Error ? error.message : 'Failed to complete order. Please contact support.')
+                        setIsSubmitting(false)
+                    }
+                },
+                modal: {
+                    ondismiss: () => {
+                        setIsSubmitting(false)
+                        setSubmitError('Payment cancelled. Please try again.')
+                    }
+                }
+            }
+
+            // Open Razorpay checkout
+            const razorpay = new window.Razorpay(options)
+            razorpay.open()
 
         } catch (error) {
-            console.error('Order submission error:', error)
-            setSubmitError(error instanceof Error ? error.message : 'Failed to place order. Please try again.')
-        } finally {
+            console.error('Payment initialization error:', error)
+            setSubmitError(error instanceof Error ? error.message : 'Failed to initialize payment. Please try again.')
             setIsSubmitting(false)
         }
     }

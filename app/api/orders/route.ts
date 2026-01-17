@@ -4,12 +4,20 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, address, items } = body
+        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id } = body
 
         // Validate required fields
         if (!name || !phone || !address || !items || items.length === 0) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
+                { status: 400 }
+            )
+        }
+
+        // Validate payment information
+        if (!razorpay_order_id || !razorpay_payment_id) {
+            return NextResponse.json(
+                { error: 'Payment information is required' },
                 { status: 400 }
             )
         }
@@ -34,7 +42,10 @@ export async function POST(request: Request) {
                 total: items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0),
                 itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
             },
-            status: 'pending'
+            status: 'pending',
+            payment_status: 'completed',
+            razorpay_order_id,
+            razorpay_payment_id
         }
 
         // Insert order into database
@@ -63,8 +74,13 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error('Order submission error:', error)
+        console.error('Error details:', error instanceof Error ? error.message : 'Unknown error')
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
         return NextResponse.json(
-            { error: 'Internal server error' },
+            {
+                error: 'Internal server error',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            },
             { status: 500 }
         )
     }
