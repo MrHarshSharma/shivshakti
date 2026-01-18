@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Search, Filter, Download } from 'lucide-react'
+import { ArrowLeft, Search, Filter, Download, ArrowRight, Clock, ChevronDown, Loader2 } from 'lucide-react'
+import { formatDate } from '@/utils/date'
 
 interface Order {
     id: number
@@ -34,6 +35,7 @@ export default function AdminOrdersPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
+    const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null)
 
     useEffect(() => {
         fetchOrders()
@@ -88,6 +90,7 @@ export default function AdminOrdersPage() {
     }
 
     const updateOrderStatus = async (orderId: number, newStatus: string) => {
+        setUpdatingOrderId(orderId)
         try {
             const response = await fetch(`/api/orders/${orderId}`, {
                 method: 'PATCH',
@@ -98,28 +101,58 @@ export default function AdminOrdersPage() {
             })
 
             if (response.ok) {
-                fetchOrders()
+                await fetchOrders()
             }
         } catch (error) {
             console.error('Error updating order status:', error)
+        } finally {
+            setUpdatingOrderId(null)
         }
     }
 
     return (
-        <div className="min-h-screen bg-[#FEFBF5] pt-32 pb-16">
-            <div className="container mx-auto px-4 max-w-7xl">
+        <div className="min-h-screen bg-[#FEFBF5] relative overflow-hidden pt-32 pb-16">
+            {/* Background Patterns */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-saffron/20 rounded-full blur-[100px] -mr-64 -mt-64 animate-pulse" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-magenta/10 rounded-full blur-[100px] -ml-64 -mb-64 animate-pulse" />
+            </div>
+
+            <div className="container mx-auto px-4 max-w-7xl relative z-10">
                 {/* Header */}
-                <div className="mb-8">
-                    <Link href="/admin" className="text-saffron hover:text-orange-600 text-sm font-bold uppercase tracking-wider mb-4 inline-flex items-center gap-2">
+                <div className="mb-12">
+                    <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-orange-100 text-saffron hover:text-orange-600 text-xs font-bold uppercase tracking-wider mb-6 transition-all">
                         <ArrowLeft className="h-4 w-4" /> Back to Dashboard
                     </Link>
-                    <h1 className="font-cinzel text-4xl text-[#2D1B1B] mb-2">Orders Management</h1>
-                    <p className="text-[#4A3737]/70 font-playfair">View and manage all customer orders</p>
+                    <h1 className="font-cinzel text-5xl text-[#2D1B1B] mb-2 font-bold">Orders <span className="text-saffron">Management</span></h1>
+                    <p className="text-[#4A3737]/70 font-playfair text-lg">Orchestrate customer joy and commerce.</p>
                 </div>
 
-                {/* Filters */}
-                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6 mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Summary */}
+                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Orders</p>
+                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">{filteredOrders.length}</p>
+                        </div>
+                        <div>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Revenue</p>
+                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
+                                ₹{filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0).toLocaleString()}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Average Order Value</p>
+                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
+                                ₹{filteredOrders.length > 0 ? Math.round(filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0) / filteredOrders.length) : 0}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filters - Glassmorphism */}
+                <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] border border-white/40 p-8 shadow-xl mb-8 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Search */}
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#4A3737]/40" />
@@ -155,8 +188,8 @@ export default function AdminOrdersPage() {
                     </div>
                 </div>
 
-                {/* Orders Table */}
-                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 overflow-hidden">
+                {/* Orders Table - Glassmorphism */}
+                <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-2xl overflow-hidden mb-8">
                     {isLoading ? (
                         <div className="text-center py-12">
                             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-saffron border-r-transparent"></div>
@@ -173,57 +206,90 @@ export default function AdminOrdersPage() {
                                     <tr>
                                         <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Order ID</th>
                                         <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Customer</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Items</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Product Name</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Quantity</th>
                                         <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Total</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Date</th>
                                         <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Payment</th>
                                         <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Status</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Date</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredOrders.map((order) => (
+                                    {filteredOrders.map((order, idx) => (
                                         <motion.tr
                                             key={order.id}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="border-b border-orange-50 hover:bg-orange-50/50 transition-colors"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            className="border-b border-orange-50/50 hover:bg-orange-50/30 transition-colors group"
                                         >
-                                            <td className="py-4 px-6 font-playfair text-sm text-[#2D1B1B] font-semibold">#{order.id}</td>
-                                            <td className="py-4 px-6">
+                                            <td className="py-6 px-6 font-playfair text-sm text-[#2D1B1B] font-bold">
+                                                <span className="text-saffron">#</span>{order.id}
+                                            </td>
+                                            <td className="py-6 px-6 text-[#2D1B1B]">
                                                 <div>
-                                                    <p className="font-playfair text-sm text-[#2D1B1B] font-semibold">{order.name}</p>
-                                                    <p className="font-playfair text-xs text-[#4A3737]/70">{order.phone}</p>
+                                                    <p className="font-playfair text-sm font-bold group-hover:text-magenta transition-colors">{order.name}</p>
+                                                    <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider ">{order.phone}</p>
                                                 </div>
                                             </td>
-                                            <td className="py-4 px-6 font-playfair text-sm text-[#4A3737]">{order.order?.itemCount || 0}</td>
-                                            <td className="py-4 px-6 font-playfair text-sm text-[#2D1B1B] font-bold">₹{order.order?.total || 0}</td>
-                                            <td className="py-4 px-6">
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-200">
+                                            <td className="py-6 px-6">
+                                                {order.order?.items && order.order.items.length > 0 ? (
+                                                    <div className="flex flex-col gap-1.5">
+                                                        {order.order.items.slice(0, 3).map((item, i) => (
+                                                            <div key={i} className="flex items-center gap-2">
+                                                                <span className="text-[10px] bg-orange-100 text-saffron px-1.5 py-0.5 rounded-md font-bold">
+                                                                    x{item.quantity}
+                                                                </span>
+                                                                <span className="font-playfair text-sm text-[#2D1B1B] font-bold leading-tight">
+                                                                    {item.name}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                        {order.order.items.length > 3 && (
+                                                            <span className="text-[10px] text-saffron font-bold uppercase tracking-widest mt-0.5">
+                                                                + {order.order.items.length - 3} more varieties
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <span className="italic text-[#4A3737]/40 leading-tight text-xs">No items found</span>
+                                                )}
+                                            </td>
+                                            <td className="py-6 px-6 text-[#2D1B1B]">
+                                                <div className="w-10 h-10 rounded-xl bg-white border border-orange-100 flex items-center justify-center font-cinzel font-bold text-sm shadow-sm text-saffron">
+                                                    {order.order?.itemCount || 0}
+                                                </div>
+                                            </td>
+
+                                            <td className="py-6 px-6 font-cinzel text-sm text-[#2D1B1B] font-bold">₹{order.order?.total || 0}</td>
+                                            <td className="py-6 px-6 font-playfair text-xs text-[#4A3737]/60 italic font-medium">
+                                                {formatDate(order.created_at)}
+                                            </td>
+                                            <td className="py-6 px-6">
+                                                <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm backdrop-blur-sm">
                                                     {order.payment_status}
                                                 </span>
                                             </td>
-                                            <td className="py-4 px-6">
-                                                <select
-                                                    value={order.status}
-                                                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadge(order.status)} appearance-none cursor-pointer`}
-                                                >
-                                                    <option value="pending">Pending</option>
-                                                    <option value="completed">Completed</option>
-                                                    <option value="cancelled">Cancelled</option>
-                                                </select>
-                                            </td>
-                                            <td className="py-4 px-6 font-playfair text-sm text-[#4A3737]">
-                                                {new Date(order.created_at).toLocaleDateString()}
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <Link
-                                                    href={`/admin/orders/${order.id}`}
-                                                    className="text-saffron hover:text-orange-600 text-sm font-bold"
-                                                >
-                                                    View Details
-                                                </Link>
+                                            <td className="py-6 px-6">
+                                                <div className="relative inline-flex items-center group">
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                                                        disabled={updatingOrderId === order.id}
+                                                        className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                    >
+                                                        <option value="pending">Pending</option>
+                                                        <option value="completed">Completed</option>
+                                                        <option value="cancelled">Cancelled</option>
+                                                    </select>
+                                                    <div className="absolute right-3 pointer-events-none">
+                                                        {updatingOrderId === order.id ? (
+                                                            <Loader2 className="h-3 w-3 animate-spin text-current" />
+                                                        ) : (
+                                                            <ChevronDown className="h-3 w-3 text-current opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </td>
                                         </motion.tr>
                                     ))}
@@ -233,27 +299,7 @@ export default function AdminOrdersPage() {
                     )}
                 </div>
 
-                {/* Summary */}
-                <div className="mt-6 bg-white rounded-2xl shadow-lg border border-orange-100 p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Orders</p>
-                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">{filteredOrders.length}</p>
-                        </div>
-                        <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Revenue</p>
-                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
-                                ₹{filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0).toLocaleString()}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Average Order Value</p>
-                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
-                                ₹{filteredOrders.length > 0 ? Math.round(filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0) / filteredOrders.length) : 0}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     )

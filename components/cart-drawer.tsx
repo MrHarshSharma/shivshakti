@@ -376,7 +376,7 @@ export default function CartDrawer() {
                                     <div key={item.id} className="flex gap-4">
                                         <div className="relative h-24 w-24 bg-white rounded-lg overflow-hidden border border-orange-50 shrink-0">
                                             <Image
-                                                src={item.image}
+                                                src={(item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'}
                                                 alt={item.name}
                                                 fill
                                                 className="object-cover"
@@ -385,7 +385,9 @@ export default function CartDrawer() {
                                         <div className="flex-1 flex flex-col justify-between">
                                             <div>
                                                 <h3 className="font-playfair text-[#2D1B1B] font-bold leading-tight mb-1">{item.name}</h3>
-                                                <p className="text-saffron text-sm font-bold uppercase tracking-wider">{item.category}</p>
+                                                <p className="text-saffron text-sm font-bold uppercase tracking-wider">
+                                                    {(item.categories && item.categories.length > 0) ? item.categories[0] : (item as any).category || 'General'}
+                                                </p>
                                             </div>
                                             <div className="flex items-center justify-between mt-2">
                                                 <div className="flex items-center gap-3 bg-white px-2 py-1 rounded-full border border-orange-100 shadow-sm">
