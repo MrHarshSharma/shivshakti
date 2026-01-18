@@ -32,7 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 {/* Image Section - Clickable */}
                 <Link href={`/product/${product.id}`} className="relative w-48 md:w-64 h-48 flex-shrink-0 overflow-hidden bg-orange-50/30">
                     <Image
-                        src={product.image}
+                        src={product.images && product.images.length > 0 ? product.images[0] : '/placeholder-product.png'}
                         alt={product.name}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -49,7 +49,9 @@ export default function ProductCard({ product }: { product: Product }) {
                 <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
                     <Link href={`/product/${product.id}`}>
                         <div>
-                            <p className="text-saffron text-[10px] font-bold uppercase tracking-[0.15em] mb-1">{product.category}</p>
+                            <p className="text-saffron text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
+                                {product.categories && product.categories.length > 0 ? product.categories[0] : 'General'}
+                            </p>
                             <h3 className="font-playfair text-base md:text-xl text-[#2D1B1B] group-hover:text-magenta transition-colors mb-2 leading-tight font-bold line-clamp-2">
                                 {product.name}
                             </h3>

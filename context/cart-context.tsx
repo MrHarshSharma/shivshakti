@@ -12,8 +12,8 @@ interface CartContextType {
     items: CartItem[];
     addToCart: (product: Product, quantity: number) => void;
     addToCartSilent: (product: Product, quantity: number) => void;
-    removeFromCart: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => void;
+    removeFromCart: (productId: string | number) => void;
+    updateQuantity: (productId: string | number, quantity: number) => void;
     clearCart: () => void;
     toggleCart: () => void;
     isCartOpen: boolean;
@@ -74,11 +74,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Don't open cart drawer
     };
 
-    const removeFromCart = (productId: string) => {
+    const removeFromCart = (productId: string | number) => {
         setItems(prev => prev.filter(item => item.id !== productId));
     };
 
-    const updateQuantity = (productId: string, quantity: number) => {
+    const updateQuantity = (productId: string | number, quantity: number) => {
         if (quantity < 1) return;
         setItems(prev => prev.map(item =>
             item.id === productId ? { ...item, quantity } : item

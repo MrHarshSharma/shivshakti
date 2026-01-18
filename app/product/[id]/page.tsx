@@ -2,18 +2,39 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { products } from '@/data/products'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ShoppingCart, Star, Sparkles, Minus, Plus, CheckCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, ShoppingCart, Star, Sparkles, Minus, Plus, CheckCircle, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
+import { Product } from '@/data/products'
+
+const variants = {
+    enter: (direction: number) => ({
+        x: direction > 0 ? 1000 : -1000,
+        opacity: 0
+    }),
+    center: {
+        zIndex: 1,
+        x: 0,
+        opacity: 1
+    },
+    exit: (direction: number) => ({
+        zIndex: 0,
+        x: direction < 0 ? 1000 : -1000,
+        opacity: 0
+    })
+}
 
 // Correctly typing params as a Promise for Next.js 15
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
     const { addToCartSilent, items, updateQuantity } = useCart()
     const [quantity, setQuantity] = useState(1)
     const [showSuccess, setShowSuccess] = useState(false)
+    const [product, setProduct] = useState<Product | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [[page, direction], setPage] = useState([0, 0])
 
     // Unwrap params using React.use() or async/await pattern if this was a server component,
     // but since we need 'use client' for state, we need to handle async params carefully.
@@ -24,30 +45,74 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         params.then((resolvedParams) => setId(resolvedParams.id))
     }, [params])
 
+    useEffect(() => {
+        const fetchProduct = async () => {
+            if (!id) return
+            try {
+                const response = await fetch(`/api/products/${id}`, { cache: 'no-store' })
+                const data = await response.json()
+                if (data.success) {
+                    setProduct(data.product)
+                } else {
+                    setProduct(null)
+                }
+            } catch (error) {
+                console.error('Error fetching product:', error)
+                setProduct(null)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchProduct()
+    }, [id])
+
+    // Auto-advance carousel
+    useEffect(() => {
+        if (!product || !product.images || product.images.length <= 1) return
+
+        const timer = setInterval(() => {
+            paginate(1)
+        }, 4000)
+
+        return () => clearInterval(timer)
+    }, [product, page])
+
+    const paginate = (newDirection: number) => {
+        if (!product?.images) return
+        const newPage = (page + newDirection + product.images.length) % product.images.length
+        setPage([newPage, newDirection])
+    }
+
     // Sync quantity with cart when cart changes
     useEffect(() => {
-        if (id) {
-            const cartItem = items.find(item => item.id === id)
+        if (id && product) {
+            const cartItem = items.find(item => item.id.toString() === id.toString())
             if (cartItem) {
                 setQuantity(cartItem.quantity)
             } else {
                 setQuantity(1)
             }
         }
-    }, [id, items])
+    }, [id, items, product])
 
-    if (!id) return null; // Loading state
-
-    const product = products.find((p) => p.id === id)
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[#FEFBF5] flex items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-saffron" />
+            </div>
+        )
+    }
 
     if (!product) {
         notFound()
     }
 
-    const cartItem = items.find(item => item.id === id)
+    const cartItem = items.find(item => item.id.toString() === id?.toString())
     const isInCart = !!cartItem
 
     const handleAddToCart = () => {
+        if (!product) return
         if (isInCart) {
             // Update quantity if already in cart
             updateQuantity(product.id, quantity)
@@ -66,6 +131,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         setQuantity(newQuantity)
     }
 
+    const imageIndex = product.images && product.images.length > 0 ? page % product.images.length : 0
+
     return (
         <div className="min-h-screen bg-[#FEFBF5] pt-32 pb-20">
             <div className="container mx-auto px-4">
@@ -77,29 +144,98 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </Link>
 
                 <div className="grid md:grid-cols-2 gap-16 lg:gap-24">
-                    {/* Image */}
-                    <div className="relative aspect-[3/4] bg-white rounded-3xl overflow-hidden shadow-2xl skew-y-1 transform transition-transform hover:skew-y-0 duration-700">
-                        <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                            priority
-                        />
-                        {product.isNew && (
-                            <div className="absolute top-6 right-6 bg-magenta text-white px-4 py-2 rounded-full font-bold uppercase tracking-widest text-xs shadow-lg animate-pulse">
-                                New Arrival
+                    {/* Image Section */}
+                    <div className="space-y-6">
+                        <div className="relative aspect-[3/4] bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-white group">
+                            <AnimatePresence initial={false} custom={direction}>
+                                <motion.div
+                                    key={page}
+                                    custom={direction}
+                                    variants={variants}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    className="absolute inset-0"
+                                >
+                                    <Image
+                                        src={product.images && product.images.length > 0 ? product.images[imageIndex] : '/placeholder-product.png'}
+                                        alt={`${product.name} image ${imageIndex + 1}`}
+                                        fill
+                                        className="object-cover"
+                                        priority
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
+
+                            {/* Navigation Arrows */}
+                            {product.images && product.images.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => paginate(-1)}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/20 backdrop-blur-md text-[#2D1B1B] hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                                    >
+                                        <ChevronLeft className="h-6 w-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => paginate(1)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/20 backdrop-blur-md text-[#2D1B1B] hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                                    >
+                                        <ChevronRight className="h-6 w-6" />
+                                    </button>
+                                </>
+                            )}
+
+                            {product.isNew && (
+                                <div className="absolute top-6 right-6 bg-magenta text-white px-4 py-2 rounded-full font-bold uppercase tracking-widest text-xs shadow-lg animate-pulse z-10">
+                                    New Arrival
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Thumbnails */}
+                        {product.images && product.images.length > 1 && (
+                            <div className="flex gap-3 md:gap-4 overflow-x-auto p-2 scrollbar-hide">
+                                {product.images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setPage([idx, idx > imageIndex ? 1 : -1])}
+                                        className={`relative w-10 h-10 md:w-10 md:h-10 rounded-xl overflow-hidden flex-shrink-0 transition-all border-2 ${imageIndex === idx ? 'border-saffron ring-2 md:ring-4 ring-saffron/20' : 'border-transparent opacity-60 hover:opacity-100'
+                                            }`}
+                                    >
+                                        <Image
+                                            src={img}
+                                            alt={`${product.name} thumbnail ${idx + 1}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
 
                     {/* Details */}
                     <div className="flex flex-col justify-center">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Sparkles className="h-5 w-5 text-saffron" />
-                            <span className="text-saffron uppercase tracking-[0.2em] text-sm font-bold block">
-                                {product.category}
-                            </span>
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            <Sparkles className="h-5 w-5 text-saffron self-center" />
+                            {product.categories && product.categories.length > 0 ? (
+                                product.categories.map((category, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="bg-orange-50 text-saffron px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-orange-100"
+                                    >
+                                        {category}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className="bg-orange-50 text-saffron px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-orange-100">
+                                    General
+                                </span>
+                            )}
                         </div>
 
                         <h1 className="text-2xl md:text-5xl font-cinzel text-[#2D1B1B] mb-4 md:mb-6 leading-tight">

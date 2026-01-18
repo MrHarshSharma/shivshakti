@@ -1,14 +1,36 @@
 
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowRight, Gift, Star, Sparkles } from 'lucide-react'
-import { products } from '@/data/products'
+import { ArrowRight, Gift, Star, Sparkles, Loader2 } from 'lucide-react'
+import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products', { cache: 'no-store' })
+        const data = await response.json()
+        if (data.success) {
+          setProducts(data.products || [])
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FEFBF5]">
       {/* Hero Section */}
@@ -93,17 +115,27 @@ export default function Home() {
           </div>
 
           <div className="max-w-3xl mx-auto space-y-6">
-            {products.slice(0, 3).map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-saffron" />
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-12 font-playfair text-[#4A3737]/70">
+                Our artisanal products are arriving soon...
+              </div>
+            ) : (
+              products.slice(0, 3).map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))
+            )}
           </div>
 
           <div className="mt-16 text-center">

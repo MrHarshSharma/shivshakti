@@ -5,20 +5,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Plus, Edit, Trash2, Search } from 'lucide-react'
+import { Product } from '@/data/products'
 
-interface Product {
-    id: number
-    name: string
-    description: string
-    price: number
-    categories: string[]
-    images: string[]
+interface AdminProduct extends Product {
     created_at: string
 }
 
 export default function AdminProductsPage() {
-    const [products, setProducts] = useState<Product[]>([])
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+    const [products, setProducts] = useState<AdminProduct[]>([])
+    const [filteredProducts, setFilteredProducts] = useState<AdminProduct[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -32,7 +27,7 @@ export default function AdminProductsPage() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('/api/products')
+            const response = await fetch('/api/products', { cache: 'no-store' })
             const data = await response.json()
 
             if (data.success) {
@@ -57,7 +52,7 @@ export default function AdminProductsPage() {
         }
     }
 
-    const deleteProduct = async (productId: number) => {
+    const deleteProduct = async (productId: string | number) => {
         if (!confirm('Are you sure you want to delete this product?')) return
 
         try {
