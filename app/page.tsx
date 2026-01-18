@@ -92,15 +92,14 @@ export default function Home() {
             <div className="w-24 h-1 bg-gradient-to-r from-saffron to-magenta mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-            {products.slice(0, 3).map((product, index, array) => (
+          <div className="max-w-3xl mx-auto space-y-6">
+            {products.slice(0, 3).map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
-                className={index === array.length - 1 && array.length % 2 !== 0 ? 'col-span-2 md:col-span-1' : ''}
               >
                 <ProductCard product={product} />
               </motion.div>

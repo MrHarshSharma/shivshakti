@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingCart, User } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
 import { useState, useEffect } from 'react'
@@ -57,8 +58,14 @@ export default function Navbar() {
         <nav className="fixed top-0 z-50 w-full border-b border-orange-100/50 bg-[#FEFBF5]/80 backdrop-blur-md transition-all shadow-sm">
             <div className="container mx-auto flex h-24 items-center justify-between px-6">
                 {/* Logo */}
-                <Link href="/" className="font-cinzel text-xl md:text-3xl font-bold tracking-widest text-[#2D1B1B] hover:text-saffron transition-colors drop-shadow-sm">
-                    SHIVSHAKTI
+                <Link href="/" className="relative h-16 md:h-20 md:w-40 transition-opacity hover:opacity-80" style={{ width: '65px', borderRadius: '100%', overflow: "hidden" }}>
+                    <Image
+                        src="/image.png"
+                        alt="Shivshakti Logo"
+                        fill
+                        className="object-contain"
+                        priority
+                    />
                 </Link>
 
                 {/* Navigation Links */}
