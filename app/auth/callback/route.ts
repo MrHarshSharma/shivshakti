@@ -9,9 +9,28 @@ export async function GET(request: Request) {
 
     if (code) {
         const supabase = await createClient()
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // Tool is on localhost; likely redundant here.
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error && data.user) {
+            const user = data.user
+            // Sync user data to 'users' table
+            try {
+                const { createServiceRoleClient } = await import('@/utils/supabase/service-role')
+                const serviceRole = createServiceRoleClient()
+                await serviceRole
+                    .from('users')
+                    .upsert({
+                        id: user.id,
+                        email: user.email,
+                        full_name: user.user_metadata.full_name,
+                        avatar_url: user.user_metadata.avatar_url,
+                        last_login: new Date().toISOString()
+                    }, { onConflict: 'id' })
+            } catch (syncError) {
+                console.error('Error syncing user data:', syncError)
+                // Don't block login if sync fails
+            }
+
+            const forwardedHost = request.headers.get('x-forwarded-host')
             const isLocalEnv = process.env.NODE_ENV === 'development'
             if (isLocalEnv) {
                 // we can be sure that there is no proxy in between

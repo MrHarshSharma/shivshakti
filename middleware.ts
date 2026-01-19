@@ -9,7 +9,9 @@ export async function middleware(request: NextRequest) {
     // Protect all /admin routes and sensitive admin APIs
     const isAdminRoute = nextUrl.pathname.startsWith('/admin')
     const isAdminApi = nextUrl.pathname.startsWith('/api/orders/list') ||
-        (nextUrl.pathname.startsWith('/api/products') && request.method !== 'GET')
+        (nextUrl.pathname.startsWith('/api/orders/') && request.method === 'PATCH') ||
+        (nextUrl.pathname.startsWith('/api/products') && request.method !== 'GET') ||
+        nextUrl.pathname.startsWith('/api/upload-images')
 
     if (isAdminRoute || isAdminApi) {
         const supabase = createServerClient(
