@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/date'
 interface Order {
     id: number
     name: string
+    email?: string
     phone: string
     address: string
     status: string
@@ -67,6 +68,7 @@ export default function AdminOrdersPage() {
         if (searchTerm) {
             filtered = filtered.filter(order =>
                 order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (order.email && order.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
                 order.phone.includes(searchTerm) ||
                 order.id.toString().includes(searchTerm)
             )
@@ -158,7 +160,7 @@ export default function AdminOrdersPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#4A3737]/40" />
                             <input
                                 type="text"
-                                placeholder="Search by name, phone, or order ID..."
+                                placeholder="Search by name, email, phone, or order ID..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
@@ -229,6 +231,7 @@ export default function AdminOrdersPage() {
                                             <td className="py-6 px-6 text-[#2D1B1B]">
                                                 <div>
                                                     <p className="font-playfair text-sm font-bold group-hover:text-magenta transition-colors">{order.name}</p>
+                                                    {order.email && <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider ">{order.email}</p>}
                                                     <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider ">{order.phone}</p>
                                                 </div>
                                             </td>

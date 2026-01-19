@@ -1,16 +1,17 @@
-
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Minus, Plus, ShoppingBag, CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
+import { useAuth } from '@/context/auth-context'
 import { useState, useEffect } from 'react'
 import { sendOrderConfirmationEmail } from '@/utils/emailjs'
 import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
 
 export default function CartDrawer() {
     const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
+    const { user, loginWithGoogle } = useAuth()
     const [isOrderPlaced, setIsOrderPlaced] = useState(false)
     const [showCustomerForm, setShowCustomerForm] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,18 +27,37 @@ export default function CartDrawer() {
     })
     const [submitError, setSubmitError] = useState('')
 
-    // Load customer data from localStorage on mount
+    // Load customer data from localStorage on mount and when user changes
     useEffect(() => {
-        const savedCustomerData = localStorage.getItem('shivshakti_customer_data')
-        if (savedCustomerData) {
-            try {
-                const parsedData = JSON.parse(savedCustomerData)
-                setCustomerData(parsedData)
-            } catch (error) {
-                console.error('Error loading customer data:', error)
+        if (user) {
+            // Priority 1: Data associated with this specific user email
+            const savedUserData = localStorage.getItem(`shivshakti_customer_${user.email}`)
+            if (savedUserData) {
+                try {
+                    const parsedData = JSON.parse(savedUserData)
+                    setCustomerData(prev => ({
+                        ...parsedData,
+                        name: user.user_metadata.full_name || parsedData.name || ''
+                    }))
+                    return
+                } catch (e) { console.error(e) }
+            }
+
+            // Priority 2: Pre-fill name from Auth if no saved data
+            setCustomerData(prev => ({
+                ...prev,
+                name: user.user_metadata.full_name || ''
+            }))
+        } else {
+            // Clear if logged out (or keep global? User said store in local storage)
+            const globalData = localStorage.getItem('shivshakti_customer_data')
+            if (globalData) {
+                try {
+                    setCustomerData(JSON.parse(globalData))
+                } catch (e) { console.error(e) }
             }
         }
-    }, [])
+    }, [user])
 
     const validateForm = () => {
         const newErrors = {
@@ -70,6 +90,10 @@ export default function CartDrawer() {
     }
 
     const handleProceedToCheckout = () => {
+        if (!user) {
+            loginWithGoogle()
+            return
+        }
         setShowCustomerForm(true)
     }
 
@@ -81,6 +105,10 @@ export default function CartDrawer() {
 
     const handleCheckout = async () => {
         if (!validateForm()) return
+        if (!user) {
+            setSubmitError('Please login to place an order')
+            return
+        }
 
         setIsSubmitting(true)
         setSubmitError('')
@@ -103,6 +131,7 @@ export default function CartDrawer() {
                     currency: 'INR',
                     customerName: customerData.name,
                     customerPhone: customerData.phone,
+                    customerEmail: user.email,
                 }),
             })
 
@@ -123,6 +152,7 @@ export default function CartDrawer() {
                 prefill: {
                     name: customerData.name,
                     contact: customerData.phone,
+                    email: user.email,
                 },
                 theme: {
                     color: '#D97706', // saffron color
@@ -158,6 +188,8 @@ export default function CartDrawer() {
                                 name: customerData.name,
                                 phone: customerData.phone,
                                 address: customerData.address,
+                                email: user.email,
+                                user_id: user.id,
                                 items: items,
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
@@ -186,10 +218,11 @@ export default function CartDrawer() {
                             }
                         }).catch(err => console.error('Email sending failed:', err))
 
-                        // Save customer data to localStorage
+                        // Save customer data to localStorage (both global and per-user)
                         localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
+                        localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
 
-                        // Dispatch custom event to notify navbar
+                        // Dispatch custom event to notify navbar (if still needed, though auth context handles mostly)
                         window.dispatchEvent(new Event('customerDataUpdated'))
 
                         // Show success message
@@ -217,7 +250,7 @@ export default function CartDrawer() {
             }
 
             // Open Razorpay checkout
-            const razorpay = new window.Razorpay(options)
+            const razorpay = new (window as any).Razorpay(options)
             razorpay.open()
 
         } catch (error) {
@@ -428,9 +461,20 @@ export default function CartDrawer() {
                                 </div>
                                 <button
                                     onClick={handleProceedToCheckout}
-                                    className="w-full py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm"
+                                    className="w-full py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm flex items-center justify-center gap-2"
                                 >
-                                    Proceed to Checkout
+                                    {!user && <svg className="h-4 w-4" viewBox="0 0 24 24">
+                                        <path
+                                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                            fill="white"
+                                        />
+                                        <path
+                                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                            fill="white"
+                                            fillOpacity="0.8"
+                                        />
+                                    </svg>}
+                                    {user ? 'Proceed to Checkout' : 'Login with Google to Order'}
                                 </button>
                             </div>
                         )}

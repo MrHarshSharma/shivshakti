@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id } = body
+        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id } = body
 
         // Validate required fields
         if (!name || !phone || !address || !items || items.length === 0) {
@@ -30,6 +30,8 @@ export async function POST(request: Request) {
             name,
             phone,
             address,
+            email,
+            user_id,
             order: {
                 items: items.map((item: any) => ({
                     id: item.id,

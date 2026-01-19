@@ -4,6 +4,7 @@ import { Inter, Playfair_Display, Cinzel } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { CartProvider } from '@/context/cart-context'
+import { AuthProvider } from '@/context/auth-context'
 import CartDrawer from '@/components/cart-drawer'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -23,13 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${cinzel.variable}`}>
       <body className="antialiased">
-        <CartProvider>
-          <Navbar />
-          <CartDrawer />
-          <main>
-            {children}
-          </main>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <CartDrawer />
+            <main>
+              {children}
+            </main>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   )

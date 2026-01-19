@@ -110,7 +110,7 @@ export default function Home() {
       <section className="py-24 bg-[#FEFBF5]">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="font-cinzel text-4xl text-[#2D1B1B] mb-4">Curated with Joy</h2>
+            <h2 className="font-cinzel text-3xl text-[#2D1B1B] mb-4">Curated with Joy</h2>
             <div className="w-24 h-1 bg-gradient-to-r from-saffron to-magenta mx-auto rounded-full" />
           </div>
 
