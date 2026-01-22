@@ -33,10 +33,7 @@ export default function Navbar() {
                         Hampers
                     </Link>
                     <Link href="/about" className="hover:text-saffron transition-colors uppercase border-b-2 border-transparent hover:border-saffron py-1">
-                        Gourmet
-                    </Link>
-                    <Link href="/journal" className="hover:text-emerald transition-colors uppercase border-b-2 border-transparent hover:border-emerald py-1">
-                        Corporate
+                        About
                     </Link>
                 </div>
 
@@ -120,7 +117,7 @@ export default function Navbar() {
                         </div>
                     ) : (
                         <button
-                            onClick={loginWithGoogle}
+                            onClick={() => loginWithGoogle()}
                             className="flex items-center gap-2 px-4 py-2 bg-white border border-orange-200 text-[#4A3737] rounded-full text-xs font-bold hover:bg-orange-50 transition-all shadow-sm hover:shadow-md uppercase tracking-wider"
                         >
                             <svg className="h-4 w-4" viewBox="0 0 24 24">

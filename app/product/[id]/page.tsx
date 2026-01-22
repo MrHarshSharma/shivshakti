@@ -143,9 +143,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <ArrowLeft className="h-4 w-4 mr-2" /> Back to Collection
                 </Link>
 
-                <div className="grid md:grid-cols-2 gap-16 lg:gap-24">
+                <div className="grid md:grid-cols-12 gap-16 lg:gap-24">
                     {/* Image Section */}
-                    <div className="space-y-6">
+                    <div className="md:col-span-5 space-y-6">
                         <div className="relative aspect-[3/4] bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-white group">
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
@@ -219,7 +219,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
 
                     {/* Details */}
-                    <div className="flex flex-col justify-center">
+                    <div className="md:col-span-7 flex flex-col justify-center">
                         <div className="flex flex-wrap gap-2 mb-6">
                             <Sparkles className="h-5 w-5 text-saffron self-center" />
                             {product.categories && product.categories.length > 0 ? (

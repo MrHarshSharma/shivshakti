@@ -6,12 +6,14 @@ import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { sendOrderConfirmationEmail } from '@/utils/emailjs'
 import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
 
 export default function CartDrawer() {
     const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
     const { user, loginWithGoogle } = useAuth()
+    const searchParams = useSearchParams()
     const [isOrderPlaced, setIsOrderPlaced] = useState(false)
     const [showCustomerForm, setShowCustomerForm] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,6 +28,17 @@ export default function CartDrawer() {
         address: ''
     })
     const [submitError, setSubmitError] = useState('')
+
+    // Auto-open cart if redirected with cart=open
+    useEffect(() => {
+        if (searchParams.get('cart') === 'open' && !isCartOpen) {
+            toggleCart()
+            // Cleanup URL
+            const url = new URL(window.location.href)
+            url.searchParams.delete('cart')
+            window.history.replaceState({}, '', url.pathname + url.search)
+        }
+    }, [searchParams, isCartOpen, toggleCart])
 
     // Load customer data from localStorage on mount and when user changes
     useEffect(() => {
@@ -91,7 +104,7 @@ export default function CartDrawer() {
 
     const handleProceedToCheckout = () => {
         if (!user) {
-            loginWithGoogle()
+            loginWithGoogle(window.location.pathname + '?cart=open')
             return
         }
         setShowCustomerForm(true)
