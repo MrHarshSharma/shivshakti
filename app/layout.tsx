@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: 'Curated collection of premium Indian artifacts and textiles.',
 }
 
+import Footer from '@/components/footer'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,16 +27,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${cinzel.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased flex flex-col min-h-screen">
         <AuthProvider>
           <CartProvider>
             <Navbar />
             <Suspense fallback={null}>
               <CartDrawer />
             </Suspense>
-            <main>
+            <main className="flex-grow">
               {children}
             </main>
+            <Footer />
           </CartProvider>
         </AuthProvider>
       </body>

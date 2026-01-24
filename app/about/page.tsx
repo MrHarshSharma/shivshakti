@@ -155,27 +155,6 @@ export default function AboutPage() {
                     </div>
                 </div>
             </section>
-
-            {/* Newsletter CTA */}
-            <section className="py-16 bg-saffron overflow-hidden relative">
-                <div className="container mx-auto px-6 text-center text-white relative z-10">
-                    <h2 className="font-cinzel text-xl md:text-3xl mb-4">Join the Shivshakti Family</h2>
-                    <p className="font-playfair text-sm md:text-base mb-8 opacity-90 px-4">Subscribe to receive updates on new arrivals and exclusive festive offers.</p>
-                    <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-4 px-6 md:px-0">
-                        <input
-                            type="email"
-                            placeholder="Your email address"
-                            className="flex-1 px-6 py-3 rounded-full text-[#2D1B1B] focus:outline-none focus:ring-2 focus:ring-white/50"
-                        />
-                        <button className="px-8 py-3 bg-white text-saffron font-bold rounded-full hover:bg-orange-50 transition-colors uppercase text-sm tracking-widest">
-                            Join
-                        </button>
-                    </div>
-                </div>
-                {/* Decorative Pattern - circles */}
-                <div className="absolute top-0 left-0 w-32 h-32 border-4 border-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 right-0 w-48 h-48 border-4 border-white/10 rounded-full translate-x-1/2 translate-y-1/2" />
-            </section>
         </div>
     )
 }
