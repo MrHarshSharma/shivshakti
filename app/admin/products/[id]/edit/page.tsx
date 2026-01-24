@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, X, Plus, Save, Loader2, ArrowLeft } from 'lucide-react'
+import { Upload, X, Plus, Save, Loader2, ArrowLeft, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
+import { useRef } from 'react'
+
+const PREDEFINED_CATEGORIES = ['Gourmet', 'Hampers', 'Dry fruits', 'Other']
 
 export default function AdminEditProductPage() {
     const params = useParams()
@@ -25,6 +28,19 @@ export default function AdminEditProductPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [showDropdown, setShowDropdown] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+
+    // Handle clicking outside of dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     useEffect(() => {
         if (productId) {
@@ -78,13 +94,15 @@ export default function AdminEditProductPage() {
         setNewImageFiles(prev => prev.filter((_, i) => i !== index))
     }
 
-    const addCategory = () => {
-        if (formData.categoryInput.trim() && !formData.categories.includes(formData.categoryInput.trim())) {
+    const addCategory = (categoryName?: string) => {
+        const nameToAdd = (categoryName || formData.categoryInput).trim()
+        if (nameToAdd && !formData.categories.includes(nameToAdd)) {
             setFormData(prev => ({
                 ...prev,
-                categories: [...prev.categories, prev.categoryInput.trim()],
-                categoryInput: ''
+                categories: [...prev.categories, nameToAdd],
+                categoryInput: categoryName ? prev.categoryInput : ''
             }))
+            if (categoryName) setShowDropdown(false)
         }
     }
 
@@ -240,22 +258,53 @@ export default function AdminEditProductPage() {
                         <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
                             Categories
                         </label>
-                        <div className="flex gap-2 mb-3">
-                            <input
-                                type="text"
-                                value={formData.categoryInput}
-                                onChange={(e) => setFormData({ ...formData, categoryInput: e.target.value })}
-                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
-                                className="flex-1 px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
-                                placeholder="Enter category and press Enter"
-                            />
-                            <button
-                                type="button"
-                                onClick={addCategory}
-                                className="px-4 py-3 bg-saffron text-white rounded-lg hover:bg-orange-600 transition-colors"
-                            >
-                                <Plus className="h-5 w-5" />
-                            </button>
+                        <div className="relative" ref={dropdownRef}>
+                            <div className="flex gap-2 mb-3">
+                                <div className="relative flex-1">
+                                    <input
+                                        type="text"
+                                        value={formData.categoryInput}
+                                        onChange={(e) => setFormData({ ...formData, categoryInput: e.target.value })}
+                                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+                                        onFocus={() => setShowDropdown(true)}
+                                        className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white pr-10"
+                                        placeholder="Type to search or select from dropdown"
+                                    />
+                                    <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-300 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                                </div>
+                            </div>
+
+                            {/* Dropdown */}
+                            {showDropdown && (
+                                <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-orange-100 rounded-xl shadow-xl overflow-hidden py-1">
+                                    {PREDEFINED_CATEGORIES.map((cat) => (
+                                        <button
+                                            key={cat}
+                                            type="button"
+                                            onClick={() => addCategory(cat)}
+                                            className="w-full text-left px-4 py-3 font-playfair text-sm hover:bg-orange-50 transition-colors flex items-center justify-between group"
+                                        >
+                                            <span className={formData.categories.includes(cat) ? 'text-saffron font-bold' : 'text-[#4A3737]'}>
+                                                {cat}
+                                            </span>
+                                            {formData.categories.includes(cat) && (
+                                                <span className="text-[10px] bg-orange-100 text-saffron px-2 py-0.5 rounded-full font-bold">Selected</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                    {PREDEFINED_CATEGORIES.length > 0 && formData.categoryInput && !PREDEFINED_CATEGORIES.some(c => c.toLowerCase() === formData.categoryInput.trim().toLowerCase()) && (
+                                        <div className="border-t border-orange-50 p-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => addCategory()}
+                                                className="w-full text-left px-2 py-2 text-xs font-bold text-saffron hover:bg-orange-50 rounded transition-colors uppercase tracking-widest"
+                                            >
+                                                Add "{formData.categoryInput}" as new
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         {formData.categories.length > 0 && (
                             <div className="flex flex-wrap gap-2">

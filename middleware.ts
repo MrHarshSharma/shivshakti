@@ -8,12 +8,13 @@ export async function middleware(request: NextRequest) {
 
     // Protect all /admin routes and sensitive admin APIs
     const isAdminRoute = nextUrl.pathname.startsWith('/admin')
+    const isUserOrderRoute = nextUrl.pathname.startsWith('/my-orders')
     const isAdminApi = nextUrl.pathname.startsWith('/api/orders/list') ||
         (nextUrl.pathname.startsWith('/api/orders/') && request.method === 'PATCH') ||
         (nextUrl.pathname.startsWith('/api/products') && request.method !== 'GET') ||
         nextUrl.pathname.startsWith('/api/upload-images')
 
-    if (isAdminRoute || isAdminApi) {
+    if (isAdminRoute || isAdminApi || isUserOrderRoute) {
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,13 +35,21 @@ export async function middleware(request: NextRequest) {
         const { data: { user } } = await supabase.auth.getUser()
         const adminEmail = process.env.ADMIN_EMAIL
 
-        if (!user || user.email !== adminEmail) {
-            // For API routes, return a JSON error
-            if (isAdminApi) {
-                return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-            }
-            // For page routes, redirect to home
+        // 1. Basic Auth Check for User Routes
+        if (!user && isUserOrderRoute) {
             return NextResponse.redirect(new URL('/', request.url))
+        }
+
+        // 2. Admin Check for Admin Routes/APIs
+        if (isAdminRoute || isAdminApi) {
+            if (!user || user.email !== adminEmail) {
+                // For API routes, return a JSON error
+                if (isAdminApi) {
+                    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+                }
+                // For page routes, redirect to home
+                return NextResponse.redirect(new URL('/', request.url))
+            }
         }
     }
 

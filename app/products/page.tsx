@@ -28,7 +28,7 @@ export default function ProductsPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [activeCategory, setActiveCategory] = useState('All')
 
-    const categories = ['All', 'Hampers', 'Gourmet', 'Chocolates', 'Wellness', 'Dry Fruits']
+    const categories = ['All', 'Hampers', 'Gourmet', 'Dry Fruits', 'Others']
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -78,8 +78,8 @@ export default function ProductsPage() {
                             key={category}
                             onClick={() => setActiveCategory(category)}
                             className={`px-6 py-2 rounded-full shadow-sm transition-all whitespace-nowrap ${activeCategory === category
-                                    ? 'bg-[#2D1B1B] text-white shadow-lg scale-105'
-                                    : 'bg-white text-[#4A3737] hover:bg-orange-100 hover:text-saffron'
+                                ? 'bg-[#2D1B1B] text-white shadow-lg scale-105'
+                                : 'bg-white text-[#4A3737] hover:bg-orange-100 hover:text-saffron'
                                 }`}
                         >
                             {category}

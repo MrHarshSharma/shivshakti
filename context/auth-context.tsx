@@ -8,6 +8,7 @@ type AuthContextType = {
     user: User | null
     session: Session | null
     loading: boolean
+    isAdmin: boolean
     loginWithGoogle: (nextPath?: string) => Promise<void>
     logout: () => Promise<void>
 }
@@ -61,8 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) console.error('Error logging out:', error.message)
     }
 
+    const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+
     return (
-        <AuthContext.Provider value={{ user, session, loading, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, session, loading, isAdmin, loginWithGoogle, logout }}>
             {children}
         </AuthContext.Provider>
     )

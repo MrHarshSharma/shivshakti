@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Navbar() {
     const { toggleCart, cartCount } = useCart()
-    const { user, loginWithGoogle, logout } = useAuth()
+    const { user, loginWithGoogle, logout, isAdmin } = useAuth()
     const [showProfilePopup, setShowProfilePopup] = useState(false)
 
     return (
@@ -30,11 +30,21 @@ export default function Navbar() {
                 {/* Navigation Links */}
                 <div className="hidden md:flex items-center gap-12 text-sm font-bold tracking-[0.15em] text-[#4A3737]">
                     <Link href="/products" className="hover:text-magenta transition-colors uppercase border-b-2 border-transparent hover:border-magenta py-1">
-                        Hampers
+                        Products
                     </Link>
                     <Link href="/about" className="hover:text-saffron transition-colors uppercase border-b-2 border-transparent hover:border-saffron py-1">
                         About
                     </Link>
+                    {isAdmin && (
+                        <Link href="/admin" className="hover:text-saffron transition-colors uppercase border-b-2 border-transparent hover:border-saffron py-1">
+                            Dashboard
+                        </Link>
+                    )}
+                    {user && !isAdmin && (
+                        <Link href="/my-orders" className="hover:text-magenta transition-colors uppercase border-b-2 border-transparent hover:border-magenta py-1">
+                            My Orders
+                        </Link>
+                    )}
                 </div>
 
                 {/* Icons */}
@@ -160,6 +170,6 @@ export default function Navbar() {
                     </button>
                 </div>
             </div>
-        </nav>
+        </nav >
     )
 }
