@@ -12,7 +12,7 @@ export default function AboutPage() {
             <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden pt-16 md:pt-24">
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="https://images.unsplash.com/photo-1590073844006-3a44a72d67a7?q=80&w=2070&auto=format&fit=crop"
+                        src="/image.png"
                         alt="About Shivshakti"
                         fill
                         className="object-cover opacity-20"
@@ -48,7 +48,7 @@ export default function AboutPage() {
                             className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 md:border-8 border-white"
                         >
                             <Image
-                                src="https://images.unsplash.com/photo-1511993226955-cefe82ca9f8b?q=80&w=2070&auto=format&fit=crop"
+                                src="/logo.png"
                                 alt="Our Craftsmen"
                                 fill
                                 className="object-cover"
