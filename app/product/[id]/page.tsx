@@ -155,11 +155,22 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                     initial="enter"
                                     animate="center"
                                     exit="exit"
+                                    drag="x"
+                                    dragConstraints={{ left: 0, right: 0 }}
+                                    dragElastic={1}
+                                    onDragEnd={(e, { offset, velocity }) => {
+                                        const swipe = Math.abs(offset.x) * velocity.x
+                                        if (swipe < -10000) {
+                                            paginate(1)
+                                        } else if (swipe > 10000) {
+                                            paginate(-1)
+                                        }
+                                    }}
                                     transition={{
                                         x: { type: "spring", stiffness: 300, damping: 30 },
                                         opacity: { duration: 0.2 }
                                     }}
-                                    className="absolute inset-0"
+                                    className="absolute inset-0 cursor-grab active:cursor-grabbing"
                                 >
                                     <Image
                                         src={product.images && product.images.length > 0 ? product.images[imageIndex] : '/placeholder-product.png'}
