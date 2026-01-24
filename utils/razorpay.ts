@@ -15,6 +15,16 @@ export interface RazorpayOptions {
     theme?: {
         color?: string
     }
+    config?: {
+        display?: {
+            hide?: Array<{
+                method: string
+            }>
+            preferences?: {
+                show_default_blocks?: boolean
+            }
+        }
+    }
     handler: (response: RazorpayResponse) => void
     modal?: {
         ondismiss?: () => void
