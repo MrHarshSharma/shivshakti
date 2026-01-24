@@ -2,10 +2,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ChevronDown } from 'lucide-react'
 
 const container = {
     hidden: { opacity: 0 },
@@ -27,6 +27,7 @@ export default function ProductsPage() {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [activeCategory, setActiveCategory] = useState('All')
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     const categories = ['All', 'Hampers', 'Gourmet', 'Dry Fruits', 'Others']
 
@@ -71,20 +72,56 @@ export default function ProductsPage() {
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="flex justify-center gap-4 mb-16 text-sm font-bold tracking-wider uppercase overflow-x-auto py-4 px-4 scrollbar-hide">
-                    {categories.map((category) => (
+                {/* Professional Category Dropdown */}
+                <div className="flex justify-center mb-16 relative z-30">
+                    <div className="relative w-full max-w-xs">
                         <button
-                            key={category}
-                            onClick={() => setActiveCategory(category)}
-                            className={`px-6 py-2 rounded-full shadow-sm transition-all whitespace-nowrap ${activeCategory === category
-                                ? 'bg-[#2D1B1B] text-white shadow-lg scale-105'
-                                : 'bg-white text-[#4A3737] hover:bg-orange-100 hover:text-saffron'
-                                }`}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="w-full flex items-center justify-between px-6 py-3 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
                         >
-                            {category}
+                            <span className="text-sm font-black uppercase tracking-[0.2em] text-[#4A3737]">
+                                {activeCategory}
+                            </span>
+                            <ChevronDown className={`h-4 w-4 text-saffron transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
-                    ))}
+
+                        <AnimatePresence>
+                            {isDropdownOpen && (
+                                <>
+                                    {/* Backdrop for closing */}
+                                    <div
+                                        className="fixed inset-0 z-10"
+                                        onClick={() => setIsDropdownOpen(false)}
+                                    />
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        className="absolute top-full left-0 w-full mt-2 bg-white/90 backdrop-blur-xl border border-orange-100 rounded-2xl shadow-xl overflow-hidden z-20"
+                                    >
+                                        <div className="py-2">
+                                            {categories.map((category) => (
+                                                <button
+                                                    key={category}
+                                                    onClick={() => {
+                                                        setActiveCategory(category)
+                                                        setIsDropdownOpen(false)
+                                                    }}
+                                                    className={`w-full text-left px-6 py-3 text-xs font-black uppercase tracking-widest transition-colors ${activeCategory === category
+                                                        ? 'bg-orange-50 text-saffron'
+                                                        : 'text-[#4A3737] hover:bg-orange-50/50 hover:text-saffron'
+                                                        }`}
+                                                >
+                                                    {category}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Product List */}

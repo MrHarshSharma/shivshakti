@@ -47,96 +47,135 @@ export default function MyOrdersPage() {
         }
     }
 
-    const getStatusIcon = (status: string) => {
+    const getStatusTheme = (status: string) => {
         switch (status) {
-            case 'completed': return <CheckCircle className="h-5 w-5 text-emerald-500" />
-            case 'cancelled': return <XCircle className="h-5 w-5 text-red-500" />
-            default: return <Clock className="h-5 w-5 text-yellow-500" />
-        }
-    }
-
-    const getStatusLabel = (status: string) => {
-        switch (status) {
-            case 'completed': return 'Delivered'
-            case 'cancelled': return 'Cancelled'
-            default: return 'In Transit / Pending'
+            case 'completed': return {
+                bg: 'bg-emerald-500',
+                text: 'text-white',
+                label: 'Delivered',
+                lightBg: 'bg-emerald-50',
+                icon: <CheckCircle className="h-3 w-3" />
+            }
+            case 'cancelled': return {
+                bg: 'bg-red-500',
+                text: 'text-white',
+                label: 'Cancelled',
+                lightBg: 'bg-red-50',
+                icon: <XCircle className="h-3 w-3" />
+            }
+            default: return {
+                bg: 'bg-amber-500',
+                text: 'text-white',
+                label: 'In Transit',
+                lightBg: 'bg-amber-50',
+                icon: <Clock className="h-3 w-3" />
+            }
         }
     }
 
     return (
-        <div className="min-h-screen bg-[#FEFBF5] pt-32 pb-16">
-            <div className="container mx-auto px-4 max-w-5xl">
-                {/* Header */}
-                <div className="mb-12">
-                    <Link href="/" className="inline-flex items-center gap-2 text-saffron hover:text-orange-600 text-sm font-bold uppercase tracking-wider mb-4 transition-colors">
-                        <ArrowLeft className="h-4 w-4" /> Back to Home
+        <div className="min-h-screen bg-[#FEFBF5] pt-32 pb-24 relative overflow-hidden">
+            {/* Soft Ambient Background */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-orange-50/30 to-transparent pointer-events-none" />
+
+            <div className="container mx-auto px-4 relative z-10 max-w-4xl">
+                {/* Specific Back Button Design */}
+                <div className="mb-6">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-3 text-[#4A3737]/60 hover:text-saffron transition-all duration-300 group"
+                    >
+                        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                        <span className="text-sm font-bold uppercase tracking-[0.2em]">Back to Collection</span>
                     </Link>
-                    <h1 className="font-cinzel text-5xl text-[#2D1B1B] mb-2 font-bold tracking-tight">
+                </div>
+
+                {/* Professional Centered Header */}
+                <div className="mb-20 text-center relative">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-block mb-4"
+                    >
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-saffron opacity-60">Personal Archive</span>
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-4xl md:text-5xl lg:text-7xl font-cinzel text-[#2D1B1B] mb-6 font-bold"
+                    >
                         My <span className="text-saffron">Orders</span>
-                    </h1>
-                    <p className="text-[#4A3737]/70 font-playfair text-lg">Your history of luxury and heritage.</p>
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-[#4A3737]/60 font-playfair text-lg md:text-xl max-w-xl mx-auto italic"
+                    >
+                        Explore your curated history of heritage artifacts and luxury treasures.
+                    </motion.p>
                 </div>
 
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-20">
-                        <div className="h-12 w-12 animate-spin rounded-full border-4 border-saffron border-t-transparent" />
-                        <p className="mt-4 font-playfair text-[#4A3737]/60 italic">Gathering your treasures...</p>
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="w-10 h-10 border-t-2 border-saffron rounded-full"
+                        />
                     </div>
                 ) : orders.length === 0 ? (
-                    <div className="text-center py-20 bg-white/40 backdrop-blur-md rounded-[2.5rem] border border-orange-100 shadow-xl">
-                        <ShoppingBag className="h-20 w-20 text-[#4A3737]/10 mx-auto mb-6" />
-                        <h2 className="font-cinzel text-2xl text-[#2D1B1B] mb-4">No Orders Yet</h2>
-                        <p className="text-[#4A3737]/60 font-playfair mb-8">You haven't placed any orders with us yet.</p>
-                        <Link href="/products" className="inline-flex px-8 py-4 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest rounded-full hover:bg-black transition-all shadow-lg hover:shadow-gray-200">
-                            Start Shopping
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="bg-white rounded-3xl p-10 text-center shadow-sm border border-orange-100/30"
+                    >
+                        <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <ShoppingBag className="h-8 w-8 text-saffron/20" />
+                        </div>
+                        <h2 className="font-cinzel text-xl text-[#2D1B1B] font-black mb-1">No Orders</h2>
+                        <p className="font-playfair text-[#4A3737]/40 italic mb-8 text-sm text-balance px-4">Your heritage collection awaits its first entry.</p>
+                        <Link href="/products" className="inline-block px-8 py-3 bg-[#2D1B1B] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg hover:bg-saffron transition-all duration-300">
+                            Shop Now
                         </Link>
-                    </div>
+                    </motion.div>
                 ) : (
-                    <div className="space-y-8">
-                        {orders.map((order, idx) => (
-                            <motion.div
-                                key={order.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-[0_12px_40px_rgba(0,0,0,0.03)] overflow-hidden hover:shadow-2xl transition-all duration-500 group"
-                            >
-                                {/* Order Header */}
-                                <div className="p-8 border-b border-orange-50 bg-white/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-orange-50">
-                                            <Package className="h-6 w-6 text-saffron" />
+                    <div className="space-y-6">
+                        {orders.map((order, idx) => {
+                            const theme = getStatusTheme(order.status)
+                            return (
+                                <motion.div
+                                    key={order.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className="bg-white rounded-3xl shadow-[0_10px_30px_-5px_rgba(45,27,27,0.06)] border border-orange-50/50 overflow-hidden"
+                                >
+                                    {/* Compact Header */}
+                                    <div className="px-6 py-4 flex items-center justify-between border-b border-orange-50/30">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center border border-orange-100/50">
+                                                <Package className="h-4 w-4 text-saffron" />
+                                            </div>
+                                            <div>
+                                                <h2 className="font-cinzel text-lg text-[#2D1B1B] font-black leading-none">#{order.id}</h2>
+                                                <p className="text-[10px] font-black text-[#4A3737]/30 uppercase tracking-widest">{formatDate(order.created_at)}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-playfair text-[10px] text-[#4A3737]/50 uppercase tracking-[0.2em] mb-0.5">Order ID</p>
-                                            <h2 className="font-cinzel text-xl text-[#2D1B1B] font-bold">#{order.id}</h2>
+                                        <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm`}>
+                                            {theme.icon}
+                                            {theme.label}
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-wrap items-center gap-6">
-                                        <div>
-                                            <p className="font-playfair text-[10px] text-[#4A3737]/50 uppercase tracking-[0.2em] mb-0.5 text-right">Date</p>
-                                            <p className="font-playfair text-sm text-[#4A3737] font-medium">{formatDate(order.created_at)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-playfair text-[10px] text-[#4A3737]/50 uppercase tracking-[0.2em] mb-0.5 text-right">Total Amount</p>
-                                            <p className="font-cinzel text-lg text-[#2D1B1B] font-bold">₹{order.order.total}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-orange-100 shadow-sm">
-                                            {getStatusIcon(order.status)}
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#2D1B1B]">
-                                                {getStatusLabel(order.status)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Order Items */}
-                                <div className="p-8">
-                                    <div className="space-y-6">
+                                    {/* Concise Items List */}
+                                    <div className="p-6 space-y-4">
                                         {order.order.items.map((item, i) => (
-                                            <div key={i} className="flex items-center gap-6">
-                                                <div className="relative h-20 w-20 rounded-xl overflow-hidden border border-orange-100 flex-shrink-0">
+                                            <div key={i} className="flex items-center gap-4 group">
+                                                <div className="relative h-14 w-14 rounded-xl overflow-hidden border border-orange-50 flex-shrink-0 bg-orange-50/20">
                                                     <Image
                                                         src={item.image || '/placeholder-product.png'}
                                                         alt={item.name}
@@ -144,30 +183,23 @@ export default function MyOrdersPage() {
                                                         className="object-cover"
                                                     />
                                                 </div>
-                                                <div className="flex-grow">
-                                                    <h3 className="font-playfair text-lg text-[#2D1B1B] font-bold leading-tight mb-1">{item.name}</h3>
-                                                    <p className="text-sm text-[#4A3737]/60 font-playfair italic">Quantity: {item.quantity}</p>
+                                                <div className="flex-grow min-w-0">
+                                                    <h3 className="font-playfair text-base text-[#2D1B1B] font-black truncate leading-tight mb-1">{item.name}</h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-black text-[#4A3737]/40 uppercase tracking-widest">Qty: {item.quantity}</span>
+                                                        <span className="text-[9px] font-black text-[#4A3737]/20 uppercase">•</span>
+                                                        <span className="text-[9px] font-black text-[#4A3737]/40 uppercase tracking-widest">₹{item.price}</span>
+                                                    </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-cinzel font-bold text-[#2D1B1B]">₹{item.price * item.quantity}</p>
-                                                    <p className="text-[10px] text-[#4A3737]/40 font-playfair">₹{item.price} each</p>
+                                                    <p className="font-cinzel font-black text-[#2D1B1B] text-sm">₹{item.price * item.quantity}</p>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-
-                                {/* Order Footer (Summary) */}
-                                <div className="px-8 py-6 bg-orange-50/30 flex justify-between items-center group-hover:bg-orange-50/50 transition-colors">
-                                    <span className="font-playfair text-[#4A3737]/60 italic text-sm">
-                                        {order.order.itemCount} {order.order.itemCount === 1 ? 'item' : 'items'} in this order
-                                    </span>
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-saffron">
-                                        Payment: {order.payment_status}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            )
+                        })}
                     </div>
                 )}
             </div>
