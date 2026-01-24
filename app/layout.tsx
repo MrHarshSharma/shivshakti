@@ -11,6 +11,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
 const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel' })
 
+import { Suspense } from 'react'
+
 export const metadata: Metadata = {
   title: 'Shivshakti | Heritage & Luxury',
   description: 'Curated collection of premium Indian artifacts and textiles.',
@@ -27,7 +29,9 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <Navbar />
-            <CartDrawer />
+            <Suspense fallback={null}>
+              <CartDrawer />
+            </Suspense>
             <main>
               {children}
             </main>
