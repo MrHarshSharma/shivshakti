@@ -87,7 +87,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            className="relative py-4"
           >
             <div className="relative aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700 border-8 border-white">
               <Image
@@ -98,9 +98,9 @@ export default function Home() {
               />
             </div>
             {/* Floating Elements */}
-            <div className="absolute -bottom-10 -left-10 bg-white p-6 rounded-2xl shadow-xl animate-bounce duration-3000">
-              <p className="font-cinzel text-3xl font-bold text-magenta">100%</p>
-              <p className="text-xs font-bold uppercase tracking-wider text-[#4A3737]">Artisan Made</p>
+            <div className="absolute bottom-6 right-6 md:bottom-6 md:left-6 md:right-auto bg-white p-4 md:p-6 rounded-2xl shadow-xl animate-bounce duration-3000">
+              <p className="font-cinzel text-2xl md:text-3xl font-bold text-magenta">100%</p>
+              <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#4A3737]">Artisan Made</p>
             </div>
           </motion.div>
         </div>

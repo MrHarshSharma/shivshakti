@@ -32,61 +32,65 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Quick Access */}
-                    <div className="space-y-8">
-                        <h3 className="font-cinzel text-[10px] font-black uppercase tracking-[0.4em] text-saffron opacity-80">Collection</h3>
-                        <div className="flex flex-col gap-4 font-cinzel text-[10px] md:text-xs font-bold tracking-widest text-[#2D1B1B]">
-                            <Link href="/products" className="hover:text-magenta transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
-                                Shop All
-                            </Link>
-                            <Link href="/about" className="hover:text-saffron transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
-                                Our Story
-                            </Link>
-                            <Link href="/contact" className="hover:text-magenta transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
-                                Contact Us
-                            </Link>
+                    {/* Mobile 2-Column Wrapper for Collection & Legal */}
+                    <div className="grid grid-cols-2 gap-8 lg:contents col-span-1 md:col-span-1">
+                        {/* Quick Access */}
+                        <div className="space-y-8 text-left">
+                            <h3 className="font-cinzel text-xs font-black uppercase tracking-[0.4em] text-saffron opacity-80">Collection</h3>
+                            <div className="flex flex-col gap-4 font-cinzel text-xs font-bold tracking-widest text-[#2D1B1B]">
+                                <Link href="/products" className="hover:text-magenta transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
+                                    Shop All
+                                </Link>
+                                <Link href="/about" className="hover:text-saffron transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
+                                    Our Story
+                                </Link>
+                                <Link href="/contact" className="hover:text-magenta transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
+                                    Contact Us
+                                </Link>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Legal Policies */}
-                    <div className="space-y-8">
-                        <h3 className="font-cinzel text-[10px] font-black uppercase tracking-[0.4em] text-saffron opacity-80">Legal</h3>
-                        <div className="flex flex-col gap-4 font-cinzel text-[10px] md:text-xs font-bold tracking-widest text-[#2D1B1B]">
-                            <Link href="/shipping-policy" className="hover:text-magenta transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
-                                Shipping Policy
-                            </Link>
-                            <Link href="/terms-and-conditions" className="hover:text-saffron transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
-                                Terms of Service
-                            </Link>
-                            <Link href="/refund-policy" className="hover:text-magenta transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
-                                Refund Policy
-                            </Link>
-                            <Link href="/privacy-policy" className="hover:text-saffron transition-all flex items-center justify-center md:justify-start gap-2 group">
-                                <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
-                                Privacy Policy
-                            </Link>
+                        {/* Legal Policies */}
+                        <div className="space-y-8 text-left">
+                            <h3 className="font-cinzel text-xs font-black uppercase tracking-[0.4em] text-saffron opacity-80">Legal</h3>
+                            <div className="flex flex-col gap-4 font-cinzel text-xs font-bold tracking-widest text-[#2D1B1B]">
+                                <Link href="/shipping-policy" className="hover:text-magenta transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
+                                    Shipping Policy
+                                </Link>
+                                <Link href="/terms-and-conditions" className="hover:text-saffron transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
+                                    Terms
+                                </Link>
+                                <Link href="/refund-policy" className="hover:text-magenta transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-magenta group-hover:w-3 transition-all"></span>
+                                    Refunds
+                                </Link>
+                                <Link href="/privacy-policy" className="hover:text-saffron transition-all flex items-center justify-start gap-2 group">
+                                    <span className="h-[1px] w-0 bg-saffron group-hover:w-3 transition-all"></span>
+                                    Privacy
+                                </Link>
+                            </div>
                         </div>
                     </div>
 
                     {/* Studio/Map Section */}
                     <div className="space-y-6">
-                        <h3 className="font-cinzel text-[10px] font-black uppercase tracking-[0.4em] text-saffron opacity-80">Our Studio</h3>
+                        <h3 className="font-cinzel text-xs font-black uppercase tracking-[0.4em] text-saffron opacity-80">Our Studio</h3>
                         <div className="rounded-2xl overflow-hidden border border-orange-100 shadow-sm h-40 w-full bg-white relative group mb-4">
                             <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119064.90034383052!2d78.98993707584931!3d21.161225912616445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c0a5a31faf13%3A0x19b37d06d0bb3e2b!2sNagpur%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1769253188579!5m2!1sen!2sin"
+
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.5769458656105!2d79.1019096!3d21.169227900000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c0c011f8b8d1%3A0xc5f4de1dcf957658!2sShiv%20Shakti%20Provision!5e0!3m2!1sen!2sin!4v1769357816766!5m2!1sen!2sin"
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
                                 allowFullScreen
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
-                                className="transition-all duration-700 opacity-60 group-hover:opacity-100"
+                                className="transition-all duration-700 opacity-100"
                             ></iframe>
                             <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[8px] font-black uppercase tracking-tighter text-[#2D1B1B] border border-orange-100">
                                 Jaipur, Rajasthan
@@ -94,10 +98,10 @@ export default function Footer() {
                         </div>
                         <div className="space-y-2 text-center md:text-left">
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <Mail className="h-3 w-3 text-magenta" /> info@shivshakti.in
+                                <Mail className="h-3 w-3 text-magenta text-sm" /> info@shivshakti.in
                             </p>
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <Phone className="h-3 w-3 text-saffron" /> +91 99999 99999
+                                <Phone className="h-3 w-3 text-saffron text-sm" /> +91 99999 99999
                             </p>
                         </div>
                     </div>
