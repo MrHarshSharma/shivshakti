@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Minus, Plus, ShoppingBag, CheckCircle } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, CheckCircle, Ticket, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
@@ -28,6 +28,14 @@ export default function CartDrawer() {
         address: ''
     })
     const [submitError, setSubmitError] = useState('')
+
+    // Coupon logic
+    const [couponCode, setCouponCode] = useState('')
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false)
+    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; off_percent: string; discountAmount: number } | null>(null)
+    const [couponError, setCouponError] = useState('')
+
+    const finalTotal = cartTotal - (appliedCoupon?.discountAmount || 0)
 
     // Auto-open cart if redirected with cart=open
     useEffect(() => {
@@ -116,6 +124,39 @@ export default function CartDrawer() {
         setSubmitError('')
     }
 
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return
+        setIsApplyingCoupon(true)
+        setCouponError('')
+        setAppliedCoupon(null)
+
+        try {
+            const response = await fetch('/api/coupons/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: couponCode, cartTotal })
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                setAppliedCoupon(data.coupon)
+                setCouponCode('') // Clear input after successful apply
+            } else {
+                setCouponError(data.error || 'Failed to apply coupon')
+            }
+        } catch (err) {
+            console.error('Error applying coupon:', err)
+            setCouponError('Something went wrong. Please try again.')
+        } finally {
+            setIsApplyingCoupon(false)
+        }
+    }
+
+    const removeCoupon = () => {
+        setAppliedCoupon(null)
+        setCouponError('')
+    }
+
     const handleCheckout = async () => {
         if (!validateForm()) return
         if (!user) {
@@ -140,7 +181,7 @@ export default function CartDrawer() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    amount: cartTotal,
+                    amount: finalTotal,
                     currency: 'INR',
                     customerName: customerData.name,
                     customerPhone: customerData.phone,
@@ -204,6 +245,9 @@ export default function CartDrawer() {
                                 email: user.email,
                                 user_id: user.id,
                                 items: items,
+                                discount: appliedCoupon?.discountAmount || 0,
+                                coupon_code: appliedCoupon?.code || null,
+                                total: finalTotal,
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                             }),
@@ -225,7 +269,9 @@ export default function CartDrawer() {
                                 units: item.quantity
                             })),
                             cost: {
-                                total: cartTotal,
+                                total: finalTotal,
+                                subtotal: cartTotal,
+                                discount: appliedCoupon?.discountAmount || 0,
                                 shipping: 0,
                                 tax: 0
                             }
@@ -467,10 +513,66 @@ export default function CartDrawer() {
 
                         {/* Footer */}
                         {!isOrderPlaced && !showCustomerForm && items.length > 0 && (
-                            <div className="p-6 border-t border-orange-100 bg-white">
-                                <div className="flex justify-between items-center mb-6">
-                                    <span className="font-playfair text-lg text-[#4A3737]">Subtotal</span>
-                                    <span className="font-cinzel text-2xl font-bold text-[#2D1B1B]">₹{cartTotal}</span>
+                            <div className="p-6 border-t border-orange-100 bg-white space-y-4">
+                                {/* Coupon Section */}
+                                {!appliedCoupon ? (
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <div className="relative flex-1">
+                                                <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3737]/40" />
+                                                <input
+                                                    type="text"
+                                                    value={couponCode}
+                                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                                    placeholder="COUPON CODE"
+                                                    className="w-full pl-10 pr-4 py-2 bg-orange-50/50 border border-orange-100 rounded-lg text-xs font-bold focus:outline-none focus:ring-1 focus:ring-saffron/30 transition-all placeholder:font-normal placeholder:opacity-50"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleApplyCoupon}
+                                                disabled={isApplyingCoupon || !couponCode.trim()}
+                                                className="px-4 py-2 bg-[#2D1B1B] text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-saffron transition-all disabled:opacity-50"
+                                            >
+                                                {isApplyingCoupon ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Apply'}
+                                            </button>
+                                        </div>
+                                        {couponError && (
+                                            <p className="text-red-500 text-[10px] font-bold px-1">{couponError}</p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-lg">
+                                        <div className="flex items-center gap-2">
+                                            <Ticket className="h-4 w-4 text-green-600" />
+                                            <div>
+                                                <p className="text-[10px] font-black text-green-700 uppercase">{appliedCoupon.code} APPLIED</p>
+                                                <p className="text-[10px] text-green-600 font-playfair">{appliedCoupon.off_percent}% OFF SAVED ₹{appliedCoupon.discountAmount}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={removeCoupon}
+                                            className="text-[10px] font-black text-red-400 hover:text-red-600 uppercase"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="pt-2 space-y-2">
+                                    <div className="flex justify-between items-center text-sm font-playfair text-[#4A3737]">
+                                        <span>Subtotal</span>
+                                        <span>₹{cartTotal}</span>
+                                    </div>
+                                    {appliedCoupon && (
+                                        <div className="flex justify-between items-center text-sm font-playfair text-green-600">
+                                            <span>Coupon Saving</span>
+                                            <span>-₹{appliedCoupon.discountAmount}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center pt-2 border-t border-orange-100">
+                                        <span className="font-playfair text-lg font-bold text-[#2D1B1B]">Total</span>
+                                        <span className="font-cinzel text-2xl font-bold text-[#2D1B1B]">₹{finalTotal}</span>
+                                    </div>
                                 </div>
                                 <button
                                     onClick={handleProceedToCheckout}

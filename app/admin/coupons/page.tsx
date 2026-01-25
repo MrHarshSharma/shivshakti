@@ -25,6 +25,7 @@ interface Coupon {
     valid_from: string
     valid_till: string
     off_percent: string
+    min_cost: string
     created_at: string
 }
 
@@ -41,12 +42,13 @@ export default function CouponManagement() {
         code: '',
         valid_from: '',
         valid_till: '',
-        off_percent: ''
+        off_percent: '',
+        min_cost: ''
     })
 
     const cancelEdit = () => {
         setEditingId(null)
-        setNewCoupon({ code: '', valid_from: '', valid_till: '', off_percent: '' })
+        setNewCoupon({ code: '', valid_from: '', valid_till: '', off_percent: '', min_cost: '' })
         setError(null)
         setSuccess(null)
     }
@@ -112,7 +114,8 @@ export default function CouponManagement() {
             code: coupon.code,
             valid_from: coupon.valid_from,
             valid_till: coupon.valid_till,
-            off_percent: coupon.off_percent
+            off_percent: coupon.off_percent,
+            min_cost: coupon.min_cost || ''
         })
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -205,16 +208,28 @@ export default function CouponManagement() {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Discount %</label>
-                                <input
-                                    required
-                                    type="text"
-                                    value={newCoupon.off_percent}
-                                    onChange={(e) => setNewCoupon({ ...newCoupon, off_percent: e.target.value })}
-                                    placeholder="e.g. 20"
-                                    className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all font-bold placeholder:font-normal placeholder:opacity-30"
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Discount %</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        value={newCoupon.off_percent}
+                                        onChange={(e) => setNewCoupon({ ...newCoupon, off_percent: e.target.value })}
+                                        placeholder="e.g. 20"
+                                        className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all font-bold placeholder:font-normal placeholder:opacity-30"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Min Spend (₹)</label>
+                                    <input
+                                        type="text"
+                                        value={newCoupon.min_cost}
+                                        onChange={(e) => setNewCoupon({ ...newCoupon, min_cost: e.target.value })}
+                                        placeholder="e.g. 500"
+                                        className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all font-bold placeholder:font-normal placeholder:opacity-30"
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 gap-4">
@@ -320,6 +335,7 @@ export default function CouponManagement() {
                                                 <tr className="text-[#4A3737]/40 border-b border-orange-50/50">
                                                     <th className="text-left font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4">Code</th>
                                                     <th className="text-left font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4 px-4">Off %</th>
+                                                    <th className="text-left font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4 px-4">Min Spend</th>
                                                     <th className="text-left font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4 px-4">Validity</th>
                                                     <th className="text-left font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4 px-4">Status</th>
                                                     <th className="text-right font-playfair text-[10px] font-bold uppercase tracking-[0.2em] pb-4">Actions</th>
@@ -345,6 +361,9 @@ export default function CouponManagement() {
                                                             </td>
                                                             <td className="py-4 px-4">
                                                                 <span className="font-bold text-magenta">{coupon.off_percent}% OFF</span>
+                                                            </td>
+                                                            <td className="py-4 px-4">
+                                                                <span className="text-[#4A3737]/60 font-playfair">₹{coupon.min_cost || '0'}</span>
                                                             </td>
                                                             <td className="py-4 px-4">
                                                                 <div className="space-y-0.5">

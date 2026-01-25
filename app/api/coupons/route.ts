@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = createServiceRoleClient()
         const body = await request.json()
-        const { code, valid_from, valid_till, off_percent } = body
+        const { code, valid_from, valid_till, off_percent, min_cost } = body
 
         if (!code || !valid_from || !valid_till || !off_percent) {
             return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 })
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
         const { data, error } = await supabase
             .from('coupons')
-            .insert([{ code, valid_from, valid_till, off_percent }])
+            .insert([{ code, valid_from, valid_till, off_percent, min_cost }])
             .select()
 
         if (error) {
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest) {
     try {
         const supabase = createServiceRoleClient()
         const body = await request.json()
-        const { id, code, valid_from, valid_till, off_percent } = body
+        const { id, code, valid_from, valid_till, off_percent, min_cost } = body
 
         if (!id) {
             return NextResponse.json({ success: false, error: 'Missing coupon ID' }, { status: 400 })
@@ -70,7 +70,7 @@ export async function PATCH(request: NextRequest) {
 
         const { data, error } = await supabase
             .from('coupons')
-            .update({ code, valid_from, valid_till, off_percent })
+            .update({ code, valid_from, valid_till, off_percent, min_cost })
             .eq('id', id)
             .select()
 

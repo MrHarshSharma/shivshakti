@@ -10,6 +10,8 @@ interface OrderEmailData {
     }>
     cost: {
         total: number
+        subtotal?: number
+        discount?: number
         shipping?: number
         tax?: number
     }
@@ -31,6 +33,8 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
             order_id: data.order_id,
             orders: data.orders,
             'cost.total': data.cost.total,
+            'cost.subtotal': data.cost.subtotal || data.cost.total,
+            'cost.discount': data.cost.discount || 0,
             'cost.shipping': data.cost.shipping || 0,
             'cost.tax': data.cost.tax || 0,
         }
