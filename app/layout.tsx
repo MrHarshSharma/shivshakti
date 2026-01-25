@@ -16,6 +16,10 @@ import { Suspense } from 'react'
 export const metadata: Metadata = {
   title: 'Shivshakti | Heritage & Luxury',
   description: 'Curated collection of premium Indian artifacts and textiles.',
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  }
 }
 
 import Footer from '@/components/footer'

@@ -91,8 +91,8 @@ export default function Home() {
           >
             <div className="relative aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700 border-8 border-white">
               <Image
-                src="https://images.unsplash.com/photo-1657159811712-e07d0a538c6f?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0"
-                alt="Festive Gifting"
+                src="/hero-hamper.png"
+                alt="Festive Gourmet Gift Hamper"
                 fill
                 className="object-cover"
               />
