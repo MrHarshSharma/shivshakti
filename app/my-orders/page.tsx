@@ -52,7 +52,7 @@ export default function MyOrdersPage() {
             case 'completed': return {
                 bg: 'bg-emerald-500',
                 text: 'text-white',
-                label: 'Delivered',
+                label: 'completed',
                 lightBg: 'bg-emerald-50',
                 icon: <CheckCircle className="h-3 w-3" />
             }
@@ -66,7 +66,7 @@ export default function MyOrdersPage() {
             default: return {
                 bg: 'bg-amber-500',
                 text: 'text-white',
-                label: 'In Transit',
+                label: 'Order Placed',
                 lightBg: 'bg-amber-50',
                 icon: <Clock className="h-3 w-3" />
             }

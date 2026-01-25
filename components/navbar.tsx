@@ -22,7 +22,7 @@ export default function Navbar() {
     }, [pathname])
 
     const navLinks = [
-        { name: 'Products', href: '/products', activeColor: 'text-magenta', hoverColor: 'hover:text-magenta' },
+        { name: 'Products', href: '/products', activeColor: 'text-saffron', hoverColor: 'hover:text-saffron' },
         { name: 'About', href: '/about', activeColor: 'text-saffron', hoverColor: 'hover:text-saffron' },
     ]
 
@@ -58,7 +58,7 @@ export default function Navbar() {
                             </Link>
                         )}
                         {user && !isAdmin && (
-                            <Link href="/my-orders" className={`transition-all duration-300 uppercase border-b-2 py-1 font-black ${pathname === '/my-orders' ? 'text-magenta border-magenta' : 'text-[#4A3737]/80 border-transparent hover:text-magenta hover:border-magenta'}`}>
+                            <Link href="/my-orders" className={`transition-all duration-300 uppercase border-b-2 py-1 font-black ${pathname === '/my-orders' ? 'text-saffron border-saffron' : 'text-[#4A3737]/80 border-transparent hover:text-saffron hover:border-saffron'}`}>
                                 My Orders
                             </Link>
                         )}
@@ -111,7 +111,7 @@ export default function Navbar() {
                                                         <p className="text-[9px] text-[#4A3737]/50 truncate tracking-tight italic font-playfair">{user.email}</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => { logout(); setShowProfilePopup(false); }} className="w-full py-2.5 text-[10px] font-black text-red-500 hover:bg-red-50 rounded-xl transition-all uppercase tracking-[0.2em] border border-red-100/50">Sign Out</button>
+                                                <button onClick={() => { logout(); setShowProfilePopup(false); }} className="w-full py-2.5 text-[10px] font-black text-[#4A3737]/60 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all uppercase tracking-[0.2em] border border-orange-100 font-cinzel">Sign Out</button>
                                             </motion.div>
                                         </>
                                     )}
@@ -151,7 +151,7 @@ export default function Navbar() {
                             className="relative text-[#4A3737] bg-white p-2.5 rounded-full shadow-sm hover:shadow-md border border-orange-100 transition-all duration-300"
                         >
                             <ShoppingCart className="h-4.5 w-4.5 md:h-5 md:w-5" />
-                            <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-magenta text-[9px] font-black text-white shadow-sm ring-2 ring-[#FEFBF5]">
+                            <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-saffron text-[9px] font-black text-white shadow-sm ring-2 ring-[#FEFBF5]">
                                 {cartCount}
                             </span>
                         </button>
@@ -177,7 +177,7 @@ export default function Navbar() {
                         className="fixed inset-0 z-[9999] bg-[#FEFBF5] md:hidden flex flex-col"
                     >
                         {/* Decorative Top Accent */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-saffron via-magenta to-saffron" />
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-saffron via-saffron to-saffron" />
 
                         {/* Menu Content */}
                         <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col">
@@ -206,7 +206,7 @@ export default function Navbar() {
                                             <Link
                                                 onClick={() => setIsMenuOpen(false)}
                                                 href={link.href}
-                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === link.href ? link.activeColor : 'text-[#4A3737] active:text-magenta'}`}
+                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === link.href ? link.activeColor : 'text-[#4A3737] active:text-saffron'}`}
                                             >
                                                 {link.name}
                                             </Link>
@@ -238,7 +238,7 @@ export default function Navbar() {
                                             <Link
                                                 onClick={() => setIsMenuOpen(false)}
                                                 href="/my-orders"
-                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === '/my-orders' ? 'text-magenta' : 'text-[#4A3737] hover:text-magenta'}`}
+                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === '/my-orders' ? 'text-saffron' : 'text-[#4A3737] hover:text-saffron'}`}
                                             >
                                                 My Orders
                                             </Link>

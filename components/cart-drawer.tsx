@@ -170,19 +170,6 @@ export default function CartDrawer() {
                 theme: {
                     color: '#D97706', // saffron color
                 },
-                config: {
-                    display: {
-                        hide: [
-                            { method: 'card' },
-                            { method: 'netbanking' },
-                            { method: 'wallet' },
-                            { method: 'paylater' }
-                        ],
-                        preferences: {
-                            show_default_blocks: false
-                        }
-                    }
-                },
                 handler: async (response: RazorpayResponse) => {
                     try {
                         // Verify payment
