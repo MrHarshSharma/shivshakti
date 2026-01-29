@@ -11,7 +11,7 @@ import { usePathname } from 'next/navigation'
 
 export default function Navbar() {
     const { toggleCart, cartCount } = useCart()
-    const { user, loginWithGoogle, logout, isAdmin } = useAuth()
+    const { user, loginWithGoogle, logout, isAdmin, loading } = useAuth()
     const [showProfilePopup, setShowProfilePopup] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const pathname = usePathname()
@@ -67,7 +67,9 @@ export default function Navbar() {
                     {/* Icons & Mobile Toggle */}
                     <div className="flex items-center gap-3 md:gap-4">
                         {/* User Profile */}
-                        {user ? (
+                        {loading ? (
+                            <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-orange-50/50 animate-pulse border border-orange-100" />
+                        ) : user ? (
                             <div className="relative">
                                 <button
                                     onClick={() => setShowProfilePopup(!showProfilePopup)}

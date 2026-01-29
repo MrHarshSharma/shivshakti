@@ -82,7 +82,7 @@ export default function Footer() {
                         <h3 className="font-cinzel text-xs font-black uppercase tracking-[0.4em] text-saffron opacity-80">Our Studio</h3>
                         <div className="rounded-2xl overflow-hidden border border-orange-100 shadow-sm h-40 w-full bg-white relative group mb-4">
                             <iframe
-
+                                title="Shivshakti Map"
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.5769458656105!2d79.1019096!3d21.169227900000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd4c0c011f8b8d1%3A0xc5f4de1dcf957658!2sShiv%20Shakti%20Provision!5e0!3m2!1sen!2sin!4v1769357816766!5m2!1sen!2sin"
                                 width="100%"
                                 height="100%"
