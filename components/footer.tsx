@@ -93,7 +93,7 @@ export default function Footer() {
                                 className="transition-all duration-700 opacity-100"
                             ></iframe>
                             <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[8px] font-black uppercase tracking-tighter text-[#2D1B1B] border border-orange-100">
-                                Jaipur, Rajasthan
+                                Nagpur, Maharashtra
                             </div>
                         </div>
                         <div className="space-y-2 text-center md:text-left">

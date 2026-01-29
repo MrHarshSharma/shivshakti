@@ -58,7 +58,7 @@ export default function TermsPage() {
                     <section className="space-y-4">
                         <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Governing Law</h2>
                         <p>These Terms shall be governed and construed in accordance with the laws of India, without regard to its conflict of law provisions.</p>
-                        <p>Any disputes arising under these terms will be subject to the exclusive jurisdiction of the courts in Jaipur, Rajasthan.</p>
+                        <p>Any disputes arising under these terms will be subject to the exclusive jurisdiction of the courts in Nagpur, Maharashtra.</p>
                     </section>
                 </motion.div>
             </div>
