@@ -226,14 +226,14 @@ export default function AdminDashboard() {
                     Command Center
                     <span className="w-8 h-px bg-saffron" />
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                     <Link href="/admin/add-product">
                         <motion.div
                             whileHover={{ y: -8, scale: 1.02 }}
                             className="relative h-48 bg-gradient-to-br from-saffron via-orange-500 to-orange-600 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                            <div className="relative h-full p-8 flex flex-col justify-between text-white">
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
                                 <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
                                     <Plus className="h-6 w-6" />
                                 </div>
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                             className="relative h-48 bg-gradient-to-br from-magenta via-pink-600 to-rose-700 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                            <div className="relative h-full p-8 flex flex-col justify-between text-white">
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
                                 <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
                                     <ShoppingBag className="h-6 w-6" />
                                 </div>
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                             className="relative h-48 bg-gradient-to-br from-indigo-300 via-purple-600 to-fuchsia-700 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                            <div className="relative h-full p-8 flex flex-col justify-between text-white">
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
                                 <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
                                     <Package className="h-6 w-6" />
                                 </div>
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
                             className="relative h-48 bg-gradient-to-br from-teal-400 via-emerald-500 to-green-600 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
                         >
                             <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                            <div className="relative h-full p-8 flex flex-col justify-between text-white">
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
                                 <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
                                     <Ticket className="h-6 w-6" />
                                 </div>
