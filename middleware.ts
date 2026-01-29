@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
         )
 
         const { data: { user } } = await supabase.auth.getUser()
-        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
+        const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').split(',').map(e => e.trim())
 
         // 1. Basic Auth Check for User Routes
         if (!user && isUserOrderRoute) {
@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
 
         // 2. Admin Check for Admin Routes/APIs
         if (isAdminRoute || isAdminApi) {
-            if (!user || user.email !== adminEmail) {
+            if (!user || !user.email || !adminEmails.includes(user.email)) {
                 // For API routes, return a JSON error
                 if (isAdminApi) {
                     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })

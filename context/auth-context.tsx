@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) console.error('Error logging out:', error.message)
     }
 
-    const isAdmin = user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    const isAdmin = !!(user?.email && process.env.NEXT_PUBLIC_ADMIN_EMAIL?.split(',').map(e => e.trim()).includes(user.email))
 
     return (
         <AuthContext.Provider value={{ user, session, loading, isAdmin, loginWithGoogle, logout }}>

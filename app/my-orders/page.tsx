@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ShoppingBag, ArrowLeft, Package, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { ShoppingBag, ArrowLeft, Package, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import { formatDate } from '@/utils/date'
 import Image from 'next/image'
 
@@ -28,6 +28,7 @@ interface Order {
 export default function MyOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [cancellingId, setCancellingId] = useState<number | null>(null)
 
     useEffect(() => {
         fetchOrders()
@@ -44,6 +45,36 @@ export default function MyOrdersPage() {
             console.error('Error fetching orders:', error)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleCancelOrder = async (orderId: number) => {
+        if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+            return
+        }
+
+        setCancellingId(orderId)
+        try {
+            const response = await fetch(`/api/user/orders/${orderId}/cancel`, {
+                method: 'POST',
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                // Optimistically update the order status
+                setOrders(prevOrders =>
+                    prevOrders.map(order =>
+                        order.id === orderId ? { ...order, status: 'cancelled' } : order
+                    )
+                )
+            } else {
+                alert(data.error || 'Failed to cancel order')
+            }
+        } catch (error) {
+            console.error('Error cancelling order:', error)
+            alert('An error occurred while cancelling the order')
+        } finally {
+            setCancellingId(null)
         }
     }
 
@@ -165,9 +196,20 @@ export default function MyOrdersPage() {
                                                 <p className="text-[10px] font-black text-[#4A3737]/30 uppercase tracking-widest">{formatDate(order.created_at)}</p>
                                             </div>
                                         </div>
-                                        <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm`}>
-                                            {theme.icon}
-                                            {theme.label}
+                                        <div className="flex items-center gap-3">
+                                            {order.status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleCancelOrder(order.id)}
+                                                    disabled={cancellingId === order.id}
+                                                    className="px-3 py-1 rounded-full border border-red-200 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-colors disabled:opacity-50"
+                                                >
+                                                    {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                                                </button>
+                                            )}
+                                            <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm`}>
+                                                {theme.icon}
+                                                {theme.label}
+                                            </div>
                                         </div>
                                     </div>
 
