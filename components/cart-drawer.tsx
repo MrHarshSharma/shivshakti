@@ -266,7 +266,8 @@ export default function CartDrawer() {
                             orders: items.map(item => ({
                                 name: item.name,
                                 price: item.price,
-                                units: item.quantity
+                                units: item.quantity,
+                                image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
                             })),
                             cost: {
                                 total: finalTotal,

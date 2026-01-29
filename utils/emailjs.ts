@@ -1,4 +1,7 @@
 import emailjs from '@emailjs/browser'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { OrderConfirmationEmail } from '@/components/email/order-confirmation'
+import React from 'react'
 
 interface OrderEmailData {
     name: string
@@ -7,6 +10,7 @@ interface OrderEmailData {
         name: string
         price: number
         units: number
+        image?: string
     }>
     cost: {
         total: number
@@ -28,15 +32,17 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
             return false
         }
 
+        // Render the email component to HTML string
+        const messageHtml = renderToStaticMarkup(
+            React.createElement(OrderConfirmationEmail, data)
+        )
+
         const templateParams = {
             name: data.name,
             order_id: data.order_id,
-            orders: data.orders,
-            'cost.total': data.cost.total,
-            'cost.subtotal': data.cost.subtotal || data.cost.total,
-            'cost.discount': data.cost.discount || 0,
-            'cost.shipping': data.cost.shipping || 0,
-            'cost.tax': data.cost.tax || 0,
+            message_html: messageHtml, // Send the rendered HTML
+            orders: data.orders, // Pass the array of orders for {{#orders}} loop
+            cost: data.cost, // Pass the cost object for {{cost.shipping}}, etc.
         }
 
         await emailjs.send(
