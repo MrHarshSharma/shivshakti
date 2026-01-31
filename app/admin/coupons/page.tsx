@@ -120,11 +120,13 @@ export default function CouponManagement() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-    const handleDeleteCoupon = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this coupon?')) return
+    const [deleteId, setDeleteId] = useState<number | null>(null)
+
+    const confirmDelete = async () => {
+        if (!deleteId) return
 
         try {
-            const response = await fetch(`/api/coupons?id=${id}`, {
+            const response = await fetch(`/api/coupons?id=${deleteId}`, {
                 method: 'DELETE'
             })
             const data = await response.json()
@@ -138,7 +140,13 @@ export default function CouponManagement() {
         } catch (err) {
             console.error('Error deleting coupon:', err)
             setError('An error occurred while deleting the coupon')
+        } finally {
+            setDeleteId(null)
         }
+    }
+
+    const handleDeleteClick = (id: number) => {
+        setDeleteId(id)
     }
 
     return (
@@ -164,6 +172,28 @@ export default function CouponManagement() {
                     </h1>
                     <p className="text-[#4A3737]/70 font-playfair text-lg">Create and oversee your promotional heritage treasures.</p>
                 </div>
+
+                {/* Global Feedback Messages */}
+                {(error || success) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8"
+                    >
+                        {error && (
+                            <div className="flex items-center gap-2 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border border-red-100 shadow-sm">
+                                <AlertCircle className="h-5 w-5 shrink-0" />
+                                {error}
+                            </div>
+                        )}
+                        {success && (
+                            <div className="flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-2xl text-sm font-bold border border-green-100 shadow-sm">
+                                <CheckCircle2 className="h-5 w-5 shrink-0" />
+                                {success}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <motion.div
@@ -261,19 +291,7 @@ export default function CouponManagement() {
                                 </div>
                             </div>
 
-                            {error && (
-                                <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded-xl text-xs font-bold border border-red-100">
-                                    <AlertCircle className="h-4 w-4" />
-                                    {error}
-                                </div>
-                            )}
 
-                            {success && (
-                                <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-xl text-xs font-bold border border-green-100">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    {success}
-                                </div>
-                            )}
 
                             <button
                                 type="submit"
@@ -404,7 +422,7 @@ export default function CouponManagement() {
                                                                         <Edit className="h-4 w-4" />
                                                                     </button>
                                                                     <button
-                                                                        onClick={() => handleDeleteCoupon(coupon.id)}
+                                                                        onClick={() => handleDeleteClick(coupon.id)}
                                                                         className="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                                                     >
                                                                         <Trash2 className="h-4 w-4" />
@@ -422,6 +440,40 @@ export default function CouponManagement() {
                         </motion.div>
                     </div>
                 </div>
+                {/* Delete Confirmation Modal */}
+                {deleteId && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-orange-100"
+                        >
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Trash2 className="h-8 w-8 text-red-500" />
+                                </div>
+                                <h3 className="font-cinzel text-xl font-bold text-[#2D1B1B] mb-2">Delete Coupon?</h3>
+                                <p className="text-[#4A3737]/60 text-sm mb-8">
+                                    Are you sure you want to remove this coupon? This action cannot be undone.
+                                </p>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setDeleteId(null)}
+                                        className="flex-1 py-3 bg-gray-50 text-[#4A3737]/60 font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-gray-100 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmDelete}
+                                        className="flex-1 py-3 bg-red-500 text-white font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
             </div>
         </div>
     )

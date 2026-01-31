@@ -66,7 +66,7 @@ export default async function Home() {
       '@type': 'ContactPoint',
       telephone: '+919999999999',
       contactType: 'customer service',
-      email: 'info@shivshakti.in',
+      email: 'shivshaktiprovision18@gmail.com',
     },
   }
 

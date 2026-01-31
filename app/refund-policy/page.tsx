@@ -28,7 +28,7 @@ export default function RefundPolicyPage() {
                             <RefreshCcw className="h-6 w-6 text-saffron" />
                             <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Cancellations</h2>
                         </div>
-                        <p>We accept order cancellations within 24 hours of placing the order. To cancel your order, please email us at info@shivshakti.in or call us at +91 99999 99999.</p>
+                        <p>We accept order cancellations within 24 hours of placing the order. To cancel your order, please email us at shivshaktiprovision18@gmail.com or call us at +91 99999 99999.</p>
                         <p>Once the order has been dispatched from our studio, it cannot be cancelled.</p>
                     </section>
 
@@ -56,7 +56,7 @@ export default function RefundPolicyPage() {
 
                     <section className="bg-orange-50/50 p-6 rounded-xl border-l-4 border-orange-200">
                         <h3 className="font-bold text-[#2D1B1B] mb-2">Need Help?</h3>
-                        <p className="text-sm">For any questions related to refunds and returns, please contact our support team at info@shivshakti.in.</p>
+                        <p className="text-sm">For any questions related to refunds and returns, please contact our support team at shivshaktiprovision18@gmail.com.</p>
                     </section>
                 </motion.div>
             </div>

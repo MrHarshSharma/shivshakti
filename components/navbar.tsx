@@ -28,12 +28,12 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className="fixed top-0 z-50 w-full border-b border-orange-100/50 bg-[#FEFBF5]/80 backdrop-blur-md transition-all shadow-sm">
-                <div className="container mx-auto flex h-24 items-center justify-between px-6">
+            <nav className="fixed top-0 z-50 w-full border-b border-orange-100/50 bg-[#fef8f0] transition-all shadow-sm">
+                <div className="container mx-auto flex h-24 items-center justify-between px-6 overflow-hidden">
                     {/* Logo */}
-                    <Link href="/" className="relative h-16 w-16 rounded-full overflow-hidden transition-opacity hover:opacity-80 shadow-sm border border-orange-50">
+                    <Link href="/" className="relative h-36 w-36">
                         <Image
-                            src="/image.png"
+                            src="/logo.png"
                             alt="Shivshakti Logo"
                             fill
                             className="object-contain"

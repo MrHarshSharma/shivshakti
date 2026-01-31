@@ -20,7 +20,7 @@ export default function ContactClient() {
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="mx-auto lg:w-1/2 md:w-full">
                     {/* Contact Information */}
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
@@ -38,9 +38,7 @@ export default function ContactClient() {
                                 <div>
                                     <h3 className="font-bold text-[#2D1B1B] mb-1">Visit Us</h3>
                                     <p className="text-[#4A3737]/70">
-                                        Shivshakti Heritage Studio<br />
-                                        Nagpur, Maharashtra, 440001<br />
-                                        India
+                                        362, Wanjari Complex, Dr Ambedkar Rd, Kamal Chowk, Gurunanakpura, Balabhaupeth, Nagpur, Maharashtra 440017
                                     </p>
                                 </div>
                             </div>
@@ -51,7 +49,7 @@ export default function ContactClient() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-[#2D1B1B] mb-1">Email Support</h3>
-                                    <p className="text-[#4A3737]/70">info@shivshakti.in</p>
+                                    <p className="text-[#4A3737]/70">shivshaktiprovision18@gmail.com</p>
                                 </div>
                             </div>
 
@@ -78,62 +76,6 @@ export default function ContactClient() {
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
-
-                    {/* Contact Form Placeholder */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                    >
-                        <form className="bg-white p-8 rounded-2xl border border-orange-100 shadow-sm space-y-6">
-                            <h2 className="font-cinzel text-2xl text-[#2D1B1B] mb-6">Send a Message</h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-[#4A3737]">Name</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 rounded-xl border border-orange-100 focus:border-saffron focus:ring-1 focus:ring-saffron outline-none transition-all"
-                                        placeholder="John Doe"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-[#4A3737]">Email</label>
-                                    <input
-                                        type="email"
-                                        className="w-full px-4 py-3 rounded-xl border border-orange-100 focus:border-saffron focus:ring-1 focus:ring-saffron outline-none transition-all"
-                                        placeholder="john@example.com"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-[#4A3737]">Subject</label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-3 rounded-xl border border-orange-100 focus:border-saffron focus:ring-1 focus:ring-saffron outline-none transition-all"
-                                    placeholder="Order Inquiry"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-[#4A3737]">Message</label>
-                                <textarea
-                                    rows={4}
-                                    className="w-full px-4 py-3 rounded-xl border border-orange-100 focus:border-saffron focus:ring-1 focus:ring-saffron outline-none transition-all resize-none"
-                                    placeholder="How can we help you?"
-                                />
-                            </div>
-
-                            <button
-                                type="button"
-                                className="w-full py-4 bg-[#2D1B1B] text-white font-bold tracking-widest uppercase rounded-xl hover:bg-black transition-all shadow-lg flex items-center justify-center gap-2 group"
-                            >
-                                Send Message
-                                <Send className="h-4 w-4 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
-                        </form>
                     </motion.div>
                 </div>
             </div>

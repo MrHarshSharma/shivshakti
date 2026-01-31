@@ -8,24 +8,23 @@ export default function Footer() {
     const currentYear = new Date().getFullYear()
 
     return (
-        <footer className="bg-[#FEFBF5] border-t border-orange-100/50 pt-20 pb-12 relative overflow-hidden">
+        <footer className="bg-[#fef8f0] border-t border-orange-100/50 pt-20 pb-12 relative overflow-hidden">
             {/* Top Accent Gradient */}
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-saffron/30 to-transparent" />
 
             <div className="container mx-auto px-6 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20 text-center md:text-left">
                     {/* Brand Section */}
-                    <div className="space-y-8 flex flex-col items-center md:items-start">
-                        <Link href="/" className="inline-block relative h-20 w-20 rounded-full overflow-hidden border border-orange-100 shadow-sm transition-transform hover:scale-105 duration-300 bg-white">
+                    <div className=" flex flex-col items-center md:items-start">
+                        <Link href="/" className="inline-block relative h-46 w-46 transition-transform">
                             <Image
-                                src="/image.png"
+                                src="/logo.png"
                                 alt="Shivshakti Logo"
                                 fill
                                 className="object-contain"
                             />
                         </Link>
                         <div>
-                            <h2 className="font-cinzel text-xl font-black tracking-[0.2em] text-[#2D1B1B] uppercase mb-4">Shivshakti</h2>
                             <p className="font-playfair text-sm leading-relaxed text-[#4A3737]/80 italic">
                                 Curating a heritage of luxury and tradition. Our collection brings together the finest Indian artifacts and textiles.
                             </p>
@@ -98,7 +97,7 @@ export default function Footer() {
                         </div>
                         <div className="space-y-2 text-center md:text-left">
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <Mail className="h-3 w-3 text-magenta text-sm" /> info@shivshakti.in
+                                <Mail className="h-3 w-3 text-magenta text-sm" /> shivshaktiprovision18@gmail.com
                             </p>
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
                                 <Phone className="h-3 w-3 text-saffron text-sm" /> +91 99999 99999
@@ -110,14 +109,8 @@ export default function Footer() {
                 {/* Footer Bottom */}
                 <div className="pt-10 border-t border-orange-100/50 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                        <Link href="#" className="p-3 bg-white rounded-full border border-orange-50 text-[#4A3737]/40 hover:text-magenta hover:shadow-md transition-all">
+                        <Link href="https://www.instagram.com/shiv_shakti_provision" className="p-3 bg-white rounded-full border border-orange-50 text-[#4A3737]/40 hover:text-magenta hover:shadow-md transition-all">
                             <Instagram className="h-4 w-4" />
-                        </Link>
-                        <Link href="#" className="p-3 bg-white rounded-full border border-orange-50 text-[#4A3737]/40 hover:text-saffron hover:shadow-md transition-all">
-                            <Facebook className="h-4 w-4" />
-                        </Link>
-                        <Link href="#" className="p-3 bg-white rounded-full border border-orange-50 text-[#4A3737]/40 hover:text-blue-400 hover:shadow-md transition-all">
-                            <Twitter className="h-4 w-4" />
                         </Link>
                     </div>
 
