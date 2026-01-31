@@ -186,32 +186,34 @@ export default function MyOrdersPage() {
                                     className="bg-white rounded-3xl shadow-[0_10px_30px_-5px_rgba(45,27,27,0.06)] border border-orange-50/50 overflow-hidden"
                                 >
                                     {/* Compact Header */}
-                                    <div className="px-6 py-4 flex items-center justify-between border-b border-orange-50/30">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center border border-orange-100/50">
-                                                <Package className="h-4 w-4 text-saffron" />
+                                    <div className="px-6 py-4 flex flex-row items-start justify-between border-b border-orange-50/30 gap-4">
+                                        <div className="flex items-start gap-3 min-w-0">
+                                            <div className="w-10 h-10 md:w-8 md:h-8 bg-orange-50 rounded-lg flex items-center justify-center border border-orange-100/50 shrink-0 mt-0.5 md:mt-0">
+                                                <Package className="h-5 w-5 md:h-4 md:w-4 text-saffron" />
                                             </div>
-                                            <div>
-                                                <h2 className="font-cinzel text-lg text-[#2D1B1B] font-black leading-none">#{order.id}</h2>
-                                                <p className="text-[10px] font-black text-[#4A3737]/30 uppercase tracking-widest">{formatDate(order.created_at)}</p>
+                                            <div className="min-w-0">
+                                                <h2 className="font-cinzel text-lg text-[#2D1B1B] font-black leading-none truncate pr-2">#{order.id}</h2>
+                                                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                                    <p className="text-[10px] font-black text-[#4A3737]/30 uppercase tracking-widest whitespace-nowrap">{formatDate(order.created_at)}</p>
+                                                    {order.payment_status === 'store payment' && (
+                                                        <>
+                                                            <span className="text-[10px] text-[#4A3737]/20 font-black hidden xs:inline">•</span>
+                                                            <span className="text-[8px] font-black uppercase tracking-widest text-[#2D1B1B] bg-orange-100/50 px-1.5 py-0.5 rounded border border-orange-100 whitespace-nowrap">
+                                                                Pickup
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            {order.status === 'pending' && (
-                                                <button
-                                                    onClick={() => handleCancelOrder(order.id)}
-                                                    disabled={cancellingId === order.id}
-                                                    className="px-3 py-1 rounded-full border border-red-200 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 transition-colors disabled:opacity-50"
-                                                >
-                                                    {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}
-                                                </button>
-                                            )}
-                                            <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm`}>
-                                                {theme.icon}
-                                                {theme.label}
-                                            </div>
+
+                                        <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0`}>
+                                            {theme.icon}
+                                            {theme.label}
                                         </div>
                                     </div>
+
+
 
                                     {/* Concise Items List */}
                                     <div className="p-6 space-y-4">
@@ -239,12 +241,27 @@ export default function MyOrdersPage() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {/* Footer Actions */}
+                                    {
+                                        order.status === 'pending' && (
+                                            <div className="px-6 py-4 bg-orange-50/20 border-t border-orange-50/30 flex justify-end">
+                                                <button
+                                                    onClick={() => handleCancelOrder(order.id)}
+                                                    disabled={cancellingId === order.id}
+                                                    className="px-6 py-2 rounded-xl border border-red-200 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 shadow-sm"
+                                                >
+                                                    {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                                                </button>
+                                            </div>
+                                        )
+                                    }
                                 </motion.div>
                             )
                         })}
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     )
 }

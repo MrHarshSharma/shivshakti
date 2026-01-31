@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Minus, Plus, ShoppingBag, CheckCircle, Ticket, Loader2 } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, CheckCircle, Ticket, Loader2, Truck, Store } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
@@ -20,7 +20,8 @@ export default function CartDrawer() {
     const [customerData, setCustomerData] = useState({
         name: '',
         phone: '',
-        address: ''
+        address: '',
+        isDelivery: null as boolean | null
     })
     const [errors, setErrors] = useState({
         name: '',
@@ -101,7 +102,7 @@ export default function CartDrawer() {
             isValid = false
         }
 
-        if (!customerData.address.trim()) {
+        if (customerData.isDelivery && !customerData.address.trim()) {
             newErrors.address = 'Address is required'
             isValid = false
         }
@@ -115,6 +116,7 @@ export default function CartDrawer() {
             loginWithGoogle(window.location.pathname + '?cart=open')
             return
         }
+        setCustomerData(prev => ({ ...prev, isDelivery: null })) // Force re-selection
         setShowCustomerForm(true)
     }
 
@@ -167,6 +169,83 @@ export default function CartDrawer() {
         setIsSubmitting(true)
         setSubmitError('')
 
+        /* 
+         * Logic for Store Pickup (No Payment Gateway)
+         */
+        if (customerData.isDelivery === false) {
+            try {
+                // Create order directly
+                const createOrderResponse = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: customerData.name,
+                        phone: customerData.phone,
+                        address: 'Store Pickup', // Placeholder address
+                        email: user.email,
+                        user_id: user.id,
+                        items: items,
+                        discount: appliedCoupon?.discountAmount || 0,
+                        coupon_code: appliedCoupon?.code || null,
+                        total: finalTotal,
+                        payment_status: 'store payment',
+                        is_delivery: false,
+                        // No Razorpay fields needed
+                    }),
+                })
+
+                const createOrderData = await createOrderResponse.json()
+
+                if (!createOrderResponse.ok) {
+                    throw new Error(createOrderData.error || 'Failed to create order')
+                }
+
+                // Send order confirmation email
+                sendOrderConfirmationEmail({
+                    name: customerData.name,
+                    order_id: createOrderData.orderId,
+                    orders: items.map(item => ({
+                        name: item.name,
+                        price: item.price,
+                        units: item.quantity,
+                        image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
+                    })),
+                    cost: {
+                        total: finalTotal,
+                        subtotal: cartTotal,
+                        discount: appliedCoupon?.discountAmount || 0,
+                        shipping: 0,
+                        tax: 0
+                    }
+                }).catch(err => console.error('Email sending failed:', err))
+
+                // Save data and cleanup
+                localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
+                localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
+                window.dispatchEvent(new Event('customerDataUpdated'))
+
+                setIsOrderPlaced(true)
+                setIsSubmitting(false)
+                clearCart()
+                setTimeout(() => {
+                    setIsOrderPlaced(false)
+                    setShowCustomerForm(false)
+                    toggleCart()
+                }, 3000)
+
+            } catch (error) {
+                console.error('Order creation error:', error)
+                setSubmitError(error instanceof Error ? error.message : 'Failed to complete order. Please contact support.')
+                setIsSubmitting(false)
+            }
+            return
+        }
+
+        /* 
+         * Logic for Delivery (Razorpay)
+         */
         try {
             // Load Razorpay script
             const scriptLoaded = await loadRazorpayScript()
@@ -248,6 +327,8 @@ export default function CartDrawer() {
                                 discount: appliedCoupon?.discountAmount || 0,
                                 coupon_code: appliedCoupon?.code || null,
                                 total: finalTotal,
+                                is_delivery: true,
+                                payment_status: 'completed',
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                             }),
@@ -372,92 +453,163 @@ export default function CartDrawer() {
                                         <p className="font-playfair text-sm text-[#4A3737]">Please provide your details to complete the order</p>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        {/* Name Field */}
-                                        <div>
-                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                                                Full Name *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={customerData.name}
-                                                onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
-                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.name
-                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
-                                                    }`}
-                                                placeholder="Enter your full name"
-                                            />
-                                            {errors.name && (
-                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.name}</p>
+                                    {/* Order Type Selection */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <button
+                                            onClick={() => setCustomerData({ ...customerData, isDelivery: true })}
+                                            className={`relative flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${customerData.isDelivery === true
+                                                ? 'border-[#2D1B1B] bg-[#2D1B1B] text-white shadow-lg scale-[1.02]'
+                                                : 'border-orange-100 bg-white text-[#4A3737] hover:border-orange-200 hover:bg-orange-50'
+                                                }`}
+                                        >
+                                            {customerData.isDelivery === true && (
+                                                <div className="absolute top-2 right-2">
+                                                    <CheckCircle className="h-4 w-4 text-saffron" />
+                                                </div>
                                             )}
-                                        </div>
+                                            <Truck className={`h-8 w-8 mb-2 ${customerData.isDelivery === true ? 'text-saffron' : 'text-[#4A3737]/60'}`} />
+                                            <span className="font-cinzel font-bold text-sm tracking-widest">Delivery</span>
+                                            <span className={`text-[10px] mt-1 font-playfair ${customerData.isDelivery === true ? 'text-white/80' : 'text-[#4A3737]/60'}`}>
+                                                Doorstep Delivery
+                                            </span>
+                                        </button>
 
-                                        {/* Phone Field */}
-                                        <div>
-                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                                                Phone Number *
-                                            </label>
-                                            <input
-                                                type="tel"
-                                                value={customerData.phone}
-                                                onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.phone
-                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
-                                                    }`}
-                                                placeholder="10-digit phone number"
-                                                maxLength={10}
-                                            />
-                                            {errors.phone && (
-                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.phone}</p>
+                                        <button
+                                            onClick={() => setCustomerData({ ...customerData, isDelivery: false })}
+                                            className={`relative flex flex-col items-center justify-center p-4 border-2 rounded-xl transition-all duration-300 ${customerData.isDelivery === false
+                                                ? 'border-[#2D1B1B] bg-[#2D1B1B] text-white shadow-lg scale-[1.02]'
+                                                : 'border-orange-100 bg-white text-[#4A3737] hover:border-orange-200 hover:bg-orange-50'
+                                                }`}
+                                        >
+                                            {customerData.isDelivery === false && (
+                                                <div className="absolute top-2 right-2">
+                                                    <CheckCircle className="h-4 w-4 text-saffron" />
+                                                </div>
                                             )}
-                                        </div>
-
-                                        {/* Address Field */}
-                                        <div>
-                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                                                Delivery Address *
-                                            </label>
-                                            <textarea
-                                                value={customerData.address}
-                                                onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
-                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
-                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
-                                                    }`}
-                                                placeholder="Enter your complete delivery address"
-                                                rows={3}
-                                            />
-                                            {errors.address && (
-                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.address}</p>
-                                            )}
-                                        </div>
+                                            <Store className={`h-8 w-8 mb-2 ${customerData.isDelivery === false ? 'text-saffron' : 'text-[#4A3737]/60'}`} />
+                                            <span className="font-cinzel font-bold text-sm tracking-widest">Pickup</span>
+                                            <span className={`text-[10px] mt-1 font-playfair ${customerData.isDelivery === false ? 'text-white/80' : 'text-[#4A3737]/60'}`}>
+                                                Visit Store
+                                            </span>
+                                        </button>
                                     </div>
 
-                                    {/* Error Message */}
-                                    {submitError && (
-                                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                            <p className="text-red-600 text-sm font-playfair">{submitError}</p>
+                                    <AnimatePresence>
+                                        {customerData.isDelivery !== null && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="space-y-6 pt-4"
+                                            >
+                                                <div className="space-y-4">
+                                                    {/* Name Field */}
+                                                    <div>
+                                                        <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                            Full Name *
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={customerData.name}
+                                                            onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
+                                                            className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.name
+                                                                ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                                : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                                }`}
+                                                            placeholder="Enter your full name"
+                                                        />
+                                                        {errors.name && (
+                                                            <p className="text-red-500 text-xs mt-1 font-playfair">{errors.name}</p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Phone Field */}
+                                                    <div>
+                                                        <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                            Phone Number *
+                                                        </label>
+                                                        <input
+                                                            type="tel"
+                                                            value={customerData.phone}
+                                                            onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                                                            className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all ${errors.phone
+                                                                ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                                : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                                }`}
+                                                            placeholder="10-digit phone number"
+                                                            maxLength={10}
+                                                        />
+                                                        {errors.phone && (
+                                                            <p className="text-red-500 text-xs mt-1 font-playfair">{errors.phone}</p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Address Field - Only show for delivery */}
+                                                    {customerData.isDelivery && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, height: 0 }}
+                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                            exit={{ opacity: 0, height: 0 }}
+                                                        >
+                                                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                                                Delivery Address *
+                                                            </label>
+                                                            <textarea
+                                                                value={customerData.address}
+                                                                onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
+                                                                className={`w-full px-4 py-3 border rounded-lg font-playfair focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
+                                                                    ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                                    : 'border-orange-200 focus:ring-saffron/20 bg-white'
+                                                                    }`}
+                                                                placeholder="Enter your complete delivery address"
+                                                                rows={3}
+                                                            />
+                                                            {errors.address && (
+                                                                <p className="text-red-500 text-xs mt-1 font-playfair">{errors.address}</p>
+                                                            )}
+                                                        </motion.div>
+                                                    )}
+                                                </div>
+
+                                                {/* Error Message */}
+                                                {submitError && (
+                                                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                                        <p className="text-red-600 text-sm font-playfair">{submitError}</p>
+                                                    </div>
+                                                )}
+
+                                                <div className="flex gap-3 pt-4">
+                                                    <button
+                                                        onClick={handleBackToCart}
+                                                        disabled={isSubmitting}
+                                                        className="flex-1 py-3 border-2 border-[#2D1B1B] text-[#2D1B1B] font-bold uppercase tracking-widest hover:bg-[#2D1B1B] hover:text-white transition-colors rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Back
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCheckout}
+                                                        disabled={isSubmitting}
+                                                        className="flex-1 py-3 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        {isSubmitting ? 'Placing Order...' : 'Place Order'}
+                                                    </button>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Show Back button if no selection made yet */}
+                                    {customerData.isDelivery === null && (
+                                        <div className="mt-6">
+                                            <button
+                                                onClick={handleBackToCart}
+                                                className="w-full py-3 border-2 border-[#2D1B1B]/20 text-[#2D1B1B]/80 font-bold uppercase tracking-widest hover:bg-[#2D1B1B]/5 hover:text-[#2D1B1B] transition-colors rounded-sm"
+                                            >
+                                                Back to Cart
+                                            </button>
                                         </div>
                                     )}
 
-                                    <div className="flex gap-3 pt-4">
-                                        <button
-                                            onClick={handleBackToCart}
-                                            disabled={isSubmitting}
-                                            className="flex-1 py-3 border-2 border-[#2D1B1B] text-[#2D1B1B] font-bold uppercase tracking-widest hover:bg-[#2D1B1B] hover:text-white transition-colors rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            Back
-                                        </button>
-                                        <button
-                                            onClick={handleCheckout}
-                                            disabled={isSubmitting}
-                                            className="flex-1 py-3 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors shadow-lg rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {isSubmitting ? 'Placing Order...' : 'Place Order'}
-                                        </button>
-                                    </div>
                                 </div>
                             ) : items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">

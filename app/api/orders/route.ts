@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id } = body
+        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id, is_delivery, payment_status } = body
 
         // Validate required fields
         if (!name || !phone || !address || !items || items.length === 0) {
@@ -14,8 +14,8 @@ export async function POST(request: Request) {
             )
         }
 
-        // Validate payment information
-        if (!razorpay_order_id || !razorpay_payment_id) {
+        // Validate payment information (Only if not store payment)
+        if (payment_status !== 'store payment' && (!razorpay_order_id || !razorpay_payment_id)) {
             return NextResponse.json(
                 { error: 'Payment information is required' },
                 { status: 400 }
@@ -45,9 +45,10 @@ export async function POST(request: Request) {
                 itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
             },
             status: 'pending',
-            payment_status: 'completed',
-            razorpay_order_id,
-            razorpay_payment_id
+            payment_status: payment_status || 'completed', // Default to completed for old flow, or use provided
+            is_delivery: is_delivery !== undefined ? is_delivery : true, // Default to true if missing
+            razorpay_order_id: razorpay_order_id || null,
+            razorpay_payment_id: razorpay_payment_id || null
         }
 
         // Insert order into database

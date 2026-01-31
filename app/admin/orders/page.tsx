@@ -91,6 +91,14 @@ export default function AdminOrdersPage() {
         return styles[status as keyof typeof styles] || styles.pending
     }
 
+    const getPaymentStatusBadge = (status: string) => {
+        const s = status?.toLowerCase() || ''
+        if (s === 'store payment') {
+            return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        }
+        return 'bg-emerald-50 text-emerald-700 border-emerald-100'
+    }
+
     const updateOrderStatus = async (orderId: number, newStatus: string) => {
         setUpdatingOrderId(orderId)
         try {
@@ -269,7 +277,7 @@ export default function AdminOrdersPage() {
                                                 {formatDate(order.created_at)}
                                             </td>
                                             <td className="py-6 px-6">
-                                                <span className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm backdrop-blur-sm">
+                                                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm backdrop-blur-sm ${getPaymentStatusBadge(order.payment_status)}`}>
                                                     {order.payment_status}
                                                 </span>
                                             </td>
