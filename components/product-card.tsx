@@ -50,7 +50,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     <Link href={`/product/${product.id}`}>
                         <div>
                             <p className="text-saffron text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
-                                {product.categories && product.categories.length > 0 ? product.categories.map(category => <span key={category} className="bg-orange-50 text-saffron px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-orange-100 ml-0 mr-1">{category}</span>) : 'General'}
+                                {product.categories && product.categories.length > 0 ? product.categories.map(category => <span key={category} className="bg-orange-50 text-saffron px-3 py-1 rounded-full text-[7px] font-bold uppercase tracking-wider border border-orange-100 ml-0 mr-1">{category}</span>) : 'General'}
                             </p>
                             <h3 className="font-playfair text-base md:text-xl text-[#2D1B1B] group-hover:text-magenta transition-colors mb-2 leading-tight font-bold line-clamp-2">
                                 {product.name}
