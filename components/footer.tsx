@@ -100,7 +100,7 @@ export default function Footer() {
                                 <Mail className="h-3 w-3 text-magenta text-sm" /> shivshaktiprovision18@gmail.com
                             </p>
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <Phone className="h-3 w-3 text-saffron text-sm" /> +91 99999 99999
+                                <Phone className="h-3 w-3 text-saffron text-sm" /> +91-9028937543
                             </p>
                         </div>
                     </div>
