@@ -100,7 +100,7 @@ export default function Navbar() {
                                                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                className="absolute top-14 right-0 w-64 bg-white rounded-2xl shadow-xl border border-orange-100 p-6 z-50"
+                                                className="fixed top-16 right-6 w-64 bg-white rounded-2xl shadow-xl border border-orange-100 p-6 z-50"
                                             >
                                                 <div className="flex items-center gap-4 mb-5 border-b border-orange-50 pb-5">
                                                     {user.user_metadata.avatar_url && (
