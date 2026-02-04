@@ -80,7 +80,7 @@ export default function ProductsPage() {
                             className="w-full flex items-center justify-between px-6 py-3 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
                         >
                             <span className="text-sm font-black uppercase tracking-[0.2em] text-[#4A3737]">
-                                {activeCategory} asdf
+                                {activeCategory}
                             </span>
                             <ChevronDown className={`h-4 w-4 text-saffron transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
