@@ -26,7 +26,7 @@ export default function Footer() {
                         </Link>
                         <div>
                             <p className="font-playfair text-sm leading-relaxed text-[#4A3737]/80 italic">
-                                Curating a heritage of luxury and tradition. Our collection brings together the finest Indian artifacts and textiles.
+                                From Traditions to Thoughtful Gifting Serving Moments, Beyond Products Crafted with Care for Every Celebration.
                             </p>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ export default function Footer() {
                                 <Mail className="h-3 w-3 text-magenta text-sm" /> shivshaktiprovision18@gmail.com
                             </p>
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <Phone className="h-3 w-3 text-saffron text-sm" /> +91-9028937543
+                                <Phone className="h-3 w-3 text-saffron text-sm" /> 9890379728
                             </p>
                         </div>
                     </div>

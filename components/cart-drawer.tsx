@@ -5,7 +5,7 @@ import { X, Minus, Plus, ShoppingBag, CheckCircle, Ticket, Loader2, Truck, Store
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { sendOrderConfirmationEmail } from '@/utils/emailjs'
 import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
@@ -33,10 +33,23 @@ export default function CartDrawer() {
     // Coupon logic
     const [couponCode, setCouponCode] = useState('')
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false)
-    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; off_percent: string; discountAmount: number } | null>(null)
+    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; off_percent: number; min_cost: number } | null>(null)
     const [couponError, setCouponError] = useState('')
 
-    const finalTotal = cartTotal - (appliedCoupon?.discountAmount || 0)
+    const discountAmount = useMemo(() => {
+        if (!appliedCoupon) return 0
+        return Math.round((cartTotal * appliedCoupon.off_percent) / 100)
+    }, [cartTotal, appliedCoupon])
+
+    // Validate coupon minimum spend on cart change
+    useEffect(() => {
+        if (appliedCoupon && cartTotal < appliedCoupon.min_cost) {
+            setAppliedCoupon(null)
+            setCouponError(`Coupon removed: Minimum spend of ₹${appliedCoupon.min_cost} not met`)
+        }
+    }, [cartTotal, appliedCoupon])
+
+    const finalTotal = cartTotal - discountAmount
 
     // Auto-open cart if redirected with cart=open
     useEffect(() => {
@@ -141,7 +154,11 @@ export default function CartDrawer() {
             const data = await response.json()
 
             if (data.success) {
-                setAppliedCoupon(data.coupon)
+                setAppliedCoupon({
+                    code: data.coupon.code,
+                    off_percent: parseFloat(data.coupon.off_percent),
+                    min_cost: data.coupon.min_cost
+                })
                 setCouponCode('') // Clear input after successful apply
             } else {
                 setCouponError(data.error || 'Failed to apply coupon')
@@ -187,7 +204,7 @@ export default function CartDrawer() {
                         email: user.email,
                         user_id: user.id,
                         items: items,
-                        discount: appliedCoupon?.discountAmount || 0,
+                        discount: discountAmount,
                         coupon_code: appliedCoupon?.code || null,
                         total: finalTotal,
                         payment_status: 'store payment',
@@ -215,7 +232,7 @@ export default function CartDrawer() {
                     cost: {
                         total: finalTotal,
                         subtotal: cartTotal,
-                        discount: appliedCoupon?.discountAmount || 0,
+                        discount: discountAmount,
                         shipping: 0,
                         tax: 0
                     }
@@ -324,7 +341,7 @@ export default function CartDrawer() {
                                 email: user.email,
                                 user_id: user.id,
                                 items: items,
-                                discount: appliedCoupon?.discountAmount || 0,
+                                discount: discountAmount,
                                 coupon_code: appliedCoupon?.code || null,
                                 total: finalTotal,
                                 is_delivery: true,
@@ -353,7 +370,7 @@ export default function CartDrawer() {
                             cost: {
                                 total: finalTotal,
                                 subtotal: cartTotal,
-                                discount: appliedCoupon?.discountAmount || 0,
+                                discount: discountAmount,
                                 shipping: 0,
                                 tax: 0
                             }
@@ -699,7 +716,7 @@ export default function CartDrawer() {
                                             <Ticket className="h-4 w-4 text-green-600" />
                                             <div>
                                                 <p className="text-[10px] font-black text-green-700 uppercase">{appliedCoupon.code} APPLIED</p>
-                                                <p className="text-[10px] text-green-600 font-playfair">{appliedCoupon.off_percent}% OFF SAVED ₹{appliedCoupon.discountAmount}</p>
+                                                <p className="text-[10px] text-green-600 font-playfair">{appliedCoupon.off_percent}% OFF SAVED ₹{discountAmount}</p>
                                             </div>
                                         </div>
                                         <button
@@ -719,7 +736,7 @@ export default function CartDrawer() {
                                     {appliedCoupon && (
                                         <div className="flex justify-between items-center text-sm font-playfair text-green-600">
                                             <span>Coupon Saving</span>
-                                            <span>-₹{appliedCoupon.discountAmount}</span>
+                                            <span>-₹{discountAmount}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between items-center pt-2 border-t border-orange-100">

@@ -28,7 +28,7 @@ export default function RefundPolicyPage() {
                             <RefreshCcw className="h-6 w-6 text-saffron" />
                             <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Cancellations</h2>
                         </div>
-                        <p>We accept order cancellations within 24 hours of placing the order. To cancel your order, please email us at shivshaktiprovision18@gmail.com or call us at +91 99999 99999.</p>
+                        <p>We accept order cancellations within 24 hours of placing the order. To cancel your order, please email us at shivshaktiprovision18@gmail.com or call us at 9890379728.</p>
                         <p>Once the order has been dispatched from our studio, it cannot be cancelled.</p>
                     </section>
 

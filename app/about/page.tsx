@@ -31,7 +31,8 @@ export default function AboutPage() {
                             Our Heritage, <span className="text-saffron">Your Story</span>
                         </h1>
                         <p className="font-playfair text-base md:text-xl text-[#4A3737]/80 max-w-2xl mx-auto leading-relaxed px-4">
-                            Crafting timeless elegance and celebrating the rich tapestry of Indian artisanship since 1995.
+                            Elevated Gifting, Rooted in Tradition. A Refined Expression of Taste & Careserving generations since 1986.
+
                         </p>
                     </motion.div>
                 </div>
@@ -65,14 +66,15 @@ export default function AboutPage() {
                             <div className="w-20 h-1 bg-saffron rounded-full" />
                             <div className="font-playfair text-[#4A3737]/90 space-y-4 leading-relaxed">
                                 <p>
-                                    Shivshakti began as a small vision in the heart of Nagpur, born from a desire to preserve and promote the incredible handicrafts that have defined our culture for generations. What started as a modest collection of hand-woven textiles has grown into a premium lifestyle brand that brings the soul of India to homes across the globe.
+                                    Shivshakti was established in Nagpur in 1986 as a trusted provision store, built on the values of quality, consistency, and care. Over the decades, we have earned the confidence of generations through our commitment to excellence and thoughtful service.
                                 </p>
                                 <p>
-                                    We believe that every piece of art tells a story. From the meticulous carving of a wooden chest to the intricate embroidery on a silk hamper, each product in our collection is a testament to the skill, patience, and passion of our master artisans.
+                                    In 2008, we extended this legacy into curated gifting. What began as a natural progression soon became a defining part of our brand — premium hampers crafted with refined taste, attention to detail, and an understanding of meaningful celebrations.
                                 </p>
                                 <p>
-                                    Our mission is simple: to connect the modern world with traditional craftsmanship, ensuring that these ancient skills continue to thrive while providing our customers with products that are as meaningful as they are beautiful.
+                                    Today, Shiv Shakti represents elevated gifting rooted in tradition. From fine dry fruits and chocolates to thoughtfully designed hampers, every offering reflects our belief that gifting should feel personal, elegant, and timeless.
                                 </p>
+
                             </div>
                         </motion.div>
                     </div>
@@ -142,7 +144,8 @@ export default function AboutPage() {
                         </motion.div>
                         <h2 className="font-cinzel text-2xl md:text-5xl text-[#2D1B1B]">Curating Excellence</h2>
                         <p className="font-playfair text-lg md:text-xl text-[#4A3737]/80 leading-relaxed italic px-4">
-                            "True luxury consists of things that cannot be mass produced. It is the imperfection of the human hand that makes a piece perfect."
+                            Thoughtfully selected, beautifully presented, and defined by uncompromising quality in every detail.
+
                         </p>
                         <div className="pt-8">
                             <Link

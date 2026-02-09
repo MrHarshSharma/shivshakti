@@ -64,7 +64,7 @@ export default async function Home() {
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+919028937543',
+      telephone: '9890379728',
       contactType: 'customer service',
       email: 'shivshaktiprovision18@gmail.com',
     },

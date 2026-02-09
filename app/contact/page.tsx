@@ -22,7 +22,7 @@ export default function ContactPage() {
         image: 'https://shivshakti.vercel.app/icon.png',
         '@id': 'https://shivshakti.vercel.app',
         url: 'https://shivshakti.vercel.app/contact',
-        telephone: '+919028937543',
+        telephone: '9890379728',
         priceRange: '₹₹₹',
         address: {
             '@type': 'PostalAddress',
@@ -54,7 +54,7 @@ export default function ContactPage() {
         ],
         contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+919028937543',
+            telephone: '9890379728',
             contactType: 'customer service',
             email: 'shivshaktiprovision18@gmail.com',
             areaServed: 'IN',

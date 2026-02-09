@@ -59,7 +59,7 @@ export default function ContactClient() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-[#2D1B1B] mb-1">Call Us</h3>
-                                    <p className="text-[#4A3737]/70">+91 99999 99999</p>
+                                    <p className="text-[#4A3737]/70">9890379728</p>
                                 </div>
                             </div>
 

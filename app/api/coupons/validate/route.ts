@@ -50,7 +50,8 @@ export async function POST(request: NextRequest) {
             coupon: {
                 code: coupon.code,
                 off_percent: coupon.off_percent,
-                discountAmount: discountAmount
+                discountAmount: discountAmount,
+                min_cost: minSpend
             },
             message: 'Coupon applied successfully!'
         })
