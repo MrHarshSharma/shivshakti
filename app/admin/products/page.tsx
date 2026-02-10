@@ -98,41 +98,41 @@ export default function AdminProductsPage() {
 
                 {/* Search - More Compact */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/40 p-6 shadow-sm mb-8">
-                    
+
                     <div className="relative justify-center align-middle mx-auto flex flex-row gap-4">
-                       <div className="w-full" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-saffron/40" />
-                        <input
-                            type="text"
-                            placeholder="Search by name or category..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-11 pr-6 py-3 border border-orange-100 rounded-xl font-playfair text-base focus:outline-none focus:ring-4 focus:ring-saffron/5 bg-white/80 transition-all placeholder:text-[#4A3737]/30 shadow-inner"
-                        />
+                        <div className="w-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-saffron/40" />
+                            <input
+                                type="text"
+                                placeholder="Search by name or category..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-11 pr-6 py-3 border border-orange-100 rounded-xl font-playfair text-base focus:outline-none focus:ring-4 focus:ring-saffron/5 bg-white/80 transition-all placeholder:text-[#4A3737]/30 shadow-inner"
+                            />
                         </div>
 
-{filteredProducts.length > 0 && (
-                    <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-orange-100 p-5">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
-                            <div>
-                                <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Stock Count</p>
-                                <p className="text-xl font-bold text-[#2D1B1B] font-cinzel">{filteredProducts.length}</p>
+                        {filteredProducts.length > 0 && (
+                            <div className="w-full bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-orange-100 p-5">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+                                    <div>
+                                        <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Stock Count</p>
+                                        <p className="text-xl font-bold text-[#2D1B1B] font-cinzel">{filteredProducts.length}</p>
+                                    </div>
+                                    <div className="border-y sm:border-y-0 sm:border-x border-orange-50 py-3 sm:py-0 sm:px-6">
+                                        <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Avg Price</p>
+                                        <p className="text-xl font-bold text-[#2D1B1B] font-cinzel">
+                                            ₹{Math.round(filteredProducts.reduce((sum, p) => sum + p.price, 0) / filteredProducts.length)}
+                                        </p>
+                                    </div>
+                                    <div className="sm:pl-6">
+                                        <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Total Value</p>
+                                        <p className="text-xl font-bold text-saffron font-cinzel">
+                                            ₹{filteredProducts.reduce((sum, p) => sum + p.price, 0).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="border-y sm:border-y-0 sm:border-x border-orange-50 py-3 sm:py-0 sm:px-6">
-                                <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Avg Price</p>
-                                <p className="text-xl font-bold text-[#2D1B1B] font-cinzel">
-                                    ₹{Math.round(filteredProducts.reduce((sum, p) => sum + p.price, 0) / filteredProducts.length)}
-                                </p>
-                            </div>
-                            <div className="sm:pl-6">
-                                <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Total Value</p>
-                                <p className="text-xl font-bold text-saffron font-cinzel">
-                                    ₹{filteredProducts.reduce((sum, p) => sum + p.price, 0).toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                        )}
                     </div>
                 </div>
 
@@ -190,7 +190,7 @@ export default function AdminProductsPage() {
                                         <h3 className="font-playfair text-lg text-[#2D1B1B] font-bold mb-1 line-clamp-1 group-hover:text-saffron transition-colors">
                                             {product.name}
                                         </h3>
-                                        
+
                                         <div className="flex flex-wrap gap-1.5 mb-3">
                                             {product.categories && product.categories.map((category) => (
                                                 <span
@@ -201,9 +201,16 @@ export default function AdminProductsPage() {
                                                 </span>
                                             ))}
                                         </div>
-                                        
+
                                         <p className="text-[#4A3737]/60 text-xs line-clamp-2 font-playfair italic min-h-[32px] leading-relaxed">
-                                            {product.description}
+                                            {(() => {
+                                                try {
+                                                    const jsonDesc = JSON.parse(product.description);
+                                                    return jsonDesc.productDescription || product.description;
+                                                } catch {
+                                                    return product.description;
+                                                }
+                                            })()}
                                         </p>
                                     </div>
 
@@ -230,7 +237,7 @@ export default function AdminProductsPage() {
                 )}
 
                 {/* Summary Section - Scaled Down */}
-               
+
             </div>
         </div>
     )

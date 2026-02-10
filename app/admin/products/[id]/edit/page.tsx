@@ -18,6 +18,8 @@ export default function AdminEditProductPage() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
+        productDetails: '',
+        careInstructions: '',
         price: '',
         categories: [] as string[],
         categoryInput: '',
@@ -55,9 +57,27 @@ export default function AdminEditProductPage() {
 
             if (data.success) {
                 const product = data.product
+                let parsedDescription = product.description;
+                let details = '';
+                let care = '';
+
+                try {
+                    const jsonDesc = JSON.parse(product.description);
+                    if (typeof jsonDesc === 'object' && jsonDesc !== null) {
+                        parsedDescription = jsonDesc.productDescription || '';
+                        details = jsonDesc.productDetails || '';
+                        care = jsonDesc.careInstructions || '';
+                    }
+                } catch (e) {
+                    // Not a JSON string, assume it's just the description
+                    parsedDescription = product.description;
+                }
+
                 setFormData({
                     name: product.name,
-                    description: product.description,
+                    description: parsedDescription,
+                    productDetails: details,
+                    careInstructions: care,
                     price: product.price.toString(),
                     categories: product.categories || [],
                     categoryInput: '',
@@ -146,9 +166,16 @@ export default function AdminEditProductPage() {
             }
 
             // 3. Update product data
+            // Combine description parts into a JSON object
+            const descriptionObject = {
+                productDescription: formData.description,
+                productDetails: formData.productDetails,
+                careInstructions: formData.careInstructions
+            }
+
             const productData = {
                 name: formData.name,
-                description: formData.description,
+                description: JSON.stringify(descriptionObject),
                 price: Number(formData.price),
                 categories: formData.categories,
                 images: finalImageUrls,
@@ -222,19 +249,52 @@ export default function AdminEditProductPage() {
                         />
                     </div>
 
-                    {/* Description */}
-                    <div>
-                        <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                            Description *
-                        </label>
-                        <textarea
-                            required
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
-                            placeholder="Enter product description"
-                            rows={4}
-                        />
+                    {/* Description Section */}
+                    <div className="space-y-4">
+                        <h3 className="font-playfair font-bold text-lg text-[#2D1B1B]">Product Info</h3>
+
+                        {/* Product Description */}
+                        <div>
+                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                Product Description *
+                            </label>
+                            <textarea
+                                required
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                placeholder="Enter main product description"
+                                rows={4}
+                            />
+                        </div>
+
+                        {/* Product Details */}
+                        <div>
+                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                Product Details
+                            </label>
+                            <textarea
+                                value={formData.productDetails}
+                                onChange={(e) => setFormData({ ...formData, productDetails: e.target.value })}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                placeholder="Enter detailed specifications"
+                                rows={4}
+                            />
+                        </div>
+
+                        {/* Care Instructions */}
+                        <div>
+                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                Care Instructions
+                            </label>
+                            <textarea
+                                value={formData.careInstructions}
+                                onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                placeholder="Enter care instructions"
+                                rows={3}
+                            />
+                        </div>
                     </div>
 
                     {/* Price */}

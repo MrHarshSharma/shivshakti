@@ -56,7 +56,14 @@ export default function ProductCard({ product }: { product: Product }) {
                                 {product.name}
                             </h3>
                             <p className="text-[#4A3737]/70 text-xs leading-relaxed mb-3 line-clamp-2">
-                                {product.description}
+                                {(() => {
+                                    try {
+                                        const jsonDesc = JSON.parse(product.description);
+                                        return jsonDesc.productDescription || product.description;
+                                    } catch {
+                                        return product.description;
+                                    }
+                                })()}
                             </p>
                         </div>
                     </Link>

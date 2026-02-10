@@ -44,12 +44,23 @@ export async function generateMetadata(
     // Use first product image or fallback
     const mainImage = product.images?.[0] || '/placeholder-product.png'
 
+    // Parse description if it's JSON
+    let metaDescription = product.description
+    try {
+        const jsonDesc = JSON.parse(product.description)
+        if (typeof jsonDesc === 'object' && jsonDesc !== null && jsonDesc.productDescription) {
+            metaDescription = jsonDesc.productDescription
+        }
+    } catch {
+        // Not JSON, use description as is
+    }
+
     return {
         title: product.name,
-        description: product.description,
+        description: metaDescription,
         openGraph: {
             title: product.name,
-            description: product.description,
+            description: metaDescription,
             images: [mainImage, ...previousImages],
         },
     }

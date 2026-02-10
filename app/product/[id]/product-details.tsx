@@ -103,7 +103,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
                 <div className="grid md:grid-cols-12 gap-16 lg:gap-24">
                     {/* Image Section */}
-                    <div className="md:col-span-5 space-y-6">
+                    <div className="md:col-span-5 space-y-6 md:sticky md:top-32 h-fit">
                         <div className="relative aspect-[3/4] bg-white rounded-3xl overflow-hidden shadow-2xl border-8 border-white group">
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
@@ -216,9 +216,47 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                             </span>
                         </div>
 
-                        <p className="text-[#4A3737]/80 font-playfair text-lg leading-relaxed mb-10 border-l-4 border-magenta/20 pl-6">
-                            {product.description}
-                        </p>
+                        {(() => {
+                            let description = product.description;
+                            let details = '';
+                            let care = '';
+                            let isJson = false;
+
+                            try {
+                                const jsonDesc = JSON.parse(product.description);
+                                if (typeof jsonDesc === 'object' && jsonDesc !== null) {
+                                    description = jsonDesc.productDescription || '';
+                                    details = jsonDesc.productDetails || '';
+                                    care = jsonDesc.careInstructions || '';
+                                    isJson = true;
+                                }
+                            } catch (e) {
+                                // Not a JSON string
+                            }
+
+                            return (
+                                <div className="space-y-8 mb-10">
+                                    <div className={`text-[#4A3737]/80 font-playfair text-lg leading-relaxed ${!isJson ? 'border-l-4 border-magenta/20 pl-6' : ''}`}>
+                                        {isJson && <h3 className="font-cinzel text-xl text-[#2D1B1B] mb-3 font-bold">Description</h3>}
+                                        <p>{description}</p>
+                                    </div>
+
+                                    {details && (
+                                        <div className="text-[#4A3737]/80 font-playfair text-lg leading-relaxed">
+                                            <h3 className="font-cinzel text-xl text-[#2D1B1B] mb-3 font-bold">Product Details</h3>
+                                            <p className="whitespace-pre-line">{details}</p>
+                                        </div>
+                                    )}
+
+                                    {care && (
+                                        <div className="text-[#4A3737]/80 font-playfair text-lg leading-relaxed">
+                                            <h3 className="font-cinzel text-xl text-[#2D1B1B] mb-3 font-bold">Care Instructions</h3>
+                                            <p className="whitespace-pre-line">{care}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()}
 
                         <div className="space-y-8">
                             {/* Quantity Selector */}
