@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, X, Plus, Save, Loader2, ChevronDown } from 'lucide-react'
+import { Upload, X, Plus, Save, Loader2, ChevronDown, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
@@ -162,8 +162,8 @@ export default function AdminAddProductPage() {
             <div className="container mx-auto px-4 max-w-4xl">
                 {/* Header */}
                 <div className="mb-8">
-                    <Link href="/" className="text-saffron hover:text-orange-600 text-sm font-bold uppercase tracking-wider mb-4 inline-block">
-                        ← Back to Home
+                    <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-orange-100 text-saffron hover:text-orange-600 text-xs font-bold uppercase tracking-wider mb-6 transition-all group">
+                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
                     </Link>
                     <h1 className="font-cinzel text-4xl text-[#2D1B1B] mb-2">Add New Product</h1>
                     <p className="text-[#4A3737]/70 font-playfair">Fill in the details to add a new product to the catalog</p>

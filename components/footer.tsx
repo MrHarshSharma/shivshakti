@@ -100,7 +100,12 @@ export default function Footer() {
                                 <Mail className="h-3 w-3 text-magenta text-sm" /> shivshaktiprovision18@gmail.com
                             </p>
                             <p className="font-playfair text-[11px] text-[#4A3737]/70 flex items-center justify-center md:justify-start gap-2">
-                                <a href="tel:+919890379728"><span><Phone className="h-3 w-3 text-saffron text-sm" /> 9890379728</span></a>
+                                <a className='w-full' href="tel:+919890379728">
+                                    <span className='flex items-center gap-2 md:justify-start justify-center '>
+                                        <Phone className="h-3 w-3 text-saffron text-sm" />
+                                        <span>9890379728</span>
+                                    </span>
+                                </a>
                             </p>
                         </div>
                     </div>

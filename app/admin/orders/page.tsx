@@ -131,8 +131,8 @@ export default function AdminOrdersPage() {
             <div className="container mx-auto px-4 max-w-7xl relative z-10">
                 {/* Header */}
                 <div className="mb-12">
-                    <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-orange-100 text-saffron hover:text-orange-600 text-xs font-bold uppercase tracking-wider mb-6 transition-all">
-                        <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+                    <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-orange-100 text-saffron hover:text-orange-600 text-xs font-bold uppercase tracking-wider mb-6 transition-all group">
+                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
                     </Link>
                     <h1 className="font-cinzel text-5xl text-[#2D1B1B] mb-2 font-bold">Orders <span className="text-saffron">Management</span></h1>
                     <p className="text-[#4A3737]/70 font-playfair text-lg">Orchestrate customer joy and commerce.</p>
