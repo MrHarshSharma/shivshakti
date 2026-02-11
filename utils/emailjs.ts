@@ -1,6 +1,9 @@
 import emailjs from '@emailjs/browser'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { OrderConfirmationEmail } from '@/components/email/order-confirmation'
+import { OrderReceivedEmail } from '@/components/email/order-received'
+import { OrderAcceptedEmail } from '@/components/email/order-accepted'
+import { OrderDeliveredEmail } from '@/components/email/order-delivered'
+import { CustomerOrderCancelledEmail } from '@/components/email/customer-order-cancelled'
 import React from 'react'
 
 interface OrderEmailData {
@@ -19,9 +22,12 @@ interface OrderEmailData {
         shipping?: number
         tax?: number
     }
+    from_name?: string
+    reply_to?: string
+    mode?: string
 }
 
-export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<boolean> {
+export async function sendOrderReceivedEmail(data: OrderEmailData): Promise<boolean> {
     try {
         const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
         const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -34,7 +40,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
 
         // Render the email component to HTML string
         const messageHtml = renderToStaticMarkup(
-            React.createElement(OrderConfirmationEmail, data)
+            React.createElement(OrderReceivedEmail, { ...data, mode: data.mode })
         )
 
         const templateParams = {
@@ -43,6 +49,10 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
             message_html: messageHtml, // Send the rendered HTML
             orders: data.orders, // Pass the array of orders for {{#orders}} loop
             cost: data.cost, // Pass the cost object for {{cost.shipping}}, etc.
+            from_name: data.from_name || 'Shivshakti',
+            reply_to: data.reply_to || 'shivshaktiprovision18@gmail.com',
+            to_email: data.reply_to, // Assuming reply_to is the customer email
+            subject: `Order Received #${data.order_id} - Shivshakti`
         }
 
         await emailjs.send(
@@ -52,10 +62,104 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
             publicKey
         )
 
-        console.log('Order confirmation email sent successfully')
+        console.log('Order received email sent successfully')
         return true
     } catch (error) {
-        console.error('Failed to send order confirmation email:', error)
+        console.error('Failed to send order received email:', error)
+        return false
+    }
+}
+
+export async function sendOrderAcceptedEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+    try {
+        const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+        const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+        const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+        if (!serviceId || !templateId || !publicKey) return false
+
+        const messageHtml = renderToStaticMarkup(
+            React.createElement(OrderAcceptedEmail, { name: data.name, order_id: data.order_id })
+        )
+
+        const templateParams = {
+            name: data.name,
+            order_id: data.order_id,
+            message_html: messageHtml,
+            to_email: data.email,
+            subject: `Order #${data.order_id} Accepted - Shivshakti`,
+            from_name: 'Shivshakti',
+            reply_to: 'shivshaktiprovision18@gmail.com'
+        }
+
+        console.log('Sending Accepted Email Params:', JSON.stringify(templateParams, null, 2))
+
+        await emailjs.send(serviceId, templateId, templateParams, publicKey)
+        return true
+    } catch (error) {
+        console.error('Failed to send accepted email:', error)
+        return false
+    }
+}
+
+export async function sendOrderDeliveredEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+    try {
+        const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+        const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+        const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+        if (!serviceId || !templateId || !publicKey) return false
+
+        const messageHtml = renderToStaticMarkup(
+            React.createElement(OrderDeliveredEmail, { name: data.name, order_id: data.order_id })
+        )
+
+        const templateParams = {
+            name: data.name,
+            order_id: data.order_id,
+            message_html: messageHtml,
+            to_email: data.email,
+            subject: `Order #${data.order_id} Delivered - Shivshakti`,
+            from_name: 'Shivshakti',
+            reply_to: 'shivshaktiprovision18@gmail.com'
+        }
+
+        await emailjs.send(serviceId, templateId, templateParams, publicKey)
+        return true
+    } catch (error) {
+        console.error('Failed to send delivered email:', error)
+        return false
+    }
+}
+
+export async function sendCustomerCancellationEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+    try {
+        const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+        const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+        const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+        if (!serviceId || !templateId || !publicKey) return false
+
+        const messageHtml = renderToStaticMarkup(
+            React.createElement(CustomerOrderCancelledEmail, { name: data.name, order_id: data.order_id })
+        )
+
+        const templateParams = {
+            name: data.name,
+            order_id: data.order_id,
+            message_html: messageHtml,
+            to_email: data.email,
+            subject: `Order #${data.order_id} Cancelled - Shivshakti`,
+            from_name: 'Shivshakti',
+            reply_to: 'shivshaktiprovision18@gmail.com'
+        }
+
+        console.log('Sending Customer Cancellation Email:', JSON.stringify(templateParams, null, 2))
+
+        await emailjs.send(serviceId, templateId, templateParams, publicKey)
+        return true
+    } catch (error) {
+        console.error('Failed to send customer cancellation email:', error)
         return false
     }
 }

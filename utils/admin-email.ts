@@ -1,3 +1,6 @@
+import { OrderCancelledEmail } from '@/components/email/order-cancelled'
+import React from 'react'
+
 export interface CancelEmailData {
     order_id: number
     user_email: string
@@ -14,21 +17,21 @@ export async function sendOrderCancellationEmail(data: CancelEmailData): Promise
         return false
     }
 
-    const messageHtml = `
-        <div style="font-family: serif; color: #2D1B1B; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
-            <h2 style="color: #ef4444;">Order Cancelled</h2>
-            <p><strong>Order ID:</strong> #${data.order_id}</p>
-            <p><strong>Customer:</strong> ${data.user_email}</p>
-            <p><strong>Status:</strong> Cancelled by User</p>
-            <p>Please update your records.</p>
-        </div>
-    `
+    const { renderToStaticMarkup } = await import('react-dom/server')
+    const messageHtml = renderToStaticMarkup(
+        React.createElement(OrderCancelledEmail, {
+            order_id: data.order_id,
+            user_email: data.user_email,
+            reason: data.reason
+        })
+    )
 
     const templateParams = {
         name: 'Admin',
         to_email: (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').split(',')[0], // Send to primary admin
         order_id: data.order_id,
         message_html: messageHtml,
+        subject: `Cancelled by User - Order #${data.order_id}`
     }
 
     const privateKey = process.env.NEXT_PUBLIC_EMAILJS_PRIVATE_KEY

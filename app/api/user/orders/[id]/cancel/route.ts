@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
+
 export async function POST(
     request: Request,
     { params }: { params: Promise<{ id: string }> }

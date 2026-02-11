@@ -7,7 +7,7 @@ import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { sendOrderConfirmationEmail } from '@/utils/emailjs'
+import { sendOrderReceivedEmail } from '@/utils/emailjs'
 import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
 
 export default function CartDrawer() {
@@ -220,7 +220,7 @@ export default function CartDrawer() {
                 }
 
                 // Send order confirmation email
-                sendOrderConfirmationEmail({
+                sendOrderReceivedEmail({
                     name: customerData.name,
                     order_id: createOrderData.orderId,
                     orders: items.map(item => ({
@@ -235,7 +235,10 @@ export default function CartDrawer() {
                         discount: discountAmount,
                         shipping: 0,
                         tax: 0
-                    }
+                    },
+                    from_name: customerData.name,
+                    reply_to: user.email,
+                    mode: 'Store Pickup',
                 }).catch(err => console.error('Email sending failed:', err))
 
                 // Save data and cleanup
@@ -358,7 +361,7 @@ export default function CartDrawer() {
                         }
 
                         // Send order confirmation email (don't block on failure)
-                        sendOrderConfirmationEmail({
+                        sendOrderReceivedEmail({
                             name: customerData.name,
                             order_id: createOrderData.orderId,
                             orders: items.map(item => ({
@@ -373,7 +376,10 @@ export default function CartDrawer() {
                                 discount: discountAmount,
                                 shipping: 0,
                                 tax: 0
-                            }
+                            },
+                            from_name: customerData.name,
+                            reply_to: user.email,
+                            mode: 'Doorstep Delivery',
                         }).catch(err => console.error('Email sending failed:', err))
 
                         // Save customer data to localStorage (both global and per-user)

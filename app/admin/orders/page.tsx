@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Search, Filter, Download, ArrowRight, Clock, ChevronDown, Loader2 } from 'lucide-react'
 import { formatDate } from '@/utils/date'
+import { sendOrderAcceptedEmail, sendOrderDeliveredEmail, sendCustomerCancellationEmail } from '@/utils/emailjs'
+import { useSearchParams } from 'next/navigation'
 
 interface Order {
     id: number
@@ -37,6 +39,15 @@ export default function AdminOrdersPage() {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null)
+
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        const search = searchParams.get('search')
+        if (search) {
+            setSearchTerm(search)
+        }
+    }, [searchParams])
 
     useEffect(() => {
         fetchOrders()
@@ -85,6 +96,7 @@ export default function AdminOrdersPage() {
     const getStatusBadge = (status: string) => {
         const styles = {
             pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+            processing: 'bg-blue-100 text-blue-700 border-blue-200',
             completed: 'bg-green-100 text-green-700 border-green-200',
             cancelled: 'bg-red-100 text-red-700 border-red-200'
         }
@@ -111,6 +123,31 @@ export default function AdminOrdersPage() {
             })
 
             if (response.ok) {
+                // Send emails based on new status if changed
+                const order = orders.find(o => o.id === orderId)
+                if (order && order.status !== newStatus) {
+                    if (newStatus === 'processing') {
+                        await sendOrderAcceptedEmail({
+                            name: order.name,
+                            order_id: order.id,
+                            email: order.email || ''
+                        })
+                    } else if (newStatus === 'completed') {
+                        await sendOrderDeliveredEmail({
+                            name: order.name,
+                            order_id: order.id,
+                            email: order.email || ''
+                        })
+                    } else if (newStatus === 'cancelled') {
+                        // When admin cancels, notify the customer
+                        await sendCustomerCancellationEmail({
+                            name: order.name,
+                            order_id: order.id,
+                            email: order.email || ''
+                        })
+                    }
+                }
+
                 await fetchOrders()
             }
         } catch (error) {
@@ -290,6 +327,7 @@ export default function AdminOrdersPage() {
                                                         className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
                                                     >
                                                         <option value="pending">Pending</option>
+                                                        <option value="processing">Processing</option>
                                                         <option value="completed">Completed</option>
                                                         <option value="cancelled">Cancelled</option>
                                                     </select>
