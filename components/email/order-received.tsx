@@ -261,7 +261,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                         lineHeight: '1.5',
                         margin: '0',
                     }}>
-                        If you have any questions, please contact us at shivshaktiprovision18@gmail.com
+                        If you have any questions, please contact us at {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
                     </p>
                 </div>
             </div>

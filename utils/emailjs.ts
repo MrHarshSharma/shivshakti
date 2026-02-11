@@ -50,8 +50,8 @@ export async function sendOrderReceivedEmail(data: OrderEmailData): Promise<bool
             orders: data.orders, // Pass the array of orders for {{#orders}} loop
             cost: data.cost, // Pass the cost object for {{cost.shipping}}, etc.
             from_name: data.from_name || 'Shivshakti',
-            reply_to: data.reply_to || 'shivshaktiprovision18@gmail.com',
-            to_email: data.reply_to, // Assuming reply_to is the customer email
+            reply_to: data.reply_to || process.env.NEXT_PUBLIC_ADMIN_EMAIL || '',
+            to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || '', // Send to admin, not customer
             subject: `Order Received #${data.order_id} - Shivshakti`
         }
 
@@ -70,7 +70,26 @@ export async function sendOrderReceivedEmail(data: OrderEmailData): Promise<bool
     }
 }
 
-export async function sendOrderAcceptedEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+export async function sendOrderAcceptedEmail(data: {
+    name: string;
+    order_id: number;
+    email: string;
+    phone?: string;
+    address?: string;
+    orders?: Array<{
+        name: string;
+        price: number;
+        units: number;
+        image?: string;
+    }>;
+    cost?: {
+        total: number;
+        subtotal?: number;
+        discount?: number;
+        shipping?: number;
+        tax?: number;
+    };
+}): Promise<boolean> {
     try {
         const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
         const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -79,7 +98,14 @@ export async function sendOrderAcceptedEmail(data: { name: string; order_id: num
         if (!serviceId || !templateId || !publicKey) return false
 
         const messageHtml = renderToStaticMarkup(
-            React.createElement(OrderAcceptedEmail, { name: data.name, order_id: data.order_id })
+            React.createElement(OrderAcceptedEmail, {
+                name: data.name,
+                order_id: data.order_id,
+                phone: data.phone,
+                address: data.address,
+                orders: data.orders,
+                cost: data.cost
+            })
         )
 
         const templateParams = {
@@ -89,7 +115,7 @@ export async function sendOrderAcceptedEmail(data: { name: string; order_id: num
             to_email: data.email,
             subject: `Order #${data.order_id} Accepted - Shivshakti`,
             from_name: 'Shivshakti',
-            reply_to: 'shivshaktiprovision18@gmail.com'
+            reply_to: process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
         }
 
         console.log('Sending Accepted Email Params:', JSON.stringify(templateParams, null, 2))
@@ -102,7 +128,26 @@ export async function sendOrderAcceptedEmail(data: { name: string; order_id: num
     }
 }
 
-export async function sendOrderDeliveredEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+export async function sendOrderDeliveredEmail(data: {
+    name: string;
+    order_id: number;
+    email: string;
+    phone?: string;
+    address?: string;
+    orders?: Array<{
+        name: string;
+        price: number;
+        units: number;
+        image?: string;
+    }>;
+    cost?: {
+        total: number;
+        subtotal?: number;
+        discount?: number;
+        shipping?: number;
+        tax?: number;
+    };
+}): Promise<boolean> {
     try {
         const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
         const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -111,7 +156,14 @@ export async function sendOrderDeliveredEmail(data: { name: string; order_id: nu
         if (!serviceId || !templateId || !publicKey) return false
 
         const messageHtml = renderToStaticMarkup(
-            React.createElement(OrderDeliveredEmail, { name: data.name, order_id: data.order_id })
+            React.createElement(OrderDeliveredEmail, {
+                name: data.name,
+                order_id: data.order_id,
+                phone: data.phone,
+                address: data.address,
+                orders: data.orders,
+                cost: data.cost
+            })
         )
 
         const templateParams = {
@@ -121,7 +173,7 @@ export async function sendOrderDeliveredEmail(data: { name: string; order_id: nu
             to_email: data.email,
             subject: `Order #${data.order_id} Delivered - Shivshakti`,
             from_name: 'Shivshakti',
-            reply_to: 'shivshaktiprovision18@gmail.com'
+            reply_to: process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
         }
 
         await emailjs.send(serviceId, templateId, templateParams, publicKey)
@@ -132,7 +184,26 @@ export async function sendOrderDeliveredEmail(data: { name: string; order_id: nu
     }
 }
 
-export async function sendCustomerCancellationEmail(data: { name: string; order_id: number; email: string }): Promise<boolean> {
+export async function sendCustomerCancellationEmail(data: {
+    name: string;
+    order_id: number;
+    email: string;
+    phone?: string;
+    address?: string;
+    orders?: Array<{
+        name: string;
+        price: number;
+        units: number;
+        image?: string;
+    }>;
+    cost?: {
+        total: number;
+        subtotal?: number;
+        discount?: number;
+        shipping?: number;
+        tax?: number;
+    };
+}): Promise<boolean> {
     try {
         const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
         const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -141,7 +212,14 @@ export async function sendCustomerCancellationEmail(data: { name: string; order_
         if (!serviceId || !templateId || !publicKey) return false
 
         const messageHtml = renderToStaticMarkup(
-            React.createElement(CustomerOrderCancelledEmail, { name: data.name, order_id: data.order_id })
+            React.createElement(CustomerOrderCancelledEmail, {
+                name: data.name,
+                order_id: data.order_id,
+                phone: data.phone,
+                address: data.address,
+                orders: data.orders,
+                cost: data.cost
+            })
         )
 
         const templateParams = {
@@ -151,7 +229,7 @@ export async function sendCustomerCancellationEmail(data: { name: string; order_
             to_email: data.email,
             subject: `Order #${data.order_id} Cancelled - Shivshakti`,
             from_name: 'Shivshakti',
-            reply_to: 'shivshaktiprovision18@gmail.com'
+            reply_to: process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
         }
 
         console.log('Sending Customer Cancellation Email:', JSON.stringify(templateParams, null, 2))

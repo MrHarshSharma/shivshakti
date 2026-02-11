@@ -3,12 +3,31 @@ import React from 'react'
 interface OrderDeliveredEmailProps {
     name: string
     order_id: number
+    phone?: string
+    address?: string
+    orders?: Array<{
+        name: string
+        price: number
+        units: number
+        image?: string
+    }>
+    cost?: {
+        total: number
+        subtotal?: number
+        discount?: number
+        shipping?: number
+        tax?: number
+    }
     date?: string
 }
 
 export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
     name,
     order_id,
+    phone,
+    address,
+    orders = [],
+    cost,
     date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
 }) => {
     return (
@@ -105,6 +124,113 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                     }}>
                         Thank you for shopping with Shivshakti. We look forward to serving you again soon!
                     </p>
+
+                    {/* Customer Details */}
+                    {(phone || address) && (
+                        <div style={{
+                            backgroundColor: '#f9fafb',
+                            padding: '20px',
+                            borderRadius: '8px',
+                            margin: '20px 0',
+                            border: '1px solid #e5e7eb',
+                        }}>
+                            <h3 style={{
+                                fontSize: '14px',
+                                color: '#6b7280',
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px',
+                                margin: '0 0 15px',
+                                fontWeight: 'bold',
+                            }}>Delivery Information</h3>
+                            {phone && (
+                                <p style={{
+                                    fontSize: '14px',
+                                    color: '#2D1B1B',
+                                    margin: '0 0 8px',
+                                    lineHeight: '1.5',
+                                }}>
+                                    <strong>Phone:</strong> {phone}
+                                </p>
+                            )}
+                            {address && (
+                                <p style={{
+                                    fontSize: '14px',
+                                    color: '#2D1B1B',
+                                    margin: '0',
+                                    lineHeight: '1.5',
+                                }}>
+                                    <strong>Address:</strong> {address}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Order Summary */}
+                    {orders && orders.length > 0 && (
+                        <div style={{ marginTop: '30px' }}>
+                            <h3 style={{
+                                fontSize: '18px',
+                                color: '#2D1B1B',
+                                margin: '0 0 20px',
+                                fontWeight: 'bold',
+                            }}>Order Summary</h3>
+
+                            {orders.map((item, index) => (
+                                <div key={index} style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '15px 0',
+                                    borderBottom: index < orders.length - 1 ? '1px solid #f3f4f6' : 'none',
+                                }}>
+                                    <div style={{ flex: 1 }}>
+                                        <p style={{
+                                            fontSize: '14px',
+                                            color: '#2D1B1B',
+                                            margin: '0 0 4px',
+                                            fontWeight: 'bold',
+                                        }}>{item.name}</p>
+                                        <p style={{
+                                            fontSize: '12px',
+                                            color: '#6b7280',
+                                            margin: '0',
+                                        }}>Qty: {item.units} × ₹{item.price}</p>
+                                    </div>
+                                    <div style={{
+                                        fontSize: '14px',
+                                        color: '#2D1B1B',
+                                        fontWeight: 'bold',
+                                    }}>₹{item.price * item.units}</div>
+                                </div>
+                            ))}
+
+                            {cost && (
+                                <div style={{
+                                    marginTop: '20px',
+                                    paddingTop: '20px',
+                                    borderTop: '2px solid #2D1B1B',
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                    }}>
+                                        <span style={{
+                                            fontSize: '16px',
+                                            color: '#2D1B1B',
+                                            fontWeight: 'bold',
+                                        }}>Total</span>
+                                        <span style={{
+                                            fontSize: '20px',
+                                            color: '#15803d',
+                                            fontWeight: 'bold',
+                                            fontFamily: '"Cinzel", serif',
+                                        }}>₹{cost.total}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}
@@ -127,7 +253,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                         lineHeight: '1.5',
                         margin: '0',
                     }}>
-                        If you have any questions, please contact us at shivshaktiprovision18@gmail.com
+                        If you have any questions, please contact us at {process.env.NEXT_PUBLIC_ADMIN_EMAIL}
                     </p>
                 </div>
             </div>

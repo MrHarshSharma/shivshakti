@@ -126,24 +126,48 @@ export default function AdminOrdersPage() {
                 // Send emails based on new status if changed
                 const order = orders.find(o => o.id === orderId)
                 if (order && order.status !== newStatus) {
+                    // Prepare order items for email
+                    const emailOrders = order.order?.items?.map(item => ({
+                        name: item.name,
+                        price: item.price,
+                        units: item.quantity,
+                        image: (item as any).image // Safe cast for image property
+                    })) || []
+
+                    const emailCost = {
+                        total: order.order?.total || 0
+                    }
+
                     if (newStatus === 'processing') {
                         await sendOrderAcceptedEmail({
                             name: order.name,
                             order_id: order.id,
-                            email: order.email || ''
+                            email: order.email || '',
+                            phone: order.phone,
+                            address: order.address,
+                            orders: emailOrders,
+                            cost: emailCost
                         })
                     } else if (newStatus === 'completed') {
                         await sendOrderDeliveredEmail({
                             name: order.name,
                             order_id: order.id,
-                            email: order.email || ''
+                            email: order.email || '',
+                            phone: order.phone,
+                            address: order.address,
+                            orders: emailOrders,
+                            cost: emailCost
                         })
                     } else if (newStatus === 'cancelled') {
                         // When admin cancels, notify the customer
                         await sendCustomerCancellationEmail({
                             name: order.name,
                             order_id: order.id,
-                            email: order.email || ''
+                            email: order.email || '',
+                            phone: order.phone,
+                            address: order.address,
+                            orders: emailOrders,
+                            cost: emailCost
                         })
                     }
                 }
