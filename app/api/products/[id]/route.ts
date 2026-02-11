@@ -59,26 +59,53 @@ export async function PUT(
         }
 
         const body = await request.json()
-        const { name, description, price, categories, images } = body
+        const { name, description, price, categories, images, product_type, variations } = body
 
-        console.log('Update Request for ID:', id, 'Payload:', { name, price, imagesCount: images?.length })
+        console.log('Update Request for ID:', id, 'Payload:', { name, product_type, imagesCount: images?.length })
 
         // Validate required fields
-        if (!name || !description || price === undefined || !images || images.length === 0) {
+        if (!name || !description || !images || images.length === 0) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
             )
         }
 
+        // Validate product type specific requirements
+        if (product_type === 'simple' && price === undefined) {
+            return NextResponse.json(
+                { error: 'Price is required for simple products' },
+                { status: 400 }
+            )
+        }
+
+        if (product_type === 'variable' && (!variations || variations.length === 0)) {
+            return NextResponse.json(
+                { error: 'At least one variation is required for variable products' },
+                { status: 400 }
+            )
+        }
+
         const supabase = createServiceRoleClient()
 
-        const productData = {
+        const productData: any = {
             name,
             description,
-            price: parseInt(price.toString()),
             categories: categories || [],
             images: images,
+            product_type: product_type || 'simple',
+        }
+
+        // Add price for simple products
+        if (product_type === 'simple') {
+            productData.price = parseInt(price.toString())
+        } else {
+            productData.price = null
+        }
+
+        // Add variations for variable products
+        if (product_type === 'variable') {
+            productData.variations = variations
         }
 
         const { data, error } = await supabase

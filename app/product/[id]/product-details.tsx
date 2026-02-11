@@ -32,8 +32,17 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
     const { addToCartSilent, items, updateQuantity } = useCart()
     const [quantity, setQuantity] = useState(1)
+    const [selectedVariation, setSelectedVariation] = useState<any>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [[page, direction], setPage] = useState([0, 0])
+
+    // Initialize selected variation
+    useEffect(() => {
+        if (product?.product_type === 'variable' && product.variations && product.variations.length > 0) {
+            const defaultVar = product.variations.find(v => v.is_default) || product.variations[0]
+            setSelectedVariation(defaultVar)
+        }
+    }, [product])
 
     const id = product.id.toString()
 
@@ -57,26 +66,32 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     // Sync quantity with cart when cart changes
     useEffect(() => {
         if (id && product) {
-            const cartItem = items.find(item => item.id.toString() === id.toString())
+            const cartItem = items.find(item =>
+                item.id.toString() === id.toString() &&
+                (!selectedVariation || item.selectedVariation?.id === selectedVariation.id)
+            )
             if (cartItem) {
                 setQuantity(cartItem.quantity)
             } else {
                 setQuantity(1)
             }
         }
-    }, [id, items, product])
+    }, [id, items, product, selectedVariation])
 
-    const cartItem = items.find(item => item.id.toString() === id.toString())
+    const cartItem = items.find(item =>
+        item.id.toString() === id.toString() &&
+        (!selectedVariation || item.selectedVariation?.id === selectedVariation.id)
+    )
     const isInCart = !!cartItem
 
     const handleAddToCart = () => {
         if (!product) return
         if (isInCart) {
             // Update quantity if already in cart
-            updateQuantity(product.id, quantity)
+            updateQuantity(product.id, quantity, selectedVariation?.id)
         } else {
-            // Add new item to cart (silently, without opening drawer)
-            addToCartSilent(product, quantity)
+            // Add new item to cart
+            addToCartSilent(product, quantity, selectedVariation)
         }
 
         // Show success animation
@@ -212,9 +227,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         </h1>
                         <div className="flex items-center gap-4 mb-6 md:mb-8">
                             <span className="text-2xl md:text-3xl text-[#4A3737] font-bold">
-                                ₹{product.price}
+                                ₹{selectedVariation ? selectedVariation.price : product.price}
                             </span>
+                            {selectedVariation && (
+                                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-purple-100">
+                                    {selectedVariation.name}
+                                </span>
+                            )}
                         </div>
+
 
                         {(() => {
                             let description = product.description;
@@ -257,6 +278,29 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                             );
                         })()}
+
+
+                        {/* Variation Selector */}
+                        {product.product_type === 'variable' && product.variations && product.variations.length > 0 && (
+                            <div className="mb-10">
+                                <h3 className="text-xs md:text-sm font-bold uppercase tracking-wider text-[#4A3737] mb-4">Select Option</h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {product.variations.map((variation) => (
+                                        <button
+                                            key={variation.id}
+                                            onClick={() => setSelectedVariation(variation)}
+                                            className={`px-6 py-3 rounded-xl border-2 transition-all font-playfair text-sm ${selectedVariation?.id === variation.id
+                                                ? 'border-saffron bg-saffron/5 text-saffron shadow-md'
+                                                : 'border-orange-100 bg-white text-[#4A3737] hover:border-orange-200'
+                                                }`}
+                                        >
+                                            <div className="font-bold">{variation.name}</div>
+                                            <div className="text-[10px] opacity-70">₹{variation.price}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-8">
                             {/* Quantity Selector */}

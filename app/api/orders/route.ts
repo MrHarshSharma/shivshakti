@@ -37,11 +37,15 @@ export async function POST(request: Request) {
                     id: item.id,
                     name: item.name,
                     category: (item.categories && item.categories.length > 0) ? item.categories[0] : item.category || 'General',
-                    price: item.price,
+                    price: item.selectedVariation ? item.selectedVariation.price : item.price,
                     quantity: item.quantity,
-                    image: (item.images && item.images.length > 0) ? item.images[0] : item.image || '/placeholder-product.png'
+                    image: (item.images && item.images.length > 0) ? item.images[0] : item.image || '/placeholder-product.png',
+                    variation: item.selectedVariation || null
                 })),
-                total: items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0),
+                total: items.reduce((sum: number, item: any) => {
+                    const price = item.selectedVariation ? item.selectedVariation.price : item.price;
+                    return sum + (price * item.quantity);
+                }, 0),
                 itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
             },
             status: 'pending',

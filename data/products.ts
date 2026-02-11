@@ -7,6 +7,15 @@ export interface Product {
     categories: string[];
     images: string[];
     isNew?: boolean;
+    product_type?: 'simple' | 'variable';
+    variations?: Array<{
+        id: string;
+        name: string;
+        price: number;
+        stock?: number;
+        sku?: string;
+        is_default?: boolean;
+    }>;
 }
 
 // Keep the mock data for now but update structure to avoid typescrpit errors during migration

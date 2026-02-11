@@ -6,14 +6,21 @@ import { Product } from '@/data/products'
 
 interface CartItem extends Product {
     quantity: number;
+    selectedVariation?: {
+        id: string;
+        name: string;
+        price: number;
+        stock?: number;
+        sku?: string;
+    }
 }
 
 interface CartContextType {
     items: CartItem[];
-    addToCart: (product: Product, quantity: number) => void;
-    addToCartSilent: (product: Product, quantity: number) => void;
-    removeFromCart: (productId: string | number) => void;
-    updateQuantity: (productId: string | number, quantity: number) => void;
+    addToCart: (product: Product, quantity: number, variation?: any) => void;
+    addToCartSilent: (product: Product, quantity: number, variation?: any) => void;
+    removeFromCart: (productId: string | number, variationId?: string) => void;
+    updateQuantity: (productId: string | number, quantity: number, variationId?: string) => void;
     clearCart: () => void;
     toggleCart: () => void;
     isCartOpen: boolean;
@@ -44,44 +51,54 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     }, [items, isInitialized]);
 
-    const addToCart = (product: Product, quantity: number) => {
+    const addToCart = (product: Product, quantity: number, variation?: any) => {
         setItems(prev => {
-            const existing = prev.find(item => item.id === product.id);
+            const existing = prev.find(item =>
+                item.id === product.id &&
+                (!variation || item.selectedVariation?.id === variation.id)
+            );
             if (existing) {
                 return prev.map(item =>
-                    item.id === product.id
+                    item.id === product.id && (!variation || item.selectedVariation?.id === variation.id)
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
-            return [...prev, { ...product, quantity }];
+            return [...prev, { ...product, quantity, selectedVariation: variation }];
         });
         setIsCartOpen(true);
     };
 
-    const addToCartSilent = (product: Product, quantity: number) => {
+    const addToCartSilent = (product: Product, quantity: number, variation?: any) => {
         setItems(prev => {
-            const existing = prev.find(item => item.id === product.id);
+            const existing = prev.find(item =>
+                item.id === product.id &&
+                (!variation || item.selectedVariation?.id === variation.id)
+            );
             if (existing) {
                 return prev.map(item =>
-                    item.id === product.id
+                    item.id === product.id && (!variation || item.selectedVariation?.id === variation.id)
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
             }
-            return [...prev, { ...product, quantity }];
+            return [...prev, { ...product, quantity, selectedVariation: variation }];
         });
         // Don't open cart drawer
     };
 
-    const removeFromCart = (productId: string | number) => {
-        setItems(prev => prev.filter(item => item.id !== productId));
+    const removeFromCart = (productId: string | number, variationId?: string) => {
+        setItems(prev => prev.filter(item =>
+            !(item.id === productId && (!variationId || item.selectedVariation?.id === variationId))
+        ));
     };
 
-    const updateQuantity = (productId: string | number, quantity: number) => {
+    const updateQuantity = (productId: string | number, quantity: number, variationId?: string) => {
         if (quantity < 1) return;
         setItems(prev => prev.map(item =>
-            item.id === productId ? { ...item, quantity } : item
+            (item.id === productId && (!variationId || item.selectedVariation?.id === variationId))
+                ? { ...item, quantity }
+                : item
         ));
     };
 
@@ -92,7 +109,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const toggleCart = () => setIsCartOpen(prev => !prev);
 
     const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-    const cartTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const cartTotal = items.reduce((sum, item) => {
+        const price = item.selectedVariation ? item.selectedVariation.price : item.price;
+        return sum + (price * item.quantity);
+    }, 0);
 
     return (
         <CartContext.Provider value={{

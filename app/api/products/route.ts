@@ -6,12 +6,27 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, description, price, categories, images } = body
+        const { name, description, price, categories, images, product_type, variations } = body
 
         // Validate required fields
-        if (!name || !description || !price || !images || images.length === 0) {
+        if (!name || !description || !images || images.length === 0) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
+                { status: 400 }
+            )
+        }
+
+        // Validate product type specific requirements
+        if (product_type === 'simple' && !price) {
+            return NextResponse.json(
+                { error: 'Price is required for simple products' },
+                { status: 400 }
+            )
+        }
+
+        if (product_type === 'variable' && (!variations || variations.length === 0)) {
+            return NextResponse.json(
+                { error: 'At least one variation is required for variable products' },
                 { status: 400 }
             )
         }
@@ -20,12 +35,24 @@ export async function POST(request: Request) {
         const supabase = createServiceRoleClient()
 
         // Prepare product data
-        const productData = {
+        const productData: any = {
             name,
             description,
-            price: parseInt(price),
             categories: categories || [],
             images: images,
+            product_type: product_type || 'simple',
+        }
+
+        // Add price for simple products
+        if (product_type === 'simple') {
+            productData.price = parseInt(price)
+        } else {
+            productData.price = null
+        }
+
+        // Add variations for variable products
+        if (product_type === 'variable') {
+            productData.variations = variations
         }
 
         // Insert product into database

@@ -128,8 +128,8 @@ export default function AdminOrdersPage() {
                 if (order && order.status !== newStatus) {
                     // Prepare order items for email
                     const emailOrders = order.order?.items?.map(item => ({
-                        name: item.name,
-                        price: item.price,
+                        name: (item as any).variation ? `${item.name} (${(item as any).variation.name})` : item.name,
+                        price: (item as any).variation ? (item as any).variation.price : item.price,
                         units: item.quantity,
                         image: (item as any).image // Safe cast for image property
                     })) || []
@@ -314,6 +314,11 @@ export default function AdminOrdersPage() {
                                                                 </span>
                                                                 <span className="font-playfair text-sm text-[#2D1B1B] font-bold leading-tight">
                                                                     {item.name}
+                                                                    {(item as any).variation && (
+                                                                        <span className="ml-2 text-[9px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full uppercase">
+                                                                            {(item as any).variation.name}
+                                                                        </span>
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                         ))}

@@ -5,23 +5,12 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import { Product } from '@/data/products'
 import { useCart } from '@/context/cart-context'
 
 export default function ProductCard({ product }: { product: Product }) {
-    const { items, updateQuantity, removeFromCart } = useCart()
-    const cartItem = items.find(item => item.id === product.id)
-    const isInCart = !!cartItem
 
-    const handleQuantityChange = (newQuantity: number) => {
-        if (newQuantity < 1) {
-            // Remove from cart if quantity would go below 1
-            removeFromCart(product.id)
-        } else {
-            updateQuantity(product.id, newQuantity)
-        }
-    }
 
     return (
         <div className="group block">
@@ -71,32 +60,21 @@ export default function ProductCard({ product }: { product: Product }) {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-xl md:text-2xl font-bold text-[#2D1B1B]">
-                                ₹{product.price}
+                                {(product as any).product_type === 'variable' && (product as any).variations ? (() => {
+                                    const prices = (product as any).variations.map((v: any) => v.price)
+                                    const minPrice = Math.min(...prices)
+                                    const maxPrice = Math.max(...prices)
+                                    return minPrice === maxPrice ? `₹${minPrice}` : `₹${minPrice} - ₹${maxPrice}`
+                                })() : `₹${product.price}`}
                             </p>
+                            {(product as any).product_type === 'variable' && (
+                                <p className="text-[10px] text-saffron font-bold uppercase tracking-wider mt-0.5">
+                                    {(product as any).variations?.length} Variations
+                                </p>
+                            )}
                         </div>
 
-                        {/* Quantity Selector - Only show if item is in cart */}
-                        {isInCart && cartItem && (
-                            <div className="flex items-center border border-orange-200 rounded-full bg-white shadow-sm">
-                                <button
-                                    onClick={() => handleQuantityChange(cartItem.quantity - 1)}
-                                    className="p-2 hover:text-red-500 transition-colors"
-                                >
-                                    {cartItem.quantity === 1 ? (
-                                        <Trash2 className="h-3 w-3" />
-                                    ) : (
-                                        <Minus className="h-3 w-3" />
-                                    )}
-                                </button>
-                                <span className="w-8 text-center text-sm font-bold text-[#2D1B1B]">{cartItem.quantity}</span>
-                                <button
-                                    onClick={() => handleQuantityChange(cartItem.quantity + 1)}
-                                    className="p-2 hover:text-saffron transition-colors"
-                                >
-                                    <Plus className="h-3 w-3" />
-                                </button>
-                            </div>
-                        )}
+
                     </div>
                 </div>
             </motion.div>

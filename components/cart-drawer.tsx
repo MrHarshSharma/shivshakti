@@ -224,8 +224,8 @@ export default function CartDrawer() {
                     name: customerData.name,
                     order_id: createOrderData.orderId,
                     orders: items.map(item => ({
-                        name: item.name,
-                        price: item.price,
+                        name: item.selectedVariation ? `${item.name} (${item.selectedVariation.name})` : item.name,
+                        price: item.selectedVariation ? item.selectedVariation.price : item.price,
                         units: item.quantity,
                         image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
                     })),
@@ -365,8 +365,8 @@ export default function CartDrawer() {
                             name: customerData.name,
                             order_id: createOrderData.orderId,
                             orders: items.map(item => ({
-                                name: item.name,
-                                price: item.price,
+                                name: item.selectedVariation ? `${item.name} (${item.selectedVariation.name})` : item.name,
+                                price: item.selectedVariation ? item.selectedVariation.price : item.price,
                                 units: item.quantity,
                                 image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
                             })),
@@ -653,14 +653,21 @@ export default function CartDrawer() {
                                         <div className="flex-1 flex flex-col justify-between">
                                             <div>
                                                 <h3 className="font-playfair text-[#2D1B1B] font-bold leading-tight mb-1">{item.name}</h3>
-                                                <p className="text-saffron text-sm font-bold uppercase tracking-wider">
-                                                    {(item.categories && item.categories.length > 0) ? item.categories[0] : (item as any).category || 'General'}
-                                                </p>
+                                                <div className="flex flex-wrap gap-2 mb-1">
+                                                    <p className="text-saffron text-[10px] font-bold uppercase tracking-wider">
+                                                        {(item.categories && item.categories.length > 0) ? item.categories[0] : (item as any).category || 'General'}
+                                                    </p>
+                                                    {item.selectedVariation && (
+                                                        <span className="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border border-purple-100">
+                                                            {item.selectedVariation.name}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="flex items-center justify-between mt-2">
                                                 <div className="flex items-center gap-3 bg-white px-2 py-1 rounded-full border border-orange-100 shadow-sm">
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariation?.id)}
                                                         className="p-1 hover:text-magenta transition-colors disabled:opacity-30"
                                                         disabled={item.quantity <= 1}
                                                     >
@@ -668,15 +675,15 @@ export default function CartDrawer() {
                                                     </button>
                                                     <span className="text-sm font-bold w-4 text-center text-[#4A3737]">{item.quantity}</span>
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariation?.id)}
                                                         className="p-1 hover:text-saffron transition-colors"
                                                     >
                                                         <Plus className="h-3 w-3" />
                                                     </button>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-bold text-[#2D1B1B]">₹{item.price * item.quantity}</p>
-                                                    <button onClick={() => removeFromCart(item.id)} className="text-xs text-red-400 hover:text-red-600 underline mt-1">
+                                                    <p className="font-bold text-[#2D1B1B]">₹{(item.selectedVariation ? item.selectedVariation.price : item.price) * item.quantity}</p>
+                                                    <button onClick={() => removeFromCart(item.id, item.selectedVariation?.id)} className="text-xs text-red-400 hover:text-red-600 underline mt-1">
                                                         Remove
                                                     </button>
                                                 </div>

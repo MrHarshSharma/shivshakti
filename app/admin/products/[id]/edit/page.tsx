@@ -24,6 +24,10 @@ export default function AdminEditProductPage() {
         categories: [] as string[],
         categoryInput: '',
     })
+    const [productType, setProductType] = useState<'simple' | 'variable'>('simple')
+    const [variations, setVariations] = useState<any[]>([
+        { id: Math.random().toString(36).substr(2, 9), name: '', price: '', stock: '', sku: '', is_default: true }
+    ])
     const [existingImages, setExistingImages] = useState<string[]>([])
     const [newImages, setNewImages] = useState<string[]>([])
     const [newImageFiles, setNewImageFiles] = useState<File[]>([])
@@ -78,10 +82,16 @@ export default function AdminEditProductPage() {
                     description: parsedDescription,
                     productDetails: details,
                     careInstructions: care,
-                    price: product.price.toString(),
+                    price: (product.price || '').toString(),
                     categories: product.categories || [],
                     categoryInput: '',
                 })
+                setProductType(product.product_type || 'simple')
+                if (product.variations && product.variations.length > 0) {
+                    setVariations(product.variations)
+                } else if (product.product_type === 'variable') {
+                    setVariations([{ id: Math.random().toString(36).substr(2, 9), name: '', price: '', stock: '', sku: '', is_default: true }])
+                }
                 setExistingImages(product.images || [])
             } else {
                 throw new Error(data.error || 'Failed to fetch product')
@@ -176,9 +186,11 @@ export default function AdminEditProductPage() {
             const productData = {
                 name: formData.name,
                 description: JSON.stringify(descriptionObject),
-                price: Number(formData.price),
+                price: productType === 'simple' ? Number(formData.price) : null,
                 categories: formData.categories,
                 images: finalImageUrls,
+                product_type: productType,
+                variations: productType === 'variable' ? variations : null
             }
 
             const response = await fetch(`/api/products/${productId}`, {
@@ -249,6 +261,46 @@ export default function AdminEditProductPage() {
                         />
                     </div>
 
+                    {/* Product Type Selector */}
+                    <div>
+                        <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-4">
+                            Product Type
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => setProductType('simple')}
+                                className={`px-4 py-3 rounded-xl border-2 transition-all font-playfair flex items-center justify-center gap-2 ${productType === 'simple'
+                                    ? 'border-saffron bg-saffron/5 text-saffron shadow-sm'
+                                    : 'border-orange-100 bg-white text-[#4A3737] hover:border-orange-200'
+                                    }`}
+                            >
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${productType === 'simple' ? 'border-saffron' : 'border-orange-200'}`}>
+                                    {productType === 'simple' && <div className="w-2 h-2 rounded-full bg-saffron" />}
+                                </div>
+                                <span className="font-bold">Simple Product</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setProductType('variable')}
+                                className={`px-4 py-3 rounded-xl border-2 transition-all font-playfair flex items-center justify-center gap-2 ${productType === 'variable'
+                                    ? 'border-purple-500 bg-purple-50 text-purple-600 shadow-sm'
+                                    : 'border-orange-100 bg-white text-[#4A3737] hover:border-orange-200'
+                                    }`}
+                            >
+                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${productType === 'variable' ? 'border-purple-500' : 'border-orange-200'}`}>
+                                    {productType === 'variable' && <div className="w-2 h-2 rounded-full bg-purple-500" />}
+                                </div>
+                                <span className="font-bold">Variable Product</span>
+                            </button>
+                        </div>
+                        <p className="mt-2 text-xs text-[#4A3737]/60 font-playfair">
+                            {productType === 'simple'
+                                ? 'Simple products have a single fixed price and stock.'
+                                : 'Variable products allow you to add multiple variations (e.g., sizes, weights) with different prices.'}
+                        </p>
+                    </div>
+
                     {/* Description Section */}
                     <div className="space-y-4">
                         <h3 className="font-playfair font-bold text-lg text-[#2D1B1B]">Product Info</h3>
@@ -297,21 +349,133 @@ export default function AdminEditProductPage() {
                         </div>
                     </div>
 
-                    {/* Price */}
-                    <div>
-                        <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                            Price (₹) *
-                        </label>
-                        <input
-                            type="number"
-                            required
-                            min="0"
-                            value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                            className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
-                            placeholder="Enter price"
-                        />
-                    </div>
+                    {/* Price - Only for Simple Product */}
+                    {productType === 'simple' ? (
+                        <div>
+                            <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
+                                Price (₹) *
+                            </label>
+                            <input
+                                type="number"
+                                required={productType === 'simple'}
+                                min="0"
+                                value={formData.price}
+                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
+                                placeholder="Enter price"
+                            />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="block font-playfair text-sm font-semibold text-[#2D1B1B]">
+                                    Variations Management *
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => setVariations([...variations, { id: Math.random().toString(36).substr(2, 9), name: '', price: '', stock: '', sku: '', is_default: false }])}
+                                    className="text-xs font-bold text-saffron hover:text-orange-600 flex items-center gap-1 transition-colors uppercase tracking-widest"
+                                >
+                                    <Plus className="h-3 w-3" /> Add Variation
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {variations.map((variation, index) => (
+                                    <div key={variation.id} className="p-6 border-2 border-orange-50 rounded-2xl bg-orange-50/20 relative group/var">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                            <div>
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">Name (e.g. 1kg, Small)</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={variation.name}
+                                                    onChange={(e) => {
+                                                        const newVars = [...variations]
+                                                        newVars[index].name = e.target.value
+                                                        setVariations(newVars)
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-orange-200 rounded-lg text-sm bg-white"
+                                                    placeholder="Variation name"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">Price (₹)</label>
+                                                <input
+                                                    type="number"
+                                                    required
+                                                    value={variation.price}
+                                                    onChange={(e) => {
+                                                        const newVars = [...variations]
+                                                        newVars[index].price = e.target.value
+                                                        setVariations(newVars)
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-orange-200 rounded-lg text-sm bg-white"
+                                                    placeholder="Price"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">Stock</label>
+                                                <input
+                                                    type="number"
+                                                    value={variation.stock}
+                                                    onChange={(e) => {
+                                                        const newVars = [...variations]
+                                                        newVars[index].stock = e.target.value
+                                                        setVariations(newVars)
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-orange-200 rounded-lg text-sm bg-white"
+                                                    placeholder="Stock"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">SKU (Internal ID)</label>
+                                                <input
+                                                    type="text"
+                                                    value={variation.sku}
+                                                    onChange={(e) => {
+                                                        const newVars = [...variations]
+                                                        newVars[index].sku = e.target.value
+                                                        setVariations(newVars)
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-orange-200 rounded-lg text-sm bg-white"
+                                                    placeholder="SKU"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={variation.is_default}
+                                                    onChange={() => {
+                                                        const newVars = variations.map((v, i) => ({
+                                                            ...v,
+                                                            is_default: i === index
+                                                        }))
+                                                        setVariations(newVars)
+                                                    }}
+                                                    className="rounded text-saffron focus:ring-saffron"
+                                                />
+                                                <span className="text-[11px] font-bold text-[#4A3737] uppercase tracking-wider">Default Variation</span>
+                                            </label>
+
+                                            {variations.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setVariations(variations.filter((_, i) => i !== index))}
+                                                    className="text-red-400 hover:text-red-600 transition-colors p-1"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Categories */}
                     <div>

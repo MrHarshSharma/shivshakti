@@ -176,10 +176,30 @@ export default function AdminProductsPage() {
                                             No Vision
                                         </div>
                                     )}
-                                    {/* Floating Price Badge */}
-                                    <div className="absolute bottom-3 left-3">
+                                    {/* Floating Badges */}
+                                    <div className="absolute bottom-3 left-3 flex gap-2">
+                                        {/* Product Type Badge */}
+                                        {(product as any).product_type && (
+                                            <span className={`px-2.5 py-1 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border ${(product as any).product_type === 'variable'
+                                                    ? 'bg-purple-500/90 text-white border-purple-600/50'
+                                                    : 'bg-white/90 text-[#2D1B1B] border-orange-50'
+                                                }`}>
+                                                {(product as any).product_type === 'variable' ? 'Variable' : 'Simple'}
+                                            </span>
+                                        )}
+
+                                        {/* Price Badge */}
                                         <span className="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full text-sm font-bold text-[#2D1B1B] shadow-sm border border-orange-50">
-                                            ₹{product.price}
+                                            {(product as any).product_type === 'variable' && (product as any).variations ? (
+                                                (() => {
+                                                    const prices = (product as any).variations.map((v: any) => v.price)
+                                                    const minPrice = Math.min(...prices)
+                                                    const maxPrice = Math.max(...prices)
+                                                    return minPrice === maxPrice ? `₹${minPrice}` : `₹${minPrice} - ₹${maxPrice}`
+                                                })()
+                                            ) : (
+                                                `₹${product.price}`
+                                            )}
                                         </span>
                                     </div>
                                 </div>
