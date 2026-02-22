@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Upload, X, Plus, Save, Loader2, ChevronDown, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useRef } from 'react'
 
 const PREDEFINED_CATEGORIES = ['Gourmet', 'Hampers', 'Dry fruits', 'Other']
 
@@ -34,6 +33,20 @@ export default function AdminAddProductPage() {
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
+
+    // Auto-resize textarea based on content
+    const autoResizeTextarea = useCallback((element: HTMLTextAreaElement) => {
+        element.style.height = 'auto'
+        element.style.height = `${element.scrollHeight}px`
+    }, [])
+
+    const handleTextareaChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>,
+        field: 'description' | 'productDetails' | 'careInstructions'
+    ) => {
+        setFormData({ ...formData, [field]: e.target.value })
+        autoResizeTextarea(e.target)
+    }
 
     // Handle clicking outside of dropdown
     useEffect(() => {
@@ -393,10 +406,9 @@ export default function AdminAddProductPage() {
                             <textarea
                                 required
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'description')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[100px] overflow-hidden"
                                 placeholder="Enter main product description"
-                                rows={4}
                             />
                         </div>
 
@@ -407,10 +419,9 @@ export default function AdminAddProductPage() {
                             </label>
                             <textarea
                                 value={formData.productDetails}
-                                onChange={(e) => setFormData({ ...formData, productDetails: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'productDetails')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[100px] overflow-hidden"
                                 placeholder="Enter detailed specifications (e.g. Dimensions, Material, Weight)"
-                                rows={4}
                             />
                         </div>
 
@@ -421,10 +432,9 @@ export default function AdminAddProductPage() {
                             </label>
                             <textarea
                                 value={formData.careInstructions}
-                                onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'careInstructions')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[80px] overflow-hidden"
                                 placeholder="Enter care instructions"
-                                rows={3}
                             />
                         </div>
                     </div>

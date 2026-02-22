@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Upload, X, Plus, Save, Loader2, ArrowLeft, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useRef } from 'react'
 
 const PREDEFINED_CATEGORIES = ['Gourmet', 'Hampers', 'Dry fruits', 'Other']
 
@@ -36,6 +35,24 @@ export default function AdminEditProductPage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const descriptionRef = useRef<HTMLTextAreaElement>(null)
+    const detailsRef = useRef<HTMLTextAreaElement>(null)
+    const careRef = useRef<HTMLTextAreaElement>(null)
+
+    // Auto-resize textarea based on content
+    const autoResizeTextarea = useCallback((element: HTMLTextAreaElement | null) => {
+        if (!element) return
+        element.style.height = 'auto'
+        element.style.height = `${element.scrollHeight}px`
+    }, [])
+
+    const handleTextareaChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>,
+        field: 'description' | 'productDetails' | 'careInstructions'
+    ) => {
+        setFormData({ ...formData, [field]: e.target.value })
+        autoResizeTextarea(e.target)
+    }
 
     // Handle clicking outside of dropdown
     useEffect(() => {
@@ -53,6 +70,18 @@ export default function AdminEditProductPage() {
             fetchProduct()
         }
     }, [productId])
+
+    // Auto-resize textareas after data is loaded
+    useEffect(() => {
+        if (!isLoading) {
+            // Small delay to ensure DOM is updated
+            setTimeout(() => {
+                autoResizeTextarea(descriptionRef.current)
+                autoResizeTextarea(detailsRef.current)
+                autoResizeTextarea(careRef.current)
+            }, 0)
+        }
+    }, [isLoading, autoResizeTextarea])
 
     const fetchProduct = async () => {
         try {
@@ -311,12 +340,12 @@ export default function AdminEditProductPage() {
                                 Product Description *
                             </label>
                             <textarea
+                                ref={descriptionRef}
                                 required
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'description')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[100px] overflow-hidden"
                                 placeholder="Enter main product description"
-                                rows={4}
                             />
                         </div>
 
@@ -326,11 +355,11 @@ export default function AdminEditProductPage() {
                                 Product Details
                             </label>
                             <textarea
+                                ref={detailsRef}
                                 value={formData.productDetails}
-                                onChange={(e) => setFormData({ ...formData, productDetails: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'productDetails')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[100px] overflow-hidden"
                                 placeholder="Enter detailed specifications"
-                                rows={4}
                             />
                         </div>
 
@@ -340,11 +369,11 @@ export default function AdminEditProductPage() {
                                 Care Instructions
                             </label>
                             <textarea
+                                ref={careRef}
                                 value={formData.careInstructions}
-                                onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
-                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none"
+                                onChange={(e) => handleTextareaChange(e, 'careInstructions')}
+                                className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white resize-none min-h-[80px] overflow-hidden"
                                 placeholder="Enter care instructions"
-                                rows={3}
                             />
                         </div>
                     </div>

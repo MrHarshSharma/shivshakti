@@ -1,7 +1,8 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+// ISR: Cache GET requests for 5 minutes
+export const revalidate = 300
 
 export async function POST(request: Request) {
     try {
@@ -113,7 +114,12 @@ export async function GET() {
                 success: true,
                 products: data
             },
-            { status: 200 }
+            {
+                status: 200,
+                headers: {
+                    'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+                },
+            }
         )
 
     } catch (error) {

@@ -3,7 +3,8 @@ import HomeClient from '@/components/home-client'
 import { Product } from '@/data/products'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
+// ISR: Revalidate every 5 minutes - page is cached and served instantly from edge
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Shivshakti | Heritage Indian Artifacts & Luxuryampers',

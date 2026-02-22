@@ -4,6 +4,9 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import ProductDetails from './product-details'
 import { Product } from '@/data/products'
 
+// ISR: Revalidate every 10 minutes - product pages are cached at edge
+export const revalidate = 600
+
 interface PageProps {
     params: Promise<{ id: string }>
 }

@@ -1,7 +1,8 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+// Allow caching for GET requests (10 minutes)
+export const revalidate = 600
 
 export async function GET(
     request: Request,
@@ -33,7 +34,14 @@ export async function GET(
             )
         }
 
-        return NextResponse.json({ success: true, product: data })
+        return NextResponse.json(
+            { success: true, product: data },
+            {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
+                },
+            }
+        )
 
     } catch (error) {
         console.error('Product fetch error:', error)
