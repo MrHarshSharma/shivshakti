@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const supabase = await createClient()
         const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -14,14 +14,24 @@ export async function GET() {
             )
         }
 
-        // Use service role to bypass RLS if needed, although user_id check is safe
+        // Get pagination params
+        const { searchParams } = new URL(request.url)
+        const page = parseInt(searchParams.get('page') || '1')
+        const limit = parseInt(searchParams.get('limit') || '10')
+
+        // Calculate range for pagination
+        const from = (page - 1) * limit
+        const to = from + limit - 1
+
+        // Use service role to bypass RLS
         const serviceSupabase = createServiceRoleClient()
 
-        const { data, error } = await serviceSupabase
+        const { data, error, count } = await serviceSupabase
             .from('orders')
-            .select('*')
+            .select('*', { count: 'exact' })
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
+            .range(from, to)
 
         if (error) {
             console.error('Supabase error:', error)
@@ -31,13 +41,18 @@ export async function GET() {
             )
         }
 
-        return NextResponse.json(
-            {
-                success: true,
-                orders: data
-            },
-            { status: 200 }
-        )
+        const totalPages = Math.ceil((count || 0) / limit)
+
+        return NextResponse.json({
+            success: true,
+            orders: data,
+            pagination: {
+                page,
+                limit,
+                total: count || 0,
+                totalPages
+            }
+        })
 
     } catch (error) {
         console.error('Orders fetch error:', error)
