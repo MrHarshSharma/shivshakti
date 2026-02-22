@@ -57,7 +57,7 @@ export default function AdminDashboard() {
             color: 'text-emerald-600',
             bgColor: 'bg-emerald-500/10',
             accent: 'emerald',
-            trend: '+12.5%'
+            trend: 'Income'
         },
         {
             title: 'Total Orders',
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
             color: 'text-blue-600',
             bgColor: 'bg-blue-500/10',
             accent: 'blue',
-            trend: '+8.2%'
+            trend: 'Serving'
         },
         {
             title: 'Pending Orders',

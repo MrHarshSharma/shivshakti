@@ -1,10 +1,9 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
-import { ChevronDown } from 'lucide-react'
 
 const container = {
     hidden: { opacity: 0 },
@@ -27,7 +26,6 @@ interface ProductsClientProps {
 
 export default function ProductsClient({ products }: ProductsClientProps) {
     const [activeCategory, setActiveCategory] = useState('All')
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     const categories = ['All', 'Hampers', 'Gourmet', 'Dry Fruits', 'Others']
 
@@ -52,55 +50,31 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                     </p>
                 </div>
 
-                {/* Professional Category Dropdown */}
-                <div className="flex justify-center mb-16 relative z-30">
-                    <div className="relative w-full max-w-xs">
-                        <button
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="w-full flex items-center justify-between px-6 py-3 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-md transition-all group"
-                        >
-                            <span className="text-sm font-black uppercase tracking-[0.2em] text-[#4A3737]">
-                                {activeCategory}
-                            </span>
-                            <ChevronDown className={`h-4 w-4 text-saffron transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        <AnimatePresence>
-                            {isDropdownOpen && (
-                                <>
-                                    {/* Backdrop for closing */}
-                                    <div
-                                        className="fixed inset-0 z-10"
-                                        onClick={() => setIsDropdownOpen(false)}
-                                    />
-
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        className="absolute top-full left-0 w-full mt-2 bg-white/90 backdrop-blur-xl border border-orange-100 rounded-2xl shadow-xl overflow-hidden z-20"
-                                    >
-                                        <div className="py-2">
-                                            {categories.map((category) => (
-                                                <button
-                                                    key={category}
-                                                    onClick={() => {
-                                                        setActiveCategory(category)
-                                                        setIsDropdownOpen(false)
-                                                    }}
-                                                    className={`w-full text-left px-6 py-3 text-xs font-black uppercase tracking-widest transition-colors ${activeCategory === category
-                                                        ? 'bg-orange-50 text-saffron'
-                                                        : 'text-[#4A3737] hover:bg-orange-50/50 hover:text-saffron'
-                                                        }`}
-                                                >
-                                                    {category}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </motion.div>
-                                </>
-                            )}
-                        </AnimatePresence>
+                {/* Category Tabs */}
+                <div className="mb-16 -mx-4 px-4 overflow-x-auto scrollbar-hide">
+                    <div className="flex justify-center min-w-max md:min-w-0">
+                        <div className="inline-flex gap-1 md:gap-2 p-1.5 bg-white/80 backdrop-blur-sm rounded-full border border-orange-100 shadow-sm">
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => setActiveCategory(category)}
+                                    className={`relative px-4 md:px-6 py-2 md:py-2.5 text-[11px] md:text-xs font-bold uppercase tracking-wider md:tracking-widest rounded-full transition-all duration-300 whitespace-nowrap ${
+                                        activeCategory === category
+                                            ? 'text-white'
+                                            : 'text-[#4A3737] hover:text-saffron'
+                                    }`}
+                                >
+                                    {activeCategory === category && (
+                                        <motion.div
+                                            layoutId="activeTab"
+                                            className="absolute inset-0 bg-saffron rounded-full shadow-md"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10">{category}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
