@@ -8,7 +8,7 @@ export default function Loading() {
                 <Loader2 className="h-12 w-12 text-saffron animate-spin relative z-10" />
             </div>
             <p className="mt-4 font-cinzel text-[#2D1B1B] font-bold tracking-widest animate-pulse">
-                Loading Shivshakti...
+                Collecting...
             </p>
         </div>
     )

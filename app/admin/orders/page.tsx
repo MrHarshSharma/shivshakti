@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Search, Filter, Download, ArrowRight, Clock, ChevronDown, Loader2 } from 'lucide-react'
+import { ArrowLeft, Search, Filter, Download, ChevronDown, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/utils/date'
 import { sendOrderAcceptedEmail, sendOrderDeliveredEmail, sendCustomerCancellationEmail } from '@/utils/emailjs'
 import { useSearchParams } from 'next/navigation'
@@ -32,65 +32,78 @@ interface Order {
     created_at: string
 }
 
+interface Pagination {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+}
+
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([])
-    const [filteredOrders, setFilteredOrders] = useState<Order[]>([])
+    const [pagination, setPagination] = useState<Pagination>({
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0
+    })
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
+    const [searchInput, setSearchInput] = useState('') // For debounced input
     const [statusFilter, setStatusFilter] = useState('all')
     const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null)
 
     const searchParams = useSearchParams()
 
+    // Initialize search from URL params
     useEffect(() => {
         const search = searchParams.get('search')
         if (search) {
+            setSearchInput(search)
             setSearchTerm(search)
         }
     }, [searchParams])
 
+    // Debounce search input
     useEffect(() => {
-        fetchOrders()
-    }, [])
+        const timer = setTimeout(() => {
+            setSearchTerm(searchInput)
+        }, 400)
 
+        return () => clearTimeout(timer)
+    }, [searchInput])
+
+    // Fetch orders when filters or page changes
     useEffect(() => {
-        filterOrders()
-    }, [searchTerm, statusFilter, orders])
+        fetchOrders(1) // Reset to page 1 when filters change
+    }, [searchTerm, statusFilter])
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async (page: number) => {
+        setIsLoading(true)
         try {
-            const response = await fetch('/api/orders/list')
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: '20',
+                search: searchTerm,
+                status: statusFilter
+            })
+
+            const response = await fetch(`/api/orders/list?${params}`)
             const data = await response.json()
 
             if (data.success) {
                 setOrders(data.orders || [])
+                setPagination(data.pagination)
             }
         } catch (error) {
             console.error('Error fetching orders:', error)
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [searchTerm, statusFilter])
 
-    const filterOrders = () => {
-        let filtered = orders
-
-        // Filter by search term
-        if (searchTerm) {
-            filtered = filtered.filter(order =>
-                order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (order.email && order.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                order.phone.includes(searchTerm) ||
-                order.id.toString().includes(searchTerm)
-            )
-        }
-
-        // Filter by status
-        if (statusFilter !== 'all') {
-            filtered = filtered.filter(order => order.status === statusFilter)
-        }
-
-        setFilteredOrders(filtered)
+    const handlePageChange = (newPage: number) => {
+        fetchOrders(newPage)
     }
 
     const getStatusBadge = (status: string) => {
@@ -131,7 +144,7 @@ export default function AdminOrdersPage() {
                         name: (item as any).variation ? `${item.name} (${(item as any).variation.name})` : item.name,
                         price: (item as any).variation ? (item as any).variation.price : item.price,
                         units: item.quantity,
-                        image: (item as any).image // Safe cast for image property
+                        image: (item as any).image
                     })) || []
 
                     const emailCost = {
@@ -159,7 +172,6 @@ export default function AdminOrdersPage() {
                             cost: emailCost
                         })
                     } else if (newStatus === 'cancelled') {
-                        // When admin cancels, notify the customer
                         await sendCustomerCancellationEmail({
                             name: order.name,
                             order_id: order.id,
@@ -172,7 +184,8 @@ export default function AdminOrdersPage() {
                     }
                 }
 
-                await fetchOrders()
+                // Refresh current page
+                await fetchOrders(pagination.page)
             }
         } catch (error) {
             console.error('Error updating order status:', error)
@@ -180,6 +193,10 @@ export default function AdminOrdersPage() {
             setUpdatingOrderId(null)
         }
     }
+
+    // Calculate display range
+    const startIndex = (pagination.page - 1) * pagination.limit + 1
+    const endIndex = Math.min(pagination.page * pagination.limit, pagination.total)
 
     return (
         <div className="min-h-screen bg-[#FEFBF5] relative overflow-hidden pt-32 pb-16">
@@ -203,19 +220,19 @@ export default function AdminOrdersPage() {
                 <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Orders</p>
-                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">{filteredOrders.length}</p>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Orders (filtered)</p>
+                            <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">{pagination.total}</p>
                         </div>
                         <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Total Revenue</p>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Showing</p>
                             <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
-                                ₹{filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0).toLocaleString()}
+                                {pagination.total > 0 ? `${startIndex} - ${endIndex}` : '0'}
                             </p>
                         </div>
                         <div>
-                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Average Order Value</p>
+                            <p className="text-[#4A3737]/70 text-sm font-playfair mb-1">Pages</p>
                             <p className="text-2xl font-bold text-[#2D1B1B] font-cinzel">
-                                ₹{filteredOrders.length > 0 ? Math.round(filteredOrders.reduce((sum, order) => sum + (order.order?.total || 0), 0) / filteredOrders.length) : 0}
+                                {pagination.page} of {pagination.totalPages || 1}
                             </p>
                         </div>
                     </div>
@@ -229,9 +246,9 @@ export default function AdminOrdersPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#4A3737]/40" />
                             <input
                                 type="text"
-                                placeholder="Search by name, email, phone, or order ID..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search by name, email, or phone..."
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
                             />
                         </div>
@@ -246,6 +263,7 @@ export default function AdminOrdersPage() {
                             >
                                 <option value="all">All Status</option>
                                 <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
@@ -266,7 +284,7 @@ export default function AdminOrdersPage() {
                             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-saffron border-r-transparent"></div>
                             <p className="mt-4 text-[#4A3737]/70 font-playfair">Loading orders...</p>
                         </div>
-                    ) : filteredOrders.length === 0 ? (
+                    ) : orders.length === 0 ? (
                         <div className="text-center py-12">
                             <p className="text-[#4A3737]/70 font-playfair">No orders found</p>
                         </div>
@@ -286,12 +304,12 @@ export default function AdminOrdersPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredOrders.map((order, idx) => (
+                                    {orders.map((order, idx) => (
                                         <motion.tr
                                             key={order.id}
                                             initial={{ opacity: 0, x: -10 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: idx * 0.05 }}
+                                            transition={{ delay: idx * 0.03 }}
                                             className="border-b border-orange-50/50 hover:bg-orange-50/30 transition-colors group"
                                         >
                                             <td className="py-6 px-6 font-playfair text-sm text-[#2D1B1B] font-bold">
@@ -375,9 +393,63 @@ export default function AdminOrdersPage() {
                             </table>
                         </div>
                     )}
+
+                    {/* Pagination Controls */}
+                    {pagination.totalPages > 1 && (
+                        <div className="px-6 py-4 border-t border-orange-50 bg-white/40 flex items-center justify-between">
+                            <p className="text-sm text-[#4A3737]/60 font-playfair">
+                                Showing <span className="font-bold text-[#2D1B1B]">{startIndex}</span> to{' '}
+                                <span className="font-bold text-[#2D1B1B]">{endIndex}</span> of{' '}
+                                <span className="font-bold text-[#2D1B1B]">{pagination.total}</span> orders
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => handlePageChange(pagination.page - 1)}
+                                    disabled={pagination.page === 1 || isLoading}
+                                    className="p-2 rounded-lg border border-orange-200 hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                >
+                                    <ChevronLeft className="h-5 w-5 text-[#4A3737]" />
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
+                                        let pageNum: number
+                                        if (pagination.totalPages <= 5) {
+                                            pageNum = i + 1
+                                        } else if (pagination.page <= 3) {
+                                            pageNum = i + 1
+                                        } else if (pagination.page >= pagination.totalPages - 2) {
+                                            pageNum = pagination.totalPages - 4 + i
+                                        } else {
+                                            pageNum = pagination.page - 2 + i
+                                        }
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => handlePageChange(pageNum)}
+                                                disabled={isLoading}
+                                                className={`w-10 h-10 rounded-lg font-bold text-sm transition-all disabled:opacity-50 ${pagination.page === pageNum
+                                                    ? 'bg-saffron text-white shadow-lg'
+                                                    : 'border border-orange-200 text-[#4A3737] hover:bg-orange-50'
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                <button
+                                    onClick={() => handlePageChange(pagination.page + 1)}
+                                    disabled={pagination.page === pagination.totalPages || isLoading}
+                                    className="p-2 rounded-lg border border-orange-200 hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                >
+                                    <ChevronRight className="h-5 w-5 text-[#4A3737]" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-
-
             </div>
         </div>
     )
