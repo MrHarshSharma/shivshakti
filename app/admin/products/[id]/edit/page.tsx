@@ -50,7 +50,7 @@ export default function AdminEditProductPage() {
         e: React.ChangeEvent<HTMLTextAreaElement>,
         field: 'description' | 'productDetails' | 'careInstructions'
     ) => {
-        setFormData({ ...formData, [field]: e.target.value })
+        setFormData(prev => ({ ...prev, [field]: e.target.value }))
         autoResizeTextarea(e.target)
     }
 
@@ -111,7 +111,7 @@ export default function AdminEditProductPage() {
                     description: parsedDescription,
                     productDetails: details,
                     careInstructions: care,
-                    price: (product.price || '').toString(),
+                    price: product.price != null ? product.price.toString() : '',
                     categories: product.categories || [],
                     categoryInput: '',
                 })
@@ -284,7 +284,7 @@ export default function AdminEditProductPage() {
                             type="text"
                             required
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                             className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
                             placeholder="Enter product name"
                         />
@@ -389,7 +389,7 @@ export default function AdminEditProductPage() {
                                 required={productType === 'simple'}
                                 min="0"
                                 value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
                                 className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white"
                                 placeholder="Enter price"
                             />
@@ -517,7 +517,7 @@ export default function AdminEditProductPage() {
                                     <input
                                         type="text"
                                         value={formData.categoryInput}
-                                        onChange={(e) => setFormData({ ...formData, categoryInput: e.target.value })}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, categoryInput: e.target.value }))}
                                         onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
                                         onFocus={() => setShowDropdown(true)}
                                         className="w-full px-4 py-3 border border-orange-200 rounded-lg font-playfair focus:outline-none focus:ring-2 focus:ring-saffron/20 bg-white pr-10"
