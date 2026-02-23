@@ -1,8 +1,8 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import ProductsClient from './products-client'
 
-// ISR: Revalidate every 5 minutes - page is cached and served instantly from edge
-export const revalidate = 300
+// Disable static caching - always fetch fresh data
+export const dynamic = 'force-dynamic'
 
 async function getProducts() {
     const supabase = createServiceRoleClient()
