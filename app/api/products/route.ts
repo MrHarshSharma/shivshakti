@@ -1,5 +1,6 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 
 // ISR: Cache GET requests for 5 minutes
 export const revalidate = 300
@@ -70,6 +71,11 @@ export async function POST(request: Request) {
                 { status: 500 }
             )
         }
+
+        // Revalidate cached pages after create
+        revalidatePath('/api/products')
+        revalidatePath('/products')
+        revalidatePath('/admin/products')
 
         return NextResponse.json(
             {
