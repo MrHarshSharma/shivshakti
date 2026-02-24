@@ -7,7 +7,7 @@ export default function ContactClient() {
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-[#FDF2F4] pt-32 pb-16 md:pt-40 md:pb-20">
+            <section className="bg-[#FDF2F4] pt-16 pb-16 md:pt-20 md:pb-20">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

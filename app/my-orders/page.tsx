@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ShoppingBag, ArrowLeft, Package, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ShoppingBag, Package, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight, Truck, Store } from 'lucide-react'
 import { formatDate } from '@/utils/date'
 import Image from 'next/image'
 
@@ -86,7 +86,6 @@ export default function MyOrdersPage() {
             const data = await response.json()
 
             if (data.success) {
-                // Refresh current page after cancellation
                 await fetchOrders(pagination.page)
             } else {
                 alert(data.error || 'Failed to cancel order')
@@ -104,244 +103,243 @@ export default function MyOrdersPage() {
             case 'completed': return {
                 bg: 'bg-emerald-500',
                 text: 'text-white',
-                label: 'completed',
-                lightBg: 'bg-emerald-50',
-                icon: <CheckCircle className="h-3 w-3" />
+                label: 'Completed',
+                icon: <CheckCircle className="h-3.5 w-3.5" />
             }
             case 'cancelled': return {
                 bg: 'bg-red-500',
                 text: 'text-white',
                 label: 'Cancelled',
-                lightBg: 'bg-red-50',
-                icon: <XCircle className="h-3 w-3" />
+                icon: <XCircle className="h-3.5 w-3.5" />
             }
             default: return {
                 bg: 'bg-amber-500',
                 text: 'text-white',
-                label: 'Order Placed',
-                lightBg: 'bg-amber-50',
-                icon: <Clock className="h-3 w-3" />
+                label: 'Processing',
+                icon: <Clock className="h-3.5 w-3.5" />
             }
         }
     }
 
-    // Calculate display range
     const startIndex = (pagination.page - 1) * pagination.limit + 1
     const endIndex = Math.min(pagination.page * pagination.limit, pagination.total)
 
     return (
-        <div className="min-h-screen bg-[#FEFBF5] pt-32 pb-24 relative overflow-hidden">
-            {/* Soft Ambient Background */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-orange-50/30 to-transparent pointer-events-none" />
-
-            <div className="container mx-auto px-4 relative z-10 max-w-4xl">
-                {/* Specific Back Button Design */}
-                <div className="mb-6">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-3 text-[#4A3737]/60 hover:text-saffron transition-all duration-300 group"
-                    >
-                        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                        <span className="text-sm font-bold uppercase tracking-[0.2em]">Back to Collection</span>
-                    </Link>
-                </div>
-
-                {/* Professional Centered Header */}
-                <div className="mb-20 text-center relative">
+        <div className="min-h-screen bg-white">
+            {/* Hero Section */}
+            <section className="bg-[#FDF2F4] pt-12 pb-12 md:pt-16 md:pb-16">
+                <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-block mb-4"
+                        transition={{ duration: 0.6 }}
+                        className="text-center max-w-2xl mx-auto"
                     >
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-saffron opacity-60">Personal Archive</span>
+                        <h1 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">My Orders</h1>
+                        <p className="text-[#4A4A4A] text-lg leading-relaxed">
+                            Track and manage your orders
+                        </p>
                     </motion.div>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-5xl lg:text-7xl font-cinzel text-[#2D1B1B] mb-6 font-bold"
-                    >
-                        My <span className="text-saffron">Orders</span>
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-[#4A3737]/60 font-playfair text-lg md:text-xl max-w-xl mx-auto italic"
-                    >
-                        Explore your curated history of heritage artifacts and luxury treasures.
-                    </motion.p>
                 </div>
+            </section>
 
-                {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            className="w-10 h-10 border-t-2 border-saffron rounded-full"
-                        />
-                    </div>
-                ) : pagination.total === 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="bg-white rounded-3xl p-10 text-center shadow-sm border border-orange-100/30"
-                    >
-                        <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <ShoppingBag className="h-8 w-8 text-saffron/20" />
+            {/* Orders Section */}
+            <section className="py-12 md:py-16">
+                <div className="container mx-auto px-6 max-w-4xl">
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                className="w-10 h-10 border-2 border-[#8B1538] border-t-transparent rounded-full"
+                            />
+                            <p className="mt-4 text-[#717171]">Loading orders...</p>
                         </div>
-                        <h2 className="font-cinzel text-xl text-[#2D1B1B] font-black mb-1">No Orders</h2>
-                        <p className="font-playfair text-[#4A3737]/40 italic mb-8 text-sm text-balance px-4">Your heritage collection awaits its first entry.</p>
-                        <Link href="/products" className="inline-block px-8 py-3 bg-[#2D1B1B] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg hover:bg-saffron transition-all duration-300">
-                            Shop Now
-                        </Link>
-                    </motion.div>
-                ) : (
-                    <>
-                        <div className="space-y-6">
-                            {orders.map((order, idx) => {
-                                const theme = getStatusTheme(order.status)
-                                return (
-                                    <motion.div
-                                        key={order.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.03 }}
-                                        className="bg-white rounded-3xl shadow-[0_10px_30px_-5px_rgba(45,27,27,0.06)] border border-orange-50/50 overflow-hidden"
-                                    >
-                                        {/* Compact Header */}
-                                        <div className="px-6 py-4 flex flex-row items-start justify-between border-b border-orange-50/30 gap-4">
-                                            <div className="flex items-start gap-3 min-w-0">
-                                                <div className="w-10 h-10 md:w-8 md:h-8 bg-orange-50 rounded-lg flex items-center justify-center border border-orange-100/50 shrink-0 mt-0.5 md:mt-0">
-                                                    <Package className="h-5 w-5 md:h-4 md:w-4 text-saffron" />
+                    ) : pagination.total === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="bg-[#F8F8F8] rounded-xl p-12 text-center border border-[#EBEBEB]"
+                        >
+                            <div className="w-20 h-20 bg-[#FDF2F4] rounded-full flex items-center justify-center mx-auto mb-6">
+                                <ShoppingBag className="h-10 w-10 text-[#8B1538]" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">No Orders Yet</h2>
+                            <p className="text-[#717171] mb-8">Start shopping to see your orders here</p>
+                            <Link
+                                href="/products"
+                                className="inline-flex items-center gap-2 px-8 py-3 bg-[#8B1538] text-white font-semibold rounded-lg hover:bg-[#6B102B] transition-colors"
+                            >
+                                Browse Products
+                            </Link>
+                        </motion.div>
+                    ) : (
+                        <>
+                            {/* Results Count */}
+                            <div className="mb-6">
+                                <p className="text-[#717171]">
+                                    Showing <span className="font-medium text-[#1A1A1A]">{startIndex}-{endIndex}</span> of{' '}
+                                    <span className="font-medium text-[#1A1A1A]">{pagination.total}</span> orders
+                                </p>
+                            </div>
+
+                            {/* Orders List */}
+                            <div className="space-y-4">
+                                {orders.map((order, idx) => {
+                                    const theme = getStatusTheme(order.status)
+                                    const isStorePickup = order.payment_status === 'store payment'
+
+                                    return (
+                                        <motion.div
+                                            key={order.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            className="bg-white rounded-xl border border-[#EBEBEB] overflow-hidden hover:shadow-lg transition-shadow"
+                                        >
+                                            {/* Order Header */}
+                                            <div className="px-5 py-4 bg-[#F8F8F8] border-b border-[#EBEBEB] flex flex-wrap items-center justify-between gap-3">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <Package className="h-5 w-5 text-[#8B1538]" />
+                                                        <span className="font-bold text-[#1A1A1A]">Order #{order.id}</span>
+                                                    </div>
+                                                    <span className="text-sm text-[#717171]">{formatDate(order.created_at)}</span>
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <h2 className="font-cinzel text-lg text-[#2D1B1B] font-black leading-none truncate pr-2">#{order.id}</h2>
-                                                    <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                                                        <p className="text-[10px] font-black text-[#4A3737]/30 uppercase tracking-widest whitespace-nowrap">{formatDate(order.created_at)}</p>
-                                                        {order.payment_status === 'store payment' && (
+
+                                                <div className="flex items-center gap-3">
+                                                    {/* Delivery Type Badge */}
+                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${isStorePickup ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                                                        {isStorePickup ? (
                                                             <>
-                                                                <span className="text-[10px] text-[#4A3737]/20 font-black hidden xs:inline">•</span>
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#2D1B1B] bg-orange-100/50 px-1.5 py-0.5 rounded border border-orange-100 whitespace-nowrap">
-                                                                    Pickup
-                                                                </span>
+                                                                <Store className="h-3.5 w-3.5" />
+                                                                Store Pickup
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Truck className="h-3.5 w-3.5" />
+                                                                Delivery
                                                             </>
                                                         )}
                                                     </div>
+
+                                                    {/* Status Badge */}
+                                                    <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5`}>
+                                                        {theme.icon}
+                                                        {theme.label}
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className={`${theme.bg} ${theme.text} px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0`}>
-                                                {theme.icon}
-                                                {theme.label}
-                                            </div>
-                                        </div>
-
-                                        {/* Concise Items List */}
-                                        <div className="p-6 space-y-4">
-                                            {order.order.items.map((item, i) => (
-                                                <div key={i} className="flex items-center gap-4 group">
-                                                    <div className="relative h-14 w-14 rounded-xl overflow-hidden border border-orange-50 flex-shrink-0 bg-orange-50/20">
-                                                        <Image
-                                                            src={item.image || '/placeholder-product.png'}
-                                                            alt={item.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-grow min-w-0">
-                                                        <h3 className="font-playfair text-base text-[#2D1B1B] font-black truncate leading-tight mb-1">{item.name}</h3>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[9px] font-black text-[#4A3737]/40 uppercase tracking-widest">Qty: {item.quantity}</span>
-                                                            <span className="text-[9px] font-black text-[#4A3737]/20 uppercase">•</span>
-                                                            <span className="text-[9px] font-black text-[#4A3737]/40 uppercase tracking-widest">₹{item.price}</span>
+                                            {/* Order Items */}
+                                            <div className="p-5">
+                                                <div className="space-y-4">
+                                                    {order.order.items.map((item, i) => (
+                                                        <div key={i} className="flex items-center gap-4">
+                                                            <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-[#F8F8F8] flex-shrink-0">
+                                                                <Image
+                                                                    src={item.image || '/placeholder-product.png'}
+                                                                    alt={item.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="font-medium text-[#1A1A1A] truncate">{item.name}</h3>
+                                                                <p className="text-sm text-[#717171]">
+                                                                    Qty: {item.quantity} x ₹{item.price.toLocaleString()}
+                                                                </p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="font-semibold text-[#1A1A1A]">
+                                                                    ₹{(item.price * item.quantity).toLocaleString()}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="font-cinzel font-black text-[#2D1B1B] text-sm">₹{item.price * item.quantity}</p>
-                                                    </div>
+                                                    ))}
                                                 </div>
-                                            ))}
+
+                                                {/* Order Total & Actions */}
+                                                <div className="mt-5 pt-4 border-t border-[#EBEBEB] flex items-center justify-between">
+                                                    <div>
+                                                        <span className="text-sm text-[#717171]">Order Total</span>
+                                                        <p className="text-xl font-bold text-[#1A1A1A]">₹{order.order.total.toLocaleString()}</p>
+                                                    </div>
+
+                                                    {order.status === 'pending' && (
+                                                        <button
+                                                            onClick={() => handleCancelOrder(order.id)}
+                                                            disabled={cancellingId === order.id}
+                                                            className="px-5 py-2 border border-red-200 text-red-500 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                                                        >
+                                                            {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-[#F8F8F8] rounded-xl border border-[#EBEBEB]">
+                                    <p className="text-sm text-[#717171]">
+                                        Page <span className="font-medium text-[#1A1A1A]">{pagination.page}</span> of{' '}
+                                        <span className="font-medium text-[#1A1A1A]">{pagination.totalPages}</span>
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                            disabled={pagination.page === 1 || isLoading}
+                                            className="p-2 rounded-lg border border-[#EBEBEB] bg-white hover:bg-[#F8F8F8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            <ChevronLeft className="h-5 w-5 text-[#4A4A4A]" />
+                                        </button>
+
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
+                                                let pageNum: number
+                                                if (pagination.totalPages <= 5) {
+                                                    pageNum = i + 1
+                                                } else if (pagination.page <= 3) {
+                                                    pageNum = i + 1
+                                                } else if (pagination.page >= pagination.totalPages - 2) {
+                                                    pageNum = pagination.totalPages - 4 + i
+                                                } else {
+                                                    pageNum = pagination.page - 2 + i
+                                                }
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        onClick={() => handlePageChange(pageNum)}
+                                                        disabled={isLoading}
+                                                        className={`w-10 h-10 rounded-lg font-medium text-sm transition-all disabled:opacity-50 ${pagination.page === pageNum
+                                                            ? 'bg-[#8B1538] text-white'
+                                                            : 'bg-white border border-[#EBEBEB] text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                                            }`}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                )
+                                            })}
                                         </div>
 
-                                        {/* Footer Actions */}
-                                        {order.status === 'pending' && (
-                                            <div className="px-6 py-4 bg-orange-50/20 border-t border-orange-50/30 flex justify-end">
-                                                <button
-                                                    onClick={() => handleCancelOrder(order.id)}
-                                                    disabled={cancellingId === order.id}
-                                                    className="px-6 py-2 rounded-xl border border-red-200 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 shadow-sm"
-                                                >
-                                                    {cancellingId === order.id ? 'Cancelling...' : 'Cancel Order'}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                )
-                            })}
-                        </div>
-
-                        {/* Pagination Controls */}
-                        {pagination.totalPages > 1 && (
-                            <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl p-4 border border-orange-100 shadow-sm">
-                                <p className="text-sm text-[#4A3737]/60 font-playfair">
-                                    Showing <span className="font-bold text-[#2D1B1B]">{startIndex}</span> to{' '}
-                                    <span className="font-bold text-[#2D1B1B]">{endIndex}</span> of{' '}
-                                    <span className="font-bold text-[#2D1B1B]">{pagination.total}</span> orders
-                                </p>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page - 1)}
-                                        disabled={pagination.page === 1 || isLoading}
-                                        className="p-2 rounded-lg border border-orange-200 hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                    >
-                                        <ChevronLeft className="h-5 w-5 text-[#4A3737]" />
-                                    </button>
-
-                                    <div className="flex items-center gap-1">
-                                        {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => {
-                                            let pageNum: number
-                                            if (pagination.totalPages <= 5) {
-                                                pageNum = i + 1
-                                            } else if (pagination.page <= 3) {
-                                                pageNum = i + 1
-                                            } else if (pagination.page >= pagination.totalPages - 2) {
-                                                pageNum = pagination.totalPages - 4 + i
-                                            } else {
-                                                pageNum = pagination.page - 2 + i
-                                            }
-                                            return (
-                                                <button
-                                                    key={pageNum}
-                                                    onClick={() => handlePageChange(pageNum)}
-                                                    disabled={isLoading}
-                                                    className={`w-10 h-10 rounded-lg font-bold text-sm transition-all disabled:opacity-50 ${
-                                                        pagination.page === pageNum
-                                                            ? 'bg-saffron text-white shadow-lg'
-                                                            : 'border border-orange-200 text-[#4A3737] hover:bg-orange-50'
-                                                    }`}
-                                                >
-                                                    {pageNum}
-                                                </button>
-                                            )
-                                        })}
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                            disabled={pagination.page === pagination.totalPages || isLoading}
+                                            className="p-2 rounded-lg border border-[#EBEBEB] bg-white hover:bg-[#F8F8F8] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            <ChevronRight className="h-5 w-5 text-[#4A4A4A]" />
+                                        </button>
                                     </div>
-
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page + 1)}
-                                        disabled={pagination.page === pagination.totalPages || isLoading}
-                                        className="p-2 rounded-lg border border-orange-200 hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                                    >
-                                        <ChevronRight className="h-5 w-5 text-[#4A3737]" />
-                                    </button>
                                 </div>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </section>
         </div>
     )
 }

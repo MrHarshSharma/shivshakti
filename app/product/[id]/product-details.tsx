@@ -287,9 +287,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         )}
 
                         {/* Quantity & Add to Cart */}
-                        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                        <div className="flex items-center gap-3 mb-8">
                             {/* Quantity Selector */}
-                            <div className="flex items-center border border-[#EBEBEB] rounded-lg">
+                            <div className="flex items-center border border-[#EBEBEB] rounded-lg flex-shrink-0">
                                 <button
                                     onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
                                     className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#8B1538]"
@@ -297,7 +297,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 >
                                     <Minus className="h-4 w-4" />
                                 </button>
-                                <span className="w-12 text-center font-semibold text-[#1A1A1A]">{quantity}</span>
+                                <span className="w-10 text-center font-semibold text-[#1A1A1A]">{quantity}</span>
                                 <button
                                     onClick={() => handleQuantityChange(quantity + 1)}
                                     className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#8B1538]"
@@ -309,7 +309,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                             {/* Add to Cart Button */}
                             <button
                                 onClick={handleAddToCart}
-                                className={`flex-1 sm:flex-none sm:min-w-[200px] px-8 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${showSuccess
+                                className={`flex-1 px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${showSuccess
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-[#8B1538] text-white hover:bg-[#6B102B]'
                                     }`}

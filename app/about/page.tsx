@@ -9,7 +9,7 @@ export default function AboutPage() {
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative bg-[#FDF2F4] pt-32 pb-16 md:pt-40 md:pb-24">
+            <section className="relative bg-[#FDF2F4] pt-16 pb-16 md:pt-24 md:pb-24">
                 <div className="container mx-auto px-6">
                     <div className="max-w-3xl mx-auto text-center">
                         <motion.div

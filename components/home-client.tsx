@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Truck, Shield, Gift, Clock } from 'lucide-react'
+import { ArrowRight, Truck, Shield, Gift, Clock, Instagram } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 
@@ -142,15 +142,13 @@ export default function HomeClient({ products }: { products: Product[] }) {
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Banner 1 */}
                         <div className="relative bg-[#8B1538] rounded-xl overflow-hidden p-8 lg:p-10 text-white min-h-[280px] flex flex-col justify-end">
-                            <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
-                                <div className="absolute inset-0 bg-gradient-to-l from-white to-transparent" />
-                            </div>
+                            <div className="absolute top-4 right-4 w-24 h-24 bg-white rounded-full opacity-20" />
                             <span className="text-xs font-medium tracking-wider uppercase opacity-80 mb-2">
                                 Corporate Gifting
                             </span>
-                            <h3 className="text-2xl lg:text-3xl font-playfair font-semibold mb-3">
+                            <span className="text-2xl lg:text-3xl font-playfair font-semibold mb-3 text-white">
                                 Bulk Orders<br />Available
-                            </h3>
+                            </span>
                             <p className="text-sm opacity-90 mb-4 max-w-xs">
                                 Special discounts on bulk orders for corporate events and celebrations.
                             </p>
@@ -169,9 +167,9 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             <span className="text-xs font-medium tracking-wider uppercase text-[#8B1538] mb-2">
                                 Festival Special
                             </span>
-                            <h3 className="text-2xl lg:text-3xl font-playfair font-semibold text-[#1A1A1A] mb-3">
+                            <span className="text-2xl lg:text-3xl font-playfair font-semibold text-[#1A1A1A] mb-3">
                                 Custom<br />Hampers
-                            </h3>
+                            </span>
                             <p className="text-sm text-[#717171] mb-4 max-w-xs">
                                 Create personalized gift hampers tailored to your requirements.
                             </p>
@@ -226,23 +224,37 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 </div>
             </section>
 
-            {/* Newsletter / CTA */}
-            <section className="py-12 lg:py-16 bg-[#1A1A1A]">
-                <div className="container mx-auto px-4 lg:px-8 text-center">
-                    <h2 className="text-2xl font-playfair font-semibold text-white mb-3">
-                        Stay Updated
-                    </h2>
-                    <p className="text-sm text-white/70 mb-6 max-w-md mx-auto">
-                        Follow us on Instagram for new arrivals, offers, and gifting inspiration.
-                    </p>
-                    <a
-                        href="https://www.instagram.com/shiv_shakti_provision"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#1A1A1A] font-medium rounded-lg hover:bg-[#F8F8F8] transition-colors"
-                    >
-                        Follow @shiv_shakti_provision
-                    </a>
+            {/* Instagram CTA */}
+            <section className="py-16 lg:py-20 bg-gradient-to-br from-[#8B1538] via-[#C13584] to-[#E1306C] relative overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3" />
+                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white/5 rounded-full" />
+
+                <div className="container mx-auto px-4 lg:px-8 relative z-10">
+                    <div className="max-w-2xl mx-auto text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-6">
+                            <Instagram className="w-8 h-8 text-white" />
+                        </div>
+                        <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                            Join Our Community
+                        </h2>
+                        <p className="text-white/80 mb-8 text-lg">
+                            Follow us on Instagram for new arrivals, exclusive offers, behind-the-scenes, and gifting inspiration.
+                        </p>
+                        <a
+                            href="https://www.instagram.com/shiv_shakti_provision"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#8B1538] font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                        >
+                            <Instagram className="w-5 h-5" />
+                            @shiv_shakti_provision
+                        </a>
+                        <p className="mt-6 text-white/60 text-sm">
+                            Join 5,000+ followers for daily inspiration
+                        </p>
+                    </div>
                 </div>
             </section>
         </div>
