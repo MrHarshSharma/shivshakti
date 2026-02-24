@@ -41,7 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
                     {/* Badges */}
                     {product.isNew && (
-                        <span className="absolute top-3 left-3 px-2 py-1 bg-[#8B1538] text-white text-[10px] font-semibold rounded">
+                        <span className="absolute top-3 left-3 px-2 py-1 bg-[#D29B6C] text-white text-[10px] font-semibold rounded">
                             NEW
                         </span>
                     )}
@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     )}
 
                     {/* Name */}
-                    <h3 className="text-sm font-medium text-[#1A1A1A] mb-1 line-clamp-2 group-hover:text-[#8B1538] transition-colors">
+                    <h3 className="text-sm font-medium text-[#1A1A1A] mb-1 line-clamp-2 group-hover:text-[#D29B6C] transition-colors">
                         {product.name}
                     </h3>
 

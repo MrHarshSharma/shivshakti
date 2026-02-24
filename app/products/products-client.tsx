@@ -28,7 +28,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-[#FDF2F4] pt-12 pb-12 md:pt-16 md:pb-16">
+            <section className="bg-[#EBDDC4] pt-12 pb-12 md:pt-16 md:pb-16">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -55,13 +55,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                                     onClick={() => setActiveCategory(category)}
                                     className={`relative px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 whitespace-nowrap ${activeCategory === category
                                         ? 'text-white'
-                                        : 'text-[#4A4A4A] hover:text-[#8B1538]'
+                                        : 'text-[#4A4A4A] hover:text-[#D29B6C]'
                                         }`}
                                 >
                                     {activeCategory === category && (
                                         <motion.div
                                             layoutId="activeTab"
-                                            className="absolute inset-0 bg-[#8B1538] rounded-lg"
+                                            className="absolute inset-0 bg-[#D29B6C] rounded-lg"
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                         />
                                     )}
@@ -80,7 +80,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                     <div className="mb-8 flex items-center justify-between">
                         <p className="text-[#717171]">
                             Showing <span className="font-medium text-[#1A1A1A]">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
-                            {activeCategory !== 'All' && <span> in <span className="font-medium text-[#8B1538]">{activeCategory}</span></span>}
+                            {activeCategory !== 'All' && <span> in <span className="font-medium text-[#D29B6C]">{activeCategory}</span></span>}
                         </p>
                     </div>
 
@@ -94,14 +94,14 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                                 exit={{ opacity: 0 }}
                                 className="text-center py-20 bg-[#F8F8F8] rounded-xl border border-[#EBEBEB] max-w-lg mx-auto"
                             >
-                                <div className="w-16 h-16 bg-[#FDF2F4] rounded-full flex items-center justify-center mx-auto mb-4 text-[#8B1538]">
+                                <div className="w-16 h-16 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-4 text-[#D29B6C]">
                                     <Package className="h-8 w-8" />
                                 </div>
                                 <p className="text-xl font-semibold text-[#1A1A1A] mb-2">No products found</p>
                                 <p className="text-[#717171]">We don&apos;t have products in &quot;{activeCategory}&quot; yet.</p>
                                 <button
                                     onClick={() => setActiveCategory('All')}
-                                    className="mt-6 px-6 py-2.5 bg-[#8B1538] text-white font-medium rounded-lg hover:bg-[#6B102B] transition-colors"
+                                    className="mt-6 px-6 py-2.5 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors"
                                 >
                                     View All Products
                                 </button>

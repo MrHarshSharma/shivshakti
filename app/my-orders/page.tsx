@@ -127,7 +127,7 @@ export default function MyOrdersPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-[#FDF2F4] pt-12 pb-12 md:pt-16 md:pb-16">
+            <section className="bg-[#EBDDC4] pt-12 pb-12 md:pt-16 md:pb-16">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -151,7 +151,7 @@ export default function MyOrdersPage() {
                             <motion.div
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                className="w-10 h-10 border-2 border-[#8B1538] border-t-transparent rounded-full"
+                                className="w-10 h-10 border-2 border-[#D29B6C] border-t-transparent rounded-full"
                             />
                             <p className="mt-4 text-[#717171]">Loading orders...</p>
                         </div>
@@ -161,14 +161,14 @@ export default function MyOrdersPage() {
                             animate={{ opacity: 1 }}
                             className="bg-[#F8F8F8] rounded-xl p-12 text-center border border-[#EBEBEB]"
                         >
-                            <div className="w-20 h-20 bg-[#FDF2F4] rounded-full flex items-center justify-center mx-auto mb-6">
-                                <ShoppingBag className="h-10 w-10 text-[#8B1538]" />
+                            <div className="w-20 h-20 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-6">
+                                <ShoppingBag className="h-10 w-10 text-[#D29B6C]" />
                             </div>
                             <h2 className="text-2xl font-bold text-[#1A1A1A] mb-2">No Orders Yet</h2>
                             <p className="text-[#717171] mb-8">Start shopping to see your orders here</p>
                             <Link
                                 href="/products"
-                                className="inline-flex items-center gap-2 px-8 py-3 bg-[#8B1538] text-white font-semibold rounded-lg hover:bg-[#6B102B] transition-colors"
+                                className="inline-flex items-center gap-2 px-8 py-3 bg-[#D29B6C] text-white font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
                             >
                                 Browse Products
                             </Link>
@@ -201,7 +201,7 @@ export default function MyOrdersPage() {
                                             <div className="px-5 py-4 bg-[#F8F8F8] border-b border-[#EBEBEB] flex flex-wrap items-center justify-between gap-3">
                                                 <div className="flex items-center gap-4">
                                                     <div className="flex items-center gap-2">
-                                                        <Package className="h-5 w-5 text-[#8B1538]" />
+                                                        <Package className="h-5 w-5 text-[#D29B6C]" />
                                                         <span className="font-bold text-[#1A1A1A]">Order #{order.id}</span>
                                                     </div>
                                                     <span className="text-sm text-[#717171]">{formatDate(order.created_at)}</span>
@@ -316,7 +316,7 @@ export default function MyOrdersPage() {
                                                         onClick={() => handlePageChange(pageNum)}
                                                         disabled={isLoading}
                                                         className={`w-10 h-10 rounded-lg font-medium text-sm transition-all disabled:opacity-50 ${pagination.page === pageNum
-                                                            ? 'bg-[#8B1538] text-white'
+                                                            ? 'bg-[#D29B6C] text-white'
                                                             : 'bg-white border border-[#EBEBEB] text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                                             }`}
                                                     >

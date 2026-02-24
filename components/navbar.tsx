@@ -30,7 +30,7 @@ export default function Navbar() {
     return (
         <>
             {/* Top Banner */}
-            <div className="bg-[#8B1538] text-white text-center py-2 text-xs font-medium tracking-wide">
+            <div className="bg-[#D29B6C] text-white text-center py-2 text-xs font-medium tracking-wide">
                 Free Shipping on orders above ₹999 | Use code WELCOME10 for 10% off
             </div>
 
@@ -56,8 +56,8 @@ export default function Navbar() {
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className={`text-sm font-medium transition-colors hover:text-[#8B1538] ${
-                                        pathname === link.href ? 'text-[#8B1538]' : 'text-[#4A4A4A]'
+                                    className={`text-sm font-medium transition-colors hover:text-[#D29B6C] ${
+                                        pathname === link.href ? 'text-[#D29B6C]' : 'text-[#4A4A4A]'
                                     }`}
                                 >
                                     {link.name}
@@ -66,8 +66,8 @@ export default function Navbar() {
                             {isAdmin && (
                                 <Link
                                     href="/admin"
-                                    className={`text-sm font-medium transition-colors hover:text-[#8B1538] ${
-                                        pathname === '/admin' ? 'text-[#8B1538]' : 'text-[#4A4A4A]'
+                                    className={`text-sm font-medium transition-colors hover:text-[#D29B6C] ${
+                                        pathname === '/admin' ? 'text-[#D29B6C]' : 'text-[#4A4A4A]'
                                     }`}
                                 >
                                     Dashboard
@@ -76,8 +76,8 @@ export default function Navbar() {
                             {user && !isAdmin && (
                                 <Link
                                     href="/my-orders"
-                                    className={`text-sm font-medium transition-colors hover:text-[#8B1538] ${
-                                        pathname === '/my-orders' ? 'text-[#8B1538]' : 'text-[#4A4A4A]'
+                                    className={`text-sm font-medium transition-colors hover:text-[#D29B6C] ${
+                                        pathname === '/my-orders' ? 'text-[#D29B6C]' : 'text-[#4A4A4A]'
                                     }`}
                                 >
                                     My Orders
@@ -106,7 +106,7 @@ export default function Navbar() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="w-8 h-8 rounded-full bg-[#8B1538] flex items-center justify-center">
+                                            <div className="w-8 h-8 rounded-full bg-[#D29B6C] flex items-center justify-center">
                                                 <span className="text-white text-sm font-medium">
                                                     {user.user_metadata.full_name?.charAt(0) || 'U'}
                                                 </span>
@@ -154,7 +154,7 @@ export default function Navbar() {
                                                     )}
                                                     <button
                                                         onClick={() => { logout(); setShowProfilePopup(false); }}
-                                                        className="w-full text-left px-4 py-2.5 text-sm text-[#D0021B] hover:bg-[#FDF2F4] transition-colors"
+                                                        className="w-full text-left px-4 py-2.5 text-sm text-[#D0021B] hover:bg-[#EBDDC4] transition-colors"
                                                     >
                                                         Sign Out
                                                     </button>
@@ -166,7 +166,7 @@ export default function Navbar() {
                             ) : (
                                 <button
                                     onClick={() => loginWithGoogle()}
-                                    className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#4A4A4A] hover:text-[#8B1538] transition-colors"
+                                    className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#4A4A4A] hover:text-[#D29B6C] transition-colors"
                                 >
                                     <User className="w-5 h-5" />
                                     Login
@@ -180,7 +180,7 @@ export default function Navbar() {
                             >
                                 <ShoppingBag className="w-5 h-5 text-[#4A4A4A]" />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#8B1538] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#D29B6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                         {cartCount}
                                     </span>
                                 )}
@@ -236,7 +236,7 @@ export default function Navbar() {
                                                     <Image src={user.user_metadata.avatar_url} alt="Profile" fill className="object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-12 h-12 rounded-full bg-[#8B1538] flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-full bg-[#D29B6C] flex items-center justify-center">
                                                     <span className="text-white text-lg font-medium">
                                                         {user.user_metadata.full_name?.charAt(0) || 'U'}
                                                     </span>
@@ -252,7 +252,7 @@ export default function Navbar() {
                                     ) : (
                                         <button
                                             onClick={() => { loginWithGoogle(); setIsMenuOpen(false); }}
-                                            className="w-full py-3 bg-[#8B1538] text-white text-sm font-semibold rounded-lg hover:bg-[#6B102B] transition-colors"
+                                            className="w-full py-3 bg-[#D29B6C] text-white text-sm font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
                                         >
                                             Sign In with Google
                                         </button>
@@ -269,7 +269,7 @@ export default function Navbar() {
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`block px-4 py-3 text-sm font-medium transition-colors ${
                                             pathname === link.href
-                                                ? 'text-[#8B1538] bg-[#FDF2F4]'
+                                                ? 'text-[#D29B6C] bg-[#EBDDC4]'
                                                 : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                         }`}
                                     >
@@ -282,7 +282,7 @@ export default function Navbar() {
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`block px-4 py-3 text-sm font-medium transition-colors ${
                                             pathname === '/my-orders'
-                                                ? 'text-[#8B1538] bg-[#FDF2F4]'
+                                                ? 'text-[#D29B6C] bg-[#EBDDC4]'
                                                 : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                         }`}
                                     >
@@ -295,7 +295,7 @@ export default function Navbar() {
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`block px-4 py-3 text-sm font-medium transition-colors ${
                                             pathname === '/admin'
-                                                ? 'text-[#8B1538] bg-[#FDF2F4]'
+                                                ? 'text-[#D29B6C] bg-[#EBDDC4]'
                                                 : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                         }`}
                                     >
@@ -309,7 +309,7 @@ export default function Navbar() {
                                 <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#EBEBEB]">
                                     <button
                                         onClick={() => { logout(); setIsMenuOpen(false); }}
-                                        className="w-full py-3 text-sm font-medium text-[#D0021B] border border-[#D0021B] rounded-lg hover:bg-[#FDF2F4] transition-colors"
+                                        className="w-full py-3 text-sm font-medium text-[#D0021B] border border-[#D0021B] rounded-lg hover:bg-[#EBDDC4] transition-colors"
                                     >
                                         Sign Out
                                     </button>

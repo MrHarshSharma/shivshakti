@@ -32,7 +32,7 @@ export default function Footer() {
                                 href="https://www.instagram.com/shiv_shakti_provision"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-9 h-9 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#717171] hover:text-[#8B1538] hover:border-[#8B1538] transition-colors"
+                                className="w-9 h-9 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#717171] hover:text-[#D29B6C] hover:border-[#D29B6C] transition-colors"
                             >
                                 <Instagram className="w-4 h-4" />
                             </a>
@@ -51,7 +51,7 @@ export default function Footer() {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-[#717171] hover:text-[#8B1538] transition-colors"
+                                        className="text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -73,7 +73,7 @@ export default function Footer() {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-[#717171] hover:text-[#8B1538] transition-colors"
+                                        className="text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -89,7 +89,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="mailto:shivshaktiprovision18@gmail.com"
-                                    className="flex items-start gap-3 text-sm text-[#717171] hover:text-[#8B1538] transition-colors"
+                                    className="flex items-start gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                 >
                                     <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                     shivshaktiprovision18@gmail.com
@@ -98,7 +98,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="tel:+919890379728"
-                                    className="flex items-center gap-3 text-sm text-[#717171] hover:text-[#8B1538] transition-colors"
+                                    className="flex items-center gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                 >
                                     <Phone className="w-4 h-4 flex-shrink-0" />
                                     +91 98903 79728

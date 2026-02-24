@@ -282,7 +282,7 @@ export default function CartDrawer() {
                     email: user.email,
                 },
                 theme: {
-                    color: '#8B1538',
+                    color: '#D29B6C',
                 },
                 handler: async (response: RazorpayResponse) => {
                     try {
@@ -410,7 +410,7 @@ export default function CartDrawer() {
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-[#EBEBEB] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <ShoppingBag className="h-5 w-5 text-[#8B1538]" />
+                                <ShoppingBag className="h-5 w-5 text-[#D29B6C]" />
                                 <h2 className="text-lg font-semibold text-[#1A1A1A]">Shopping Bag</h2>
                                 {items.length > 0 && (
                                     <span className="px-2 py-0.5 bg-[#F8F8F8] text-[#717171] text-xs font-medium rounded-full">
@@ -455,34 +455,34 @@ export default function CartDrawer() {
                                         <button
                                             onClick={() => setCustomerData({ ...customerData, isDelivery: true })}
                                             className={`relative flex flex-col items-center justify-center p-4 border rounded-xl transition-all ${customerData.isDelivery === true
-                                                ? 'border-[#8B1538] bg-[#FDF2F4]'
-                                                : 'border-[#EBEBEB] bg-white hover:border-[#8B1538]/50'
+                                                ? 'border-[#D29B6C] bg-[#EBDDC4]'
+                                                : 'border-[#EBEBEB] bg-white hover:border-[#D29B6C]/50'
                                                 }`}
                                         >
                                             {customerData.isDelivery === true && (
                                                 <div className="absolute top-2 right-2">
-                                                    <Check className="h-4 w-4 text-[#8B1538]" />
+                                                    <Check className="h-4 w-4 text-[#D29B6C]" />
                                                 </div>
                                             )}
-                                            <Truck className={`h-6 w-6 mb-2 ${customerData.isDelivery === true ? 'text-[#8B1538]' : 'text-[#717171]'}`} />
-                                            <span className={`font-medium text-sm ${customerData.isDelivery === true ? 'text-[#8B1538]' : 'text-[#1A1A1A]'}`}>Delivery</span>
+                                            <Truck className={`h-6 w-6 mb-2 ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#717171]'}`} />
+                                            <span className={`font-medium text-sm ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#1A1A1A]'}`}>Delivery</span>
                                             <span className="text-xs text-[#717171] mt-0.5">To your doorstep</span>
                                         </button>
 
                                         <button
                                             onClick={() => setCustomerData({ ...customerData, isDelivery: false })}
                                             className={`relative flex flex-col items-center justify-center p-4 border rounded-xl transition-all ${customerData.isDelivery === false
-                                                ? 'border-[#8B1538] bg-[#FDF2F4]'
-                                                : 'border-[#EBEBEB] bg-white hover:border-[#8B1538]/50'
+                                                ? 'border-[#D29B6C] bg-[#EBDDC4]'
+                                                : 'border-[#EBEBEB] bg-white hover:border-[#D29B6C]/50'
                                                 }`}
                                         >
                                             {customerData.isDelivery === false && (
                                                 <div className="absolute top-2 right-2">
-                                                    <Check className="h-4 w-4 text-[#8B1538]" />
+                                                    <Check className="h-4 w-4 text-[#D29B6C]" />
                                                 </div>
                                             )}
-                                            <Store className={`h-6 w-6 mb-2 ${customerData.isDelivery === false ? 'text-[#8B1538]' : 'text-[#717171]'}`} />
-                                            <span className={`font-medium text-sm ${customerData.isDelivery === false ? 'text-[#8B1538]' : 'text-[#1A1A1A]'}`}>Store Pickup</span>
+                                            <Store className={`h-6 w-6 mb-2 ${customerData.isDelivery === false ? 'text-[#D29B6C]' : 'text-[#717171]'}`} />
+                                            <span className={`font-medium text-sm ${customerData.isDelivery === false ? 'text-[#D29B6C]' : 'text-[#1A1A1A]'}`}>Store Pickup</span>
                                             <span className="text-xs text-[#717171] mt-0.5">Visit our store</span>
                                         </button>
                                     </div>
@@ -506,7 +506,7 @@ export default function CartDrawer() {
                                                         onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
                                                         className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.name
                                                             ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                            : 'border-[#EBEBEB] focus:ring-[#8B1538]/20 focus:border-[#8B1538]'
+                                                            : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
                                                             }`}
                                                         placeholder="Enter your full name"
                                                     />
@@ -526,7 +526,7 @@ export default function CartDrawer() {
                                                         onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                                                         className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.phone
                                                             ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                            : 'border-[#EBEBEB] focus:ring-[#8B1538]/20 focus:border-[#8B1538]'
+                                                            : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
                                                             }`}
                                                         placeholder="10-digit phone number"
                                                         maxLength={10}
@@ -551,7 +551,7 @@ export default function CartDrawer() {
                                                             onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
                                                             className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
                                                                 ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                                : 'border-[#EBEBEB] focus:ring-[#8B1538]/20 focus:border-[#8B1538]'
+                                                                : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
                                                                 }`}
                                                             placeholder="Enter your complete delivery address"
                                                             rows={3}
@@ -580,7 +580,7 @@ export default function CartDrawer() {
                                                     <button
                                                         onClick={handleCheckout}
                                                         disabled={isSubmitting}
-                                                        className="flex-1 py-3 bg-[#8B1538] text-white font-medium rounded-lg hover:bg-[#6B102B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                                        className="flex-1 py-3 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                                                     >
                                                         {isSubmitting ? (
                                                             <>
@@ -616,7 +616,7 @@ export default function CartDrawer() {
                                     </div>
                                     <button
                                         onClick={toggleCart}
-                                        className="px-6 py-2.5 bg-[#8B1538] text-white font-medium rounded-lg hover:bg-[#6B102B] transition-colors"
+                                        className="px-6 py-2.5 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors"
                                     >
                                         Continue Shopping
                                     </button>
@@ -646,7 +646,7 @@ export default function CartDrawer() {
                                                     <div className="flex items-center gap-1 bg-white rounded-lg border border-[#EBEBEB]">
                                                         <button
                                                             onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariation?.id)}
-                                                            className="p-1.5 hover:bg-[#F8F8F8] transition-colors text-[#717171] hover:text-[#8B1538] rounded-l-lg"
+                                                            className="p-1.5 hover:bg-[#F8F8F8] transition-colors text-[#717171] hover:text-[#D29B6C] rounded-l-lg"
                                                             disabled={item.quantity <= 1}
                                                         >
                                                             <Minus className="h-3 w-3" />
@@ -654,7 +654,7 @@ export default function CartDrawer() {
                                                         <span className="w-8 text-center text-sm font-medium text-[#1A1A1A]">{item.quantity}</span>
                                                         <button
                                                             onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariation?.id)}
-                                                            className="p-1.5 hover:bg-[#F8F8F8] transition-colors text-[#717171] hover:text-[#8B1538] rounded-r-lg"
+                                                            className="p-1.5 hover:bg-[#F8F8F8] transition-colors text-[#717171] hover:text-[#D29B6C] rounded-r-lg"
                                                         >
                                                             <Plus className="h-3 w-3" />
                                                         </button>
@@ -689,7 +689,7 @@ export default function CartDrawer() {
                                                     value={couponCode}
                                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                                     placeholder="Enter coupon code"
-                                                    className="w-full px-4 py-2.5 bg-[#F8F8F8] border border-[#EBEBEB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8B1538]/20 focus:border-[#8B1538] transition-all"
+                                                    className="w-full px-4 py-2.5 bg-[#F8F8F8] border border-[#EBEBEB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#D29B6C]/20 focus:border-[#D29B6C] transition-all"
                                                 />
                                             </div>
                                             <button
@@ -742,7 +742,7 @@ export default function CartDrawer() {
 
                                 <button
                                     onClick={handleProceedToCheckout}
-                                    className="w-full py-3.5 bg-[#8B1538] text-white font-semibold rounded-lg hover:bg-[#6B102B] transition-colors flex items-center justify-center gap-2"
+                                    className="w-full py-3.5 bg-[#D29B6C] text-white font-semibold rounded-lg hover:bg-[#B8845A] transition-colors flex items-center justify-center gap-2"
                                 >
                                     {!user && (
                                         <svg className="h-4 w-4" viewBox="0 0 24 24">
