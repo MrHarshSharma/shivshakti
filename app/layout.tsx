@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 }
 
 import Footer from '@/components/footer'
+import WhatsAppButton from '@/components/whatsapp-button'
 
 export default function RootLayout({
   children,
@@ -42,6 +43,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <WhatsAppButton />
           </CartProvider>
         </AuthProvider>
       </body>
