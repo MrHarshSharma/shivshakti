@@ -13,7 +13,6 @@ import {
     Loader2,
     X,
     Calendar,
-    CalendarClock,
     CheckCircle2,
     AlertCircle
 } from 'lucide-react'
@@ -262,32 +261,26 @@ export default function CouponManagement() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Valid From</label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-saffron opacity-50" />
-                                        <input
-                                            required
-                                            type="date"
-                                            value={newCoupon.valid_from}
-                                            onChange={(e) => setNewCoupon({ ...newCoupon, valid_from: e.target.value })}
-                                            className="w-full pl-12 pr-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all font-playfair"
-                                        />
-                                    </div>
+                                    <input
+                                        required
+                                        type="date"
+                                        value={newCoupon.valid_from}
+                                        onChange={(e) => setNewCoupon({ ...newCoupon, valid_from: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Valid Till</label>
-                                    <div className="relative">
-                                        <CalendarClock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-magenta opacity-50" />
-                                        <input
-                                            required
-                                            type="date"
-                                            value={newCoupon.valid_till}
-                                            onChange={(e) => setNewCoupon({ ...newCoupon, valid_till: e.target.value })}
-                                            className="w-full pl-12 pr-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all font-playfair"
-                                        />
-                                    </div>
+                                    <input
+                                        required
+                                        type="date"
+                                        value={newCoupon.valid_till}
+                                        onChange={(e) => setNewCoupon({ ...newCoupon, valid_till: e.target.value })}
+                                        className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl focus:ring-2 focus:ring-saffron/20 focus:border-saffron outline-none transition-all"
+                                    />
                                 </div>
                             </div>
 
