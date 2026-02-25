@@ -15,7 +15,7 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <Link href="/" className="inline-block mb-4">
-                            <div className="relative h-14 w-36">
+                            <div className="relative h-20 w-20">
                                 <Image
                                     src="/logo.png"
                                     alt="Shivshakti"

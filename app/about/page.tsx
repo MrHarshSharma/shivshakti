@@ -2,8 +2,64 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { Heart, ShieldCheck, Users, Sparkles, ArrowRight, Award, Package, Clock } from 'lucide-react'
+import { useRef, useEffect, useState } from 'react'
+
+// Animated Counter Component
+function AnimatedCounter({
+    value,
+    suffix = '',
+    duration = 2000
+}: {
+    value: number
+    suffix?: string
+    duration?: number
+}) {
+    const [count, setCount] = useState(0)
+    const ref = useRef<HTMLSpanElement>(null)
+    const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+    useEffect(() => {
+        if (!isInView) return
+
+        let startTime: number
+        let animationFrame: number
+
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp
+            const progress = Math.min((timestamp - startTime) / duration, 1)
+
+            // Easing function for smooth animation
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+            setCount(Math.floor(easeOutQuart * value))
+
+            if (progress < 1) {
+                animationFrame = requestAnimationFrame(animate)
+            } else {
+                setCount(value)
+            }
+        }
+
+        animationFrame = requestAnimationFrame(animate)
+
+        return () => cancelAnimationFrame(animationFrame)
+    }, [isInView, value, duration])
+
+    const formatNumber = (num: number) => {
+        if (value >= 1000 && suffix.includes('K')) {
+            return Math.floor(num / 1000) + 'K'
+        }
+        return num.toLocaleString()
+    }
+
+    return (
+        <span ref={ref}>
+            {value >= 1000 && suffix.includes('K') ? formatNumber(count) : count}
+            {suffix.replace('K', '')}
+        </span>
+    )
+}
 
 export default function AboutPage() {
     return (
@@ -41,12 +97,12 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                             className="relative"
                         >
-                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
+                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-white flex items-center justify-center p-4">
                                 <Image
                                     src="/logo.png"
                                     alt="Shivshakti Heritage"
                                     fill
-                                    className="object-cover"
+                                    className="object-contain p-4"
                                 />
                             </div>
                             <div className="absolute -bottom-6 -right-6 bg-[#D29B6C] text-white p-6 rounded-xl shadow-lg hidden md:block">
@@ -84,10 +140,10 @@ export default function AboutPage() {
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {[
-                            { number: "38+", label: "Years of Trust" },
-                            { number: "50K+", label: "Happy Customers" },
-                            { number: "1000+", label: "Products Curated" },
-                            { number: "100%", label: "Quality Assured" },
+                            { value: 38, suffix: "+", label: "Years of Trust" },
+                            { value: 50000, suffix: "K+", label: "Happy Customers" },
+                            { value: 1000, suffix: "+", label: "Products Curated" },
+                            { value: 100, suffix: "%", label: "Quality Assured" },
                         ].map((stat, i) => (
                             <motion.div
                                 key={i}
@@ -97,7 +153,9 @@ export default function AboutPage() {
                                 transition={{ delay: i * 0.1 }}
                                 className="text-center"
                             >
-                                <p className="text-3xl md:text-4xl font-bold text-[#D29B6C]">{stat.number}</p>
+                                <p className="text-3xl md:text-4xl font-bold text-[#D29B6C]">
+                                    <AnimatedCounter value={stat.value} suffix={stat.suffix} duration={2000} />
+                                </p>
                                 <p className="text-[#717171] mt-1">{stat.label}</p>
                             </motion.div>
                         ))}
@@ -188,13 +246,13 @@ export default function AboutPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg"
+                            className="relative aspect-[1/1] rounded-2xl overflow-hidden shadow-lg bg-white"
                         >
                             <Image
-                                src="/image.png"
+                                src="/logo.png"
                                 alt="Premium Gift Hampers"
                                 fill
-                                className="object-cover"
+                                className="object-contain p-4"
                             />
                         </motion.div>
                     </div>
