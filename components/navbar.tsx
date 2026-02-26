@@ -325,7 +325,7 @@ export default function Navbar() {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: 8 }}
                                                     transition={{ duration: 0.15 }}
-                                                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-[#EBEBEB] py-2 z-50"
+                                                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-[#EBEBEB] py-2 z-[60]"
                                                 >
                                                     <div className="px-4 py-3 border-b border-[#EBEBEB]">
                                                         <p className="text-sm font-semibold text-[#1A1A1A] truncate">
