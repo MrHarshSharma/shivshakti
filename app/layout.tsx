@@ -35,7 +35,9 @@ export default function RootLayout({
       <body className="antialiased flex flex-col min-h-screen">
         <AuthProvider>
           <CartProvider>
-            <Navbar />
+            <Suspense fallback={null}>
+              <Navbar />
+            </Suspense>
             <Suspense fallback={null}>
               <CartDrawer />
             </Suspense>
