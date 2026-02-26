@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = createServiceRoleClient()
         const body = await request.json()
-        const { code, cartTotal } = body
+        const { code, cartTotal, user_id } = body
 
         if (!code) {
             return NextResponse.json({ success: false, error: 'Coupon code is required' }, { status: 400 })
@@ -32,7 +32,27 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'This coupon has expired' }, { status: 400 })
         }
 
-        // 3. Validate Minimum Spend
+        // 3. Check if user has already used this coupon
+        if (user_id) {
+            const { data: existingOrders, error: orderError } = await supabase
+                .from('orders')
+                .select('id, order')
+                .eq('user_id', user_id)
+
+            if (!orderError && existingOrders) {
+                const alreadyUsed = existingOrders.some((order: any) =>
+                    order.order?.coupon_code?.toUpperCase() === code.toUpperCase()
+                )
+                if (alreadyUsed) {
+                    return NextResponse.json({
+                        success: false,
+                        error: 'You have already used this coupon'
+                    }, { status: 400 })
+                }
+            }
+        }
+
+        // 4. Validate Minimum Spend
         const minSpend = parseFloat(coupon.min_cost || '0')
         if (cartTotal < minSpend) {
             return NextResponse.json({
@@ -41,7 +61,7 @@ export async function POST(request: NextRequest) {
             }, { status: 400 })
         }
 
-        // 4. Calculate Discount
+        // 5. Calculate Discount
         const offPercent = parseFloat(coupon.off_percent)
         const discountAmount = Math.round((cartTotal * offPercent) / 100)
 

@@ -140,7 +140,7 @@ export default function CartDrawer() {
             const response = await fetch('/api/coupons/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: couponCode, cartTotal })
+                body: JSON.stringify({ code: couponCode, cartTotal, user_id: user?.id })
             })
             const data = await response.json()
 
