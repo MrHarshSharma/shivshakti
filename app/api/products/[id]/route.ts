@@ -165,6 +165,41 @@ export async function DELETE(
 
         const supabase = createServiceRoleClient()
 
+        // First, fetch the product to get its images
+        const { data: product, error: fetchError } = await supabase
+            .from('product')
+            .select('images')
+            .eq('id', id)
+            .single()
+
+        if (fetchError) {
+            console.error('Supabase fetch error:', fetchError)
+            return NextResponse.json(
+                { error: 'Failed to fetch product', details: fetchError.message },
+                { status: 404 }
+            )
+        }
+
+        // Delete images from storage
+        if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+            const filePaths = product.images.map((url: string) => {
+                const urlParts = url.split('/')
+                return urlParts[urlParts.length - 1]
+            }).filter((path: string) => path)
+
+            if (filePaths.length > 0) {
+                const { error: storageError } = await supabase.storage
+                    .from('products')
+                    .remove(filePaths)
+
+                if (storageError) {
+                    console.error('Storage deletion error:', storageError)
+                    // Continue with product deletion even if image deletion fails
+                }
+            }
+        }
+
+        // Delete the product from database
         const { error } = await supabase
             .from('product')
             .delete()
@@ -185,7 +220,7 @@ export async function DELETE(
 
         return NextResponse.json({
             success: true,
-            message: 'Product deleted successfully'
+            message: 'Product and associated images deleted successfully'
         })
 
     } catch (error) {
