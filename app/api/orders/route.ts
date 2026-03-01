@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id, is_delivery, payment_status } = body
+        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id, is_delivery, payment_status, discount, coupon_code, total } = body
 
         // Validate required fields
         if (!name || !phone || !address || !items || items.length === 0) {
@@ -25,6 +25,15 @@ export async function POST(request: Request) {
         // Create Supabase client with service role (bypasses RLS)
         const supabase = createServiceRoleClient()
 
+        // Calculate subtotal from items
+        const subtotal = items.reduce((sum: number, item: any) => {
+            const price = item.selectedVariation ? item.selectedVariation.price : item.price;
+            return sum + (price * item.quantity);
+        }, 0)
+
+        // Use provided total (with discount) or calculate from subtotal
+        const finalTotal = total !== undefined ? total : subtotal
+
         // Prepare order data
         const orderData = {
             name,
@@ -42,10 +51,10 @@ export async function POST(request: Request) {
                     image: (item.images && item.images.length > 0) ? item.images[0] : item.image || '/placeholder-product.png',
                     variation: item.selectedVariation || null
                 })),
-                total: items.reduce((sum: number, item: any) => {
-                    const price = item.selectedVariation ? item.selectedVariation.price : item.price;
-                    return sum + (price * item.quantity);
-                }, 0),
+                subtotal: subtotal,
+                discount: discount || 0,
+                coupon_code: coupon_code || null,
+                total: finalTotal,
                 itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
             },
             status: 'pending',

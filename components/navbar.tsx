@@ -2,261 +2,638 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, User, Menu, X } from 'lucide-react'
+import { ShoppingBag, User, Menu, X, ChevronDown, Search, Home, Package, Info, Mail, ClipboardList, LayoutDashboard } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+
+interface SearchProduct {
+    id: string | number
+    name: string
+    price: number
+    images: string[]
+    product_type?: 'simple' | 'variable'
+    variations?: Array<{
+        id: string
+        name: string
+        price: number
+        is_default?: boolean
+    }>
+}
 
 export default function Navbar() {
     const { toggleCart, cartCount } = useCart()
     const { user, loginWithGoogle, logout, isAdmin, loading } = useAuth()
     const [showProfilePopup, setShowProfilePopup] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
+    const [searchCount, setSearchCount] = useState(0)
+    const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+    const [isSearching, setIsSearching] = useState(false)
+    const searchRef = useRef<HTMLDivElement>(null)
+    const mobileSearchRef = useRef<HTMLDivElement>(null)
     const pathname = usePathname()
+    const router = useRouter()
+    const searchParams = useSearchParams()
 
-    // Close menu on route change
     useEffect(() => {
         setIsMenuOpen(false)
+        setShowSearchDropdown(false)
     }, [pathname])
 
+    // Initialize search query from URL if on products page
+    useEffect(() => {
+        if (pathname === '/products') {
+            const query = searchParams.get('search') || ''
+            setSearchQuery(query)
+        }
+    }, [pathname, searchParams])
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setShowSearchDropdown(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchQuery.trim().length >= 2) {
+                setIsSearching(true)
+                try {
+                    const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`)
+                    const data = await res.json()
+                    setSearchResults(data.products || [])
+                    setSearchCount(data.count || 0)
+                    setShowSearchDropdown(true)
+                } catch (error) {
+                    console.error('Search error:', error)
+                } finally {
+                    setIsSearching(false)
+                }
+            } else {
+                setSearchResults([])
+                setSearchCount(0)
+                setShowSearchDropdown(false)
+            }
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [searchQuery])
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+            setShowSearchDropdown(false)
+            setIsMenuOpen(false)
+        } else {
+            router.push('/products')
+        }
+    }
+
+    const getProductPrice = (product: SearchProduct) => {
+        if (product.product_type === 'variable' && product.variations && product.variations.length > 0) {
+            const defaultVariation = product.variations.find(v => v.is_default) || product.variations[0]
+            const prices = product.variations.map(v => v.price)
+            const minPrice = Math.min(...prices)
+            const maxPrice = Math.max(...prices)
+            if (minPrice === maxPrice) {
+                return { current: minPrice, original: null }
+            }
+            return { current: minPrice, original: maxPrice, isRange: true }
+        }
+        return { current: product.price, original: null }
+    }
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(price)
+    }
+
+    const highlightMatch = (text: string, query: string) => {
+        if (!query.trim()) return text
+        const regex = new RegExp(`(${query.trim()})`, 'gi')
+        const parts = text.split(regex)
+        return parts.map((part, i) =>
+            regex.test(part) ? <span key={i} className="text-[#D29B6C] font-semibold">{part}</span> : part
+        )
+    }
+
     const navLinks = [
-        { name: 'Products', href: '/products', activeColor: 'text-saffron', hoverColor: 'hover:text-saffron' },
-        { name: 'About', href: '/about', activeColor: 'text-saffron', hoverColor: 'hover:text-saffron' },
+        { name: 'Home', href: '/', icon: Home },
+        { name: 'All Products', href: '/products', icon: Package },
+        { name: 'About Us', href: '/about', icon: Info },
+        { name: 'Contact Us', href: '/contact', icon: Mail },
     ]
 
     return (
         <>
-            <nav className="fixed top-0 z-50 w-full border-b border-orange-100/50 bg-[#fef8f0] transition-all shadow-sm">
-                <div className="container mx-auto flex h-24 items-center justify-between px-6 overflow-hidden">
-                    {/* Logo */}
-                    <Link href="/" className="relative h-36 w-36">
-                        <Image
-                            src="/logo.png"
-                            alt="Shivshakti Logo"
-                            fill
-                            className="object-contain"
-                            priority
-                        />
-                    </Link>
+            {/* Top Banner */}
+            <div className="bg-[#D29B6C] text-white text-center py-2 text-xs font-medium tracking-wide">
+                Free Shipping on orders above ₹999 | Use code WELCOME10 for 10% off
+            </div>
 
-                    {/* Desktop Navigation Links */}
-                    <div className="hidden md:flex items-center gap-12 text-sm font-black tracking-[0.2em] text-[#2D1B1B]">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className={`transition-all duration-300 uppercase border-b-2 py-1 ${pathname === link.href ? `${link.activeColor} border-current` : 'text-[#4A3737]/80 border-transparent'} ${link.hoverColor} hover:border-current`}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-                        {isAdmin && (
-                            <Link href="/admin" className={`transition-all duration-300 uppercase border-b-2 py-1 font-black ${pathname === '/admin' ? 'text-saffron border-saffron' : 'text-[#4A3737]/80 border-transparent hover:text-saffron hover:border-saffron'}`}>
-                                Dashboard
-                            </Link>
-                        )}
-                        {user && !isAdmin && (
-                            <Link href="/my-orders" className={`transition-all duration-300 uppercase border-b-2 py-1 font-black ${pathname === '/my-orders' ? 'text-saffron border-saffron' : 'text-[#4A3737]/80 border-transparent hover:text-saffron hover:border-saffron'}`}>
-                                My Orders
-                            </Link>
-                        )}
-                    </div>
-
-                    {/* Icons & Mobile Toggle */}
-                    <div className="flex items-center gap-3 md:gap-4">
-                        {/* User Profile */}
-                        {loading ? (
-                            <div className="h-9 w-9 md:h-10 md:w-10 rounded-full bg-orange-50/50 animate-pulse border border-orange-100" />
-                        ) : user ? (
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowProfilePopup(!showProfilePopup)}
-                                    className="relative flex items-center gap-2 text-[#4A3737] bg-white rounded-full shadow-sm hover:shadow-md border border-orange-100 transition-all duration-300"
-                                >
-                                    {user.user_metadata.avatar_url ? (
-                                        <div className="relative h-9 w-9 md:h-10 md:w-10 rounded-full overflow-hidden border border-orange-100">
-                                            <Image
-                                                src={user.user_metadata.avatar_url}
-                                                alt={user.user_metadata.full_name || 'User'}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="p-2.5 text-[#4A3737]">
-                                            <User className="h-4.5 w-4.5 md:h-5 md:w-5" />
-                                        </div>
-                                    )}
-                                </button>
-
-                                {/* Profile Popup */}
-                                <AnimatePresence>
-                                    {showProfilePopup && (
-                                        <>
-                                            <div className="fixed inset-0 z-40" onClick={() => setShowProfilePopup(false)} />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                className="fixed top-16 right-6 w-64 bg-white rounded-2xl shadow-xl border border-orange-100 p-6 z-50"
+            {/* Main Header - White Section */}
+            <div className="bg-white border-b border-[#EBEBEB]">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="flex items-center justify-between h-24 md:h-28">
+                        {/* Left - Search Bar (Desktop) */}
+                        <div className="hidden md:flex items-center flex-1">
+                            <div ref={searchRef} className="relative w-72">
+                                <form onSubmit={handleSearch} className="relative flex items-center">
+                                    <input
+                                        type="text"
+                                        placeholder="Search for..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onFocus={() => searchQuery.trim().length >= 2 && setShowSearchDropdown(true)}
+                                        className="w-full pl-4 pr-16 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#D29B6C] transition-colors"
+                                    />
+                                    <div className="absolute right-3 inset-y-0 flex items-center gap-2">
+                                        {searchQuery && !isSearching && (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setSearchQuery(''); setShowSearchDropdown(false); if (pathname === '/products') router.push('/products'); }}
+                                                className="text-[#999] hover:text-[#666] flex items-center justify-center"
                                             >
-                                                <div className="flex items-center gap-4 mb-5 border-b border-orange-50 pb-5">
-                                                    {user.user_metadata.avatar_url && (
-                                                        <div className="relative h-11 w-11 rounded-full overflow-hidden border-2 border-saffron/20 shadow-sm">
-                                                            <Image src={user.user_metadata.avatar_url} alt="Profile" fill className="object-cover" />
-                                                        </div>
-                                                    )}
-                                                    <div className="min-w-0">
-                                                        <h3 className="font-cinzel text-[11px] font-black text-[#2D1B1B] truncate uppercase tracking-wider">{user.user_metadata.full_name || 'Shivshakti Member'}</h3>
-                                                        <p className="text-[9px] text-[#4A3737]/50 truncate tracking-tight italic font-playfair">{user.email}</p>
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                        {isSearching ? (
+                                            <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <button type="submit" className="text-[#666] hover:text-[#D29B6C] flex items-center justify-center">
+                                                <Search className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+
+                                {/* Search Dropdown */}
+                                <AnimatePresence>
+                                    {showSearchDropdown && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-[#EBEBEB] z-[100] max-h-[400px] overflow-hidden"
+                                        >
+                                            {/* Header */}
+                                            <div className="flex items-center justify-between px-4 py-3 border-b border-[#EBEBEB] bg-[#FAFAFA]">
+                                                <span className="text-sm font-semibold text-[#1A1A1A]">Products</span>
+                                                <span className="text-xs text-[#717171]">{searchCount} items found</span>
+                                            </div>
+
+                                            {/* Results */}
+                                            <div className="overflow-y-auto max-h-[320px]">
+                                                {isSearching ? (
+                                                    <div className="flex items-center justify-center py-8">
+                                                        <div className="w-6 h-6 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin"></div>
                                                     </div>
-                                                </div>
-                                                <button onClick={() => { logout(); setShowProfilePopup(false); }} className="w-full py-2.5 text-[10px] font-black text-[#4A3737]/60 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all uppercase tracking-[0.2em] border border-orange-100 font-cinzel">Sign Out</button>
-                                            </motion.div>
-                                        </>
+                                                ) : searchResults.length > 0 ? (
+                                                    <>
+                                                        {searchResults.map((product) => {
+                                                            const priceInfo = getProductPrice(product)
+                                                            return (
+                                                                <Link
+                                                                    key={product.id}
+                                                                    href={`/product/${product.id}`}
+                                                                    onClick={() => setShowSearchDropdown(false)}
+                                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#FDF8F3] transition-colors border-b border-[#F5F5F5] last:border-b-0"
+                                                                >
+                                                                    <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-[#F8F8F8]">
+                                                                        <Image
+                                                                            src={product.images?.[0] || '/placeholder.png'}
+                                                                            alt={product.name}
+                                                                            fill
+                                                                            className="object-cover"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-sm text-[#1A1A1A] truncate">
+                                                                            {highlightMatch(product.name, searchQuery)}
+                                                                        </p>
+                                                                        <div className="flex items-center gap-2 mt-1">
+                                                                            <span className="text-sm font-semibold text-[#D29B6C]">
+                                                                                {formatPrice(priceInfo.current)}
+                                                                            </span>
+                                                                            {priceInfo.original && !priceInfo.isRange && (
+                                                                                <span className="text-xs text-[#999] line-through">
+                                                                                    {formatPrice(priceInfo.original)}
+                                                                                </span>
+                                                                            )}
+                                                                            {priceInfo.isRange && (
+                                                                                <span className="text-xs text-[#999]">
+                                                                                    - {formatPrice(priceInfo.original!)}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            )
+                                                        })}
+                                                        {searchCount > searchResults.length && (
+                                                            <button
+                                                                onClick={handleSearch}
+                                                                className="w-full py-3 text-sm font-medium text-[#D29B6C] hover:bg-[#FDF8F3] transition-colors"
+                                                            >
+                                                                View all {searchCount} results
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div className="py-8 text-center">
+                                                        <p className="text-sm text-[#717171]">No products found for &quot;{searchQuery}&quot;</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </motion.div>
                                     )}
                                 </AnimatePresence>
                             </div>
-                        ) : (
-                            <button
-                                onClick={() => loginWithGoogle()}
-                                className="flex items-center gap-2 px-3 py-2 md:px-5 md:py-2.5 bg-white border border-orange-200 text-[#2D1B1B] rounded-full text-[9px] md:text-[10px] font-black hover:bg-orange-50 transition-all shadow-sm hover:shadow-md uppercase tracking-[0.1em] md:tracking-[0.15em]"
-                            >
-                                <svg className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" viewBox="0 0 24 24">
-                                    <path
-                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                        fill="#4285F4"
-                                    />
-                                    <path
-                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                        fill="#34A853"
-                                    />
-                                    <path
-                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-                                        fill="#FBBC05"
-                                    />
-                                    <path
-                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                        fill="#EA4335"
-                                    />
-                                </svg>
-                                <span className="hidden min-[380px]:inline">SIGN IN</span>
-                                <span className="min-[380px]:hidden">LOGIN</span>
-                            </button>
-                        )}
+                        </div>
 
-                        {/* Cart Icon */}
-                        <button
-                            onClick={toggleCart}
-                            className="relative text-[#4A3737] bg-white p-2.5 rounded-full shadow-sm hover:shadow-md border border-orange-100 transition-all duration-300"
-                        >
-                            <ShoppingCart className="h-4.5 w-4.5 md:h-5 md:w-5" />
-                            <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-saffron text-[9px] font-black text-white shadow-sm ring-2 ring-[#FEFBF5]">
-                                {cartCount}
-                            </span>
-                        </button>
-
-                        {/* Mobile Menu Toggle */}
+                        {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(true)}
-                            className="md:hidden relative text-[#2D1B1B] bg-white p-2.5 rounded-full shadow-sm border border-orange-100 hover:shadow-md transition-all duration-300"
+                            className="md:hidden p-2 rounded-lg hover:bg-[#F8F8F8] transition-colors"
                         >
-                            <Menu className="h-4.5 w-4.5" />
+                            <Menu className="w-6 h-6 text-[#4A4A4A]" />
                         </button>
+
+                        {/* Center - Logo */}
+                        <Link href="/" className="flex-shrink-0">
+                            <div className="relative h-20 w-30 md:h-24 md:w-30">
+                                <Image
+                                    src="/logo.png"
+                                    alt="Heart and Hampers"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
+                        </Link>
+
+                        {/* Right - Actions */}
+                        <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end">
+                            {/* User/Sign In */}
+                            {loading ? (
+                                <div className="w-10 h-10 rounded-full bg-[#F3F3F3] animate-pulse" />
+                            ) : user ? (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowProfilePopup(!showProfilePopup)}
+                                        className="flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                                    >
+                                        {user.user_metadata.avatar_url ? (
+                                            <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                                                <Image
+                                                    src={user.user_metadata.avatar_url}
+                                                    alt="Profile"
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <User className="w-6 h-6 text-[#4A4A4A]" />
+                                        )}
+                                        <span className="text-xs text-[#4A4A4A] hidden md:block">
+                                            {user.user_metadata.full_name?.split(' ')[0] || 'Account'}
+                                        </span>
+                                    </button>
+
+                                    <AnimatePresence>
+                                        {showProfilePopup && (
+                                            <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setShowProfilePopup(false)} />
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 8 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 8 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-[#EBEBEB] py-2 z-[60]"
+                                                >
+                                                    <div className="px-4 py-3 border-b border-[#EBEBEB]">
+                                                        <p className="text-sm font-semibold text-[#1A1A1A] truncate">
+                                                            {user.user_metadata.full_name || 'Welcome!'}
+                                                        </p>
+                                                        <p className="text-xs text-[#717171] truncate mt-0.5">
+                                                            {user.email}
+                                                        </p>
+                                                    </div>
+                                                    {!isAdmin && (
+                                                        <Link
+                                                            href="/my-orders"
+                                                            onClick={() => setShowProfilePopup(false)}
+                                                            className="block px-4 py-2.5 text-sm text-[#4A4A4A] hover:bg-[#F8F8F8] transition-colors"
+                                                        >
+                                                            My Orders
+                                                        </Link>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <Link
+                                                            href="/admin"
+                                                            onClick={() => setShowProfilePopup(false)}
+                                                            className="block px-4 py-2.5 text-sm text-[#4A4A4A] hover:bg-[#F8F8F8] transition-colors"
+                                                        >
+                                                            Admin Dashboard
+                                                        </Link>
+                                                    )}
+                                                    <button
+                                                        onClick={() => { logout(); setShowProfilePopup(false); }}
+                                                        className="w-full text-left px-4 py-2.5 text-sm text-[#D0021B] hover:bg-[#FEF2F2] transition-colors"
+                                                    >
+                                                        Sign Out
+                                                    </button>
+                                                </motion.div>
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => loginWithGoogle()}
+                                    className="flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                                >
+                                    <User className="w-6 h-6 text-[#4A4A4A]" />
+                                    <span className="text-xs text-[#4A4A4A] hidden md:block">Sign in</span>
+                                </button>
+                            )}
+
+                            {/* Cart */}
+                            <button
+                                onClick={toggleCart}
+                                className="relative flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                            >
+                                <div className="relative">
+                                    <ShoppingBag className="w-6 h-6 text-[#4A4A4A]" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#D29B6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-xs text-[#4A4A4A] hidden md:block">Cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation Bar - Colored Section */}
+            <nav className="sticky top-0 z-50 bg-[#D29B6C] shadow-sm">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="hidden md:flex items-center justify-center gap-8 h-12">
+                        {navLinks.map((link) => {
+                            const Icon = link.icon
+                            return (
+                                <Link
+                                    key={link.name}
+                                    href={link.href}
+                                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === link.href
+                                        ? 'text-white'
+                                        : 'text-white/80 hover:text-white'
+                                        }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {link.name.toUpperCase()}
+                                </Link>
+                            )
+                        })}
+                        {user && !isAdmin && (
+                            <Link
+                                href="/my-orders"
+                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/my-orders'
+                                    ? 'text-white'
+                                    : 'text-white/80 hover:text-white'
+                                    }`}
+                            >
+                                <ClipboardList className="w-4 h-4" />
+                                TRACK ORDER
+                            </Link>
+                        )}
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/admin'
+                                    ? 'text-white'
+                                    : 'text-white/80 hover:text-white'
+                                    }`}
+                            >
+                                <LayoutDashboard className="w-4 h-4" />
+                                DASHBOARD
+                            </Link>
+                        )}
                     </div>
                 </div>
             </nav>
 
-            {/* Mobile Menu Fullscreen Overlay */}
+            {/* Mobile Menu */}
             <AnimatePresence>
                 {isMenuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[9999] bg-[#FEFBF5] md:hidden flex flex-col"
-                    >
-                        {/* Decorative Top Accent */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-saffron via-saffron to-saffron" />
-
-                        {/* Menu Content */}
-                        <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col">
-                            {/* Top Header & Close Button */}
-                            <div className="flex items-center justify-between mb-12">
-                                <p className="font-playfair italic text-[#4A3737]/30 tracking-[0.2em] text-[10px] uppercase">
-                                    Heritage Archives
-                                </p>
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/50 z-[60]"
+                            onClick={() => setIsMenuOpen(false)}
+                        />
+                        <motion.div
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: 'tween', duration: 0.3 }}
+                            className="fixed top-0 left-0 bottom-0 w-[300px] bg-white z-[70] shadow-xl overflow-y-auto"
+                        >
+                            <div className="flex items-center justify-between p-4 border-b border-[#EBEBEB]">
+                                <Link href="/" onClick={() => setIsMenuOpen(false)}>
+                                    <div className="relative h-12 w-12">
+                                        <Image src="/logo.png" alt="Heart and Hampers" fill className="object-contain" />
+                                    </div>
+                                </Link>
                                 <button
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="p-3 bg-white rounded-full shadow-lg border border-orange-100 text-[#4A3737] active:scale-95 transition-all"
+                                    className="p-2 rounded-lg hover:bg-[#F8F8F8] transition-colors"
                                 >
-                                    <X className="h-5 w-5" />
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <div className="w-full max-w-sm">
-                                <div className="flex flex-col gap-10 w-full mb-16 pl-2">
-                                    {navLinks.map((link, idx) => (
-                                        <motion.div
-                                            key={link.name}
-                                            initial={{ opacity: 0, x: -30 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.1 * (idx + 1) }}
-                                        >
-                                            <Link
-                                                onClick={() => setIsMenuOpen(false)}
-                                                href={link.href}
-                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === link.href ? link.activeColor : 'text-[#4A3737] active:text-saffron'}`}
-                                            >
-                                                {link.name}
-                                            </Link>
-                                        </motion.div>
-                                    ))}
+                            {/* Mobile Search */}
+                            <div ref={mobileSearchRef} className="p-4 border-b border-[#EBEBEB]">
+                                <form onSubmit={handleSearch} className="relative flex items-center">
+                                    <input
+                                        type="text"
+                                        placeholder="Search for..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-4 pr-10 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#D29B6C]"
+                                    />
+                                    <div className="absolute right-3 inset-y-0 flex items-center">
+                                        {isSearching ? (
+                                            <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <button type="submit" className="flex items-center justify-center">
+                                                <Search className="w-5 h-5 text-[#666]" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
 
-                                    {isAdmin && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -30 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3 }}
-                                        >
-                                            <Link
-                                                onClick={() => setIsMenuOpen(false)}
-                                                href="/admin"
-                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === '/admin' ? 'text-saffron' : 'text-[#4A3737] hover:text-saffron'}`}
-                                            >
-                                                Dashboard
-                                            </Link>
-                                        </motion.div>
-                                    )}
+                                {/* Mobile Search Results */}
+                                {showSearchDropdown && searchQuery.trim().length >= 2 && (
+                                    <div className="mt-3 bg-[#FAFAFA] rounded-lg border border-[#EBEBEB] max-h-[300px] overflow-y-auto">
+                                        <div className="flex items-center justify-between px-3 py-2 border-b border-[#EBEBEB]">
+                                            <span className="text-xs font-semibold text-[#1A1A1A]">Products</span>
+                                            <span className="text-xs text-[#717171]">{searchCount} found</span>
+                                        </div>
+                                        {isSearching ? (
+                                            <div className="flex items-center justify-center py-6">
+                                                <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin"></div>
+                                            </div>
+                                        ) : searchResults.length > 0 ? (
+                                            searchResults.slice(0, 5).map((product) => {
+                                                const priceInfo = getProductPrice(product)
+                                                return (
+                                                    <Link
+                                                        key={product.id}
+                                                        href={`/product/${product.id}`}
+                                                        onClick={() => { setShowSearchDropdown(false); setIsMenuOpen(false); }}
+                                                        className="flex items-center gap-3 px-3 py-2 hover:bg-white transition-colors border-b border-[#F0F0F0] last:border-b-0"
+                                                    >
+                                                        <div className="relative w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-[#F8F8F8]">
+                                                            <Image
+                                                                src={product.images?.[0] || '/placeholder.png'}
+                                                                alt={product.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs text-[#1A1A1A] truncate">{product.name}</p>
+                                                            <p className="text-xs font-semibold text-[#D29B6C]">{formatPrice(priceInfo.current)}</p>
+                                                        </div>
+                                                    </Link>
+                                                )
+                                            })
+                                        ) : (
+                                            <div className="py-6 text-center">
+                                                <p className="text-xs text-[#717171]">No products found</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
-                                    {user && !isAdmin && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -30 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3 }}
+                            {/* User Section */}
+                            {!loading && (
+                                <div className="p-4 border-b border-[#EBEBEB]">
+                                    {user ? (
+                                        <div className="flex items-center gap-3">
+                                            {user.user_metadata.avatar_url ? (
+                                                <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                                                    <Image src={user.user_metadata.avatar_url} alt="Profile" fill className="object-cover" />
+                                                </div>
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-[#D29B6C] flex items-center justify-center">
+                                                    <span className="text-white text-lg font-medium">
+                                                        {user.user_metadata.full_name?.charAt(0) || 'U'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-semibold text-[#1A1A1A] truncate">
+                                                    {user.user_metadata.full_name || 'Welcome!'}
+                                                </p>
+                                                <p className="text-xs text-[#717171] truncate">{user.email}</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => { loginWithGoogle(); setIsMenuOpen(false); }}
+                                            className="w-full py-3 bg-[#D29B6C] text-white text-sm font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
                                         >
-                                            <Link
-                                                onClick={() => setIsMenuOpen(false)}
-                                                href="/my-orders"
-                                                className={`group flex items-end gap-4 font-cinzel text-3xl font-black transition-all ${pathname === '/my-orders' ? 'text-saffron' : 'text-[#4A3737] hover:text-saffron'}`}
-                                            >
-                                                My Orders
-                                            </Link>
-                                        </motion.div>
+                                            Sign In with Google
+                                        </button>
                                     )}
                                 </div>
+                            )}
 
+                            {/* Navigation Links */}
+                            <div className="py-2">
+                                {navLinks.map((link) => {
+                                    const Icon = link.icon
+                                    return (
+                                        <Link
+                                            key={link.name}
+                                            href={link.href}
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === link.href
+                                                ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                                : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                                }`}
+                                        >
+                                            <Icon className="w-5 h-5" />
+                                            {link.name}
+                                        </Link>
+                                    )
+                                })}
+                                {user && !isAdmin && (
+                                    <Link
+                                        href="/my-orders"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === '/my-orders'
+                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                            : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                            }`}
+                                    >
+                                        <ClipboardList className="w-5 h-5" />
+                                        Track Order
+                                    </Link>
+                                )}
+                                {isAdmin && (
+                                    <Link
+                                        href="/admin"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === '/admin'
+                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                            : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                            }`}
+                                    >
+                                        <LayoutDashboard className="w-5 h-5" />
+                                        Admin Dashboard
+                                    </Link>
+                                )}
                             </div>
 
-                            <div className="mt-auto pb-8 pt-12 flex justify-center">
-                                <p className="font-playfair italic text-[#4A3737]/30 tracking-[0.3em] text-[10px] uppercase">
-                                    Est. Shivshakti Heritage Luxury
-                                </p>
-                            </div>
-                        </div>
-                    </motion.div>
+                            {/* Sign Out */}
+                            {user && (
+                                <div className="p-4 border-t border-[#EBEBEB] mt-auto">
+                                    <button
+                                        onClick={() => { logout(); setIsMenuOpen(false); }}
+                                        className="w-full py-3 text-sm font-medium text-[#D0021B] border border-[#D0021B] rounded-lg hover:bg-[#FEF2F2] transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
+                            )}
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </>

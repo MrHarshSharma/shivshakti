@@ -3,150 +3,258 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { ArrowRight, Gift, Star, Sparkles, Loader2 } from 'lucide-react'
+import { ArrowRight, Truck, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 
 export default function HomeClient({ products }: { products: Product[] }) {
     return (
-        <div className="flex flex-col min-h-screen bg-[#FEFBF5]">
+        <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-36 md:pt-40">
-                {/* Background Patterns */}
-                <div className="absolute inset-0 z-0 opacity-10">
-                    <div className="absolute top-0 left-0 w-96 h-96 bg-saffron rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-magenta rounded-full mix-blend-multiply filter blur-3xl animate-pulse animation-delay-2000" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border-[40px] border-orange-100 rounded-full opacity-30" />
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10 container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="text-center lg:text-left"
-                    >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm mb-6 border border-orange-100">
-                            <Sparkles className="h-4 w-4 text-saffron fill-saffron" />
-                            <span className="text-[#4A3737] text-xs font-bold uppercase tracking-widest">
-                                Handmade with Love
+            <section className="relative bg-[#EBDDC4]">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="grid lg:grid-cols-2 gap-8 items-center py-12 lg:py-20">
+                        {/* Content */}
+                        <div className="text-center lg:text-left">
+                            <span className="inline-block px-3 py-1 bg-[#D29B6C] text-white text-xs font-medium rounded-full mb-4">
+                                New Collection
                             </span>
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-semibold text-[#1A1A1A] mb-4 leading-tight">
+                                Premium Gift Hampers
+                                <br />
+                                <span className="text-[#D29B6C]">Made with Love</span>
+                            </h1>
+                            <p className="text-base text-[#4A4A4A] mb-8 max-w-md mx-auto lg:mx-0">
+                                Discover our handcrafted collection of luxury gift hampers, perfect for every occasion and celebration.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                                <Link
+                                    href="/products"
+                                    className="w-full sm:w-auto px-8 py-3 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors flex items-center justify-center gap-2"
+                                >
+                                    Shop Now
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                                <Link
+                                    href="/about"
+                                    className="w-full sm:w-auto px-8 py-3 bg-white text-[#1A1A1A] font-medium rounded-lg border border-[#E0E0E0] hover:border-[#1A1A1A] transition-colors"
+                                >
+                                    Learn More
+                                </Link>
+                            </div>
                         </div>
-                        <h1 className="text-3xl sm:text-4xl md:text-7xl font-cinzel font-bold tracking-tight mb-6 text-[#2D1B1B] leading-tight">
-                            Celebrate Life's <span className="text-magenta relative inline-block">
-                                Colors
-                                <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
-                                </svg>
-                            </span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-[#4A3737]/80 max-w-xl mx-auto lg:mx-0 mb-10 font-playfair leading-relaxed">
-                            Discover our vibrant collection of handcrafted hampers, gourmet treats, and festive decor designed to spread joy and warmth.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                            <Link
-                                href="/products"
-                                className="px-8 py-4 bg-saffron text-white font-bold tracking-widest uppercase rounded-full hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-300/50 flex items-center gap-2"
-                            >
-                                Explore Hampers <ArrowRight className="h-5 w-5" />
-                            </Link>
-                            <Link
-                                href="/about"
-                                className="px-8 py-4 bg-white text-[#4A3737] border-2 border-orange-100 font-bold tracking-widest uppercase rounded-full hover:border-saffron hover:text-saffron transition-all"
-                            >
-                                Our Story
-                            </Link>
-                        </div>
-                    </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="relative py-4"
-                    >
-                        <div className="relative aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700 border-8 border-white">
-                            <Image
-                                src="/hero-hamper.png"
-                                alt="Festive Gourmet Gift Hamper"
-                                fill
-                                className="object-cover"
-                                priority
-                            />
+                        {/* Image */}
+                        <div className="relative">
+                            <div className="relative aspect-square max-w-md mx-auto lg:max-w-none">
+                                <Image
+                                    src="/hero-hamper.png"
+                                    alt="Premium Gift Hamper"
+                                    fill
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
                         </div>
-                        {/* Floating Elements */}
-                        <div className="absolute bottom-6 right-6 md:bottom-6 md:left-6 md:right-auto bg-white p-4 md:p-6 rounded-2xl shadow-xl animate-bounce duration-3000">
-                            <p className="font-cinzel text-2xl md:text-3xl font-bold text-magenta">100%</p>
-                            <p className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#4A3737]">Artisan Made</p>
-                        </div>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
-            {/* Featured Collection */}
-            <section className="py-24 bg-[#FEFBF5]">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="font-cinzel text-3xl text-[#2D1B1B] mb-4">Curated with Joy</h2>
-                        <div className="w-24 h-1 bg-gradient-to-r from-saffron to-magenta mx-auto rounded-full" />
-                    </div>
-
-                    <div className="max-w-3xl mx-auto space-y-6">
-                        {products.length === 0 ? (
-                            <div className="text-center py-12 font-playfair text-[#4A3737]/70">
-                                Our artisanal products are arriving soon...
+            {/* Trust Badges */}
+            <section className="border-b border-[#EBEBEB]">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6">
+                        {[
+                            { icon: Truck, title: 'Free Shipping', desc: 'On orders ₹999+' },
+                            { icon: Shield, title: 'Secure Payment', desc: '100% protected' },
+                            { icon: Gift, title: 'Gift Wrapping', desc: 'Premium packaging' },
+                            { icon: Clock, title: 'Fast Delivery', desc: '3-5 business days' },
+                        ].map((item) => (
+                            <div key={item.title} className="flex items-center gap-3 p-3">
+                                <div className="w-10 h-10 rounded-full bg-[#EBDDC4] flex items-center justify-center flex-shrink-0">
+                                    <item.icon className="w-5 h-5 text-[#D29B6C]" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-[#1A1A1A]">{item.title}</p>
+                                    <p className="text-xs text-[#717171]">{item.desc}</p>
+                                </div>
                             </div>
-                        ) : (
-                            products.slice(0, 3).map((product, index) => (
-                                <motion.div
-                                    key={product.id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.15 }}
-                                >
-                                    <ProductCard product={product} />
-                                </motion.div>
-                            ))
-                        )}
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Featured Products */}
+            <section className="py-12 lg:py-16">
+                <div className="container mx-auto px-4 lg:px-8">
+                    {/* Section Header */}
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 className="text-2xl font-playfair font-semibold text-[#1A1A1A]">
+                                Featured Products
+                            </h2>
+                            <p className="text-sm text-[#717171] mt-1">
+                                Handpicked selections for you
+                            </p>
+                        </div>
+                        <Link
+                            href="/products"
+                            className="hidden md:flex items-center gap-2 text-sm font-medium text-[#D29B6C] hover:underline"
+                        >
+                            View All
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
                     </div>
 
-                    <div className="mt-16 text-center">
-                        <Link href="/products" className="inline-block px-10 py-4 border-2 border-[#2D1B1B] text-[#2D1B1B] hover:bg-[#2D1B1B] hover:text-white transition-colors font-bold uppercase tracking-widest rounded-full">
-                            View Full Collection
+                    {/* Products Grid */}
+                    {products.length === 0 ? (
+                        <div className="text-center py-16 bg-[#F8F8F8] rounded-lg">
+                            <Gift className="w-12 h-12 text-[#717171] mx-auto mb-4" />
+                            <p className="text-lg font-medium text-[#1A1A1A] mb-2">Coming Soon</p>
+                            <p className="text-sm text-[#717171]">
+                                Our collection is being curated. Check back soon!
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                            {products.slice(0, 8).map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Mobile View All */}
+                    <div className="mt-8 text-center md:hidden">
+                        <Link
+                            href="/products"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#D29B6C] text-white font-medium rounded-lg"
+                        >
+                            View All Products
+                            <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </div>
             </section>
 
-            {/* Trust Section */}
-            <section className="py-24 bg-emerald-50 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl" />
-                <div className="container mx-auto px-4 text-center">
-                    <div className="grid md:grid-cols-3 gap-12">
-                        <div>
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-emerald-600">
-                                <Gift className="w-8 h-8" />
-                            </div>
-                            <h3 className="font-cinzel text-xl font-bold mb-2 text-[#2D1B1B]">Beautiful Packaging</h3>
-                            <p className="text-[#4A3737]/70">Hand-wrapped in reusable, eco-friendly vibrant boxes.</p>
+            {/* Categories / Banner Section */}
+            <section className="py-12 lg:py-16 bg-[#F8F8F8]">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Banner 1 */}
+                        <div className="relative bg-[#D29B6C] rounded-xl overflow-hidden p-8 lg:p-10 text-white min-h-[280px] flex flex-col justify-end">
+                            <div className="absolute top-4 right-4 w-24 h-24 bg-white rounded-full opacity-20" />
+                            <span className="text-xs font-medium tracking-wider uppercase opacity-80 mb-2">
+                                Corporate Gifting
+                            </span>
+                            <span className="text-2xl lg:text-3xl font-playfair font-semibold mb-3 text-white">
+                                Bulk Orders<br />Available
+                            </span>
+                            <p className="text-sm opacity-90 mb-4 max-w-xs">
+                                Special discounts on bulk orders for corporate events and celebrations.
+                            </p>
+                            <Link
+                                href="/contact"
+                                className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
+                            >
+                                Contact Us
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
                         </div>
-                        <div>
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-orange-500">
-                                <Star className="w-8 h-8" />
-                            </div>
-                            <h3 className="font-cinzel text-xl font-bold mb-2 text-[#2D1B1B]">Premium Quality</h3>
-                            <p className="text-[#4A3737]/70">Sourced directly from artisans and organic farms.</p>
+
+                        {/* Banner 2 */}
+                        <div className="relative bg-white rounded-xl overflow-hidden p-8 lg:p-10 border border-[#EBEBEB] min-h-[280px] flex flex-col justify-end">
+                            <div className="absolute top-4 right-4 w-24 h-24 bg-[#EBDDC4] rounded-full opacity-50" />
+                            <span className="text-xs font-medium tracking-wider uppercase text-[#D29B6C] mb-2">
+                                Festival Special
+                            </span>
+                            <span className="text-2xl lg:text-3xl font-playfair font-semibold text-[#1A1A1A] mb-3">
+                                Custom<br />Hampers
+                            </span>
+                            <p className="text-sm text-[#717171] mb-4 max-w-xs">
+                                Create personalized gift hampers tailored to your requirements.
+                            </p>
+                            <Link
+                                href="/products"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#D29B6C] hover:underline"
+                            >
+                                Explore Now
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
                         </div>
-                        <div>
-                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-pink-600">
-                                <Sparkles className="w-8 h-8" />
+                    </div>
+                </div>
+            </section>
+
+            {/* Why Choose Us */}
+            <section className="py-12 lg:py-16">
+                <div className="container mx-auto px-4 lg:px-8">
+                    <div className="text-center mb-10">
+                        <h2 className="text-2xl font-playfair font-semibold text-[#1A1A1A] mb-2">
+                            Why Choose Shivshakti?
+                        </h2>
+                        <p className="text-sm text-[#717171]">
+                            What makes us different from others
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                title: 'Handcrafted Quality',
+                                desc: 'Each hamper is carefully curated and assembled by hand to ensure the highest quality.',
+                            },
+                            {
+                                title: 'Premium Ingredients',
+                                desc: 'We source only the finest ingredients from trusted local artisans and suppliers.',
+                            },
+                            {
+                                title: 'Beautiful Packaging',
+                                desc: 'Our eco-friendly packaging is designed to make a lasting impression.',
+                            },
+                        ].map((item, index) => (
+                            <div key={index} className="text-center p-6">
+                                <div className="w-12 h-12 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="text-lg font-semibold text-[#D29B6C]">{index + 1}</span>
+                                </div>
+                                <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">{item.title}</h3>
+                                <p className="text-sm text-[#717171] leading-relaxed">{item.desc}</p>
                             </div>
-                            <h3 className="font-cinzel text-xl font-bold mb-2 text-[#2D1B1B]">Thoughtful Curation</h3>
-                            <p className="text-[#4A3737]/70">Combinations designed to create the perfect festive mood.</p>
-                        </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Instagram CTA */}
+            <section className="py-16 lg:py-20 bg-[#EBDDC4] relative overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-[#D29B6C]/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#D29B6C]/10 rounded-full translate-x-1/3 translate-y-1/3" />
+                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-[#D29B6C]/5 rounded-full" />
+
+                <div className="container mx-auto px-4 lg:px-8 relative z-10">
+                    <div className="max-w-2xl mx-auto text-center">
+                        {/* Instagram Logo */}
+
+                        <h2 className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-4">
+                            Join Our Community
+                        </h2>
+                        <p className="text-[#4A4A4A] mb-8 text-lg">
+                            Follow us on Instagram for new arrivals, exclusive offers, behind-the-scenes, and gifting inspiration.
+                        </p>
+                        <a
+                            href="https://www.instagram.com/shiv_shakti_provision"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#F77737] via-[#E1306C] to-[#C13584] text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                        >
+                            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                            @shiv_shakti_provision
+                        </a>
+                        <p className="mt-6 text-[#717171] text-sm">
+                            Join for daily inspiration
+                        </p>
                     </div>
                 </div>
             </section>
