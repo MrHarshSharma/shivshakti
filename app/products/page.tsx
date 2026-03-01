@@ -1,8 +1,8 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import ProductsClient from './products-client'
 
-// Disable static caching - always fetch fresh data
-export const dynamic = 'force-dynamic'
+// Cache this page and revalidate every 60 seconds
+export const revalidate = 60
 
 async function getProducts() {
     const supabase = createServiceRoleClient()
