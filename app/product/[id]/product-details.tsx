@@ -32,17 +32,18 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
     const { addToCartSilent, items, updateQuantity } = useCart()
     const [quantity, setQuantity] = useState(1)
-    const [selectedVariation, setSelectedVariation] = useState<any>(null)
+
+    // Initialize selected variation immediately (not in useEffect) to avoid hydration mismatch
+    const getInitialVariation = () => {
+        if (product?.product_type === 'variable' && product.variations && product.variations.length > 0) {
+            return product.variations.find(v => v.is_default) || product.variations[0]
+        }
+        return null
+    }
+
+    const [selectedVariation, setSelectedVariation] = useState<any>(getInitialVariation)
     const [showSuccess, setShowSuccess] = useState(false)
     const [[page, direction], setPage] = useState([0, 0])
-
-    // Initialize selected variation
-    useEffect(() => {
-        if (product?.product_type === 'variable' && product.variations && product.variations.length > 0) {
-            const defaultVar = product.variations.find(v => v.is_default) || product.variations[0]
-            setSelectedVariation(defaultVar)
-        }
-    }, [product])
 
     const id = product.id.toString()
 
@@ -250,7 +251,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         {/* Price */}
                         <div className="flex items-baseline gap-3 mb-6">
                             <span className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-                                ₹{(selectedVariation ? selectedVariation.price : product.price).toLocaleString()}
+                                ₹{(selectedVariation?.price ?? product.price ?? 0).toLocaleString()}
                             </span>
                             {selectedVariation && (
                                 <span className="text-sm text-[#717171]">

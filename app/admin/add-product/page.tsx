@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Upload, X, Plus, Save, Loader2, ChevronDown, ArrowLeft } from 'lucide-react'
+import { Upload, X, Plus, Save, Loader2, ChevronDown, ArrowLeft, FileSpreadsheet, Download, CheckCircle, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -33,6 +33,16 @@ export default function AdminAddProductPage() {
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
+
+    // Bulk import state
+    const [showBulkImport, setShowBulkImport] = useState(false)
+    const [importFile, setImportFile] = useState<File | null>(null)
+    const [isImporting, setIsImporting] = useState(false)
+    const [importResult, setImportResult] = useState<{
+        success: boolean
+        summary?: { total: number; created: number; updated: number; failed: number }
+        errors?: Array<{ row: number; error: string }>
+    } | null>(null)
 
     // Auto-resize textarea based on content
     const autoResizeTextarea = useCallback((element: HTMLTextAreaElement) => {
@@ -92,6 +102,43 @@ export default function AdminAddProductPage() {
             ...prev,
             categories: prev.categories.filter(c => c !== category)
         }))
+    }
+
+    const handleBulkImport = async () => {
+        if (!importFile) return
+
+        setIsImporting(true)
+        setImportResult(null)
+
+        try {
+            const formData = new FormData()
+            formData.append('file', importFile)
+
+            const response = await fetch('/api/products/import', {
+                method: 'POST',
+                body: formData,
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Import failed')
+            }
+
+            setImportResult({
+                success: true,
+                summary: data.summary,
+                errors: data.errors
+            })
+            setImportFile(null)
+        } catch (error) {
+            setImportResult({
+                success: false,
+                errors: [{ row: 0, error: error instanceof Error ? error.message : 'Import failed' }]
+            })
+        } finally {
+            setIsImporting(false)
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -200,6 +247,170 @@ export default function AdminAddProductPage() {
                     </Link>
                     <h1 className="font-cinzel text-4xl text-[#2D1B1B] mb-2">Add New Product</h1>
                     <p className="text-[#4A3737]/70 font-playfair">Fill in the details to add a new product to the catalog</p>
+                </div>
+
+                {/* Bulk Import Section */}
+                <div className="bg-white rounded-2xl shadow-lg border border-orange-100 p-6 mb-6">
+                    <button
+                        type="button"
+                        onClick={() => setShowBulkImport(!showBulkImport)}
+                        className="w-full flex items-center justify-between"
+                    >
+                        <div className="flex items-center gap-3">
+                            <FileSpreadsheet className="h-6 w-6 text-saffron" />
+                            <div className="text-left">
+                                <h2 className="font-cinzel text-xl text-[#2D1B1B]">Bulk Import</h2>
+                                <p className="text-sm text-[#4A3737]/70 font-playfair">Import multiple products via Excel file</p>
+                            </div>
+                        </div>
+                        <ChevronDown className={`h-5 w-5 text-saffron transition-transform ${showBulkImport ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {showBulkImport && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mt-6 space-y-4"
+                        >
+                            {/* Download Template */}
+                            <div className="flex items-center gap-4 p-4 bg-orange-50/50 rounded-lg border border-orange-100">
+                                <div className="flex-1">
+                                    <p className="font-playfair text-sm font-semibold text-[#2D1B1B]">Step 1: Download Template</p>
+                                    <p className="text-xs text-[#4A3737]/70">Get the Excel template with correct column headers</p>
+                                </div>
+                                <a
+                                    href="/api/products/template"
+                                    download
+                                    className="flex items-center gap-2 px-4 py-2 bg-saffron text-white rounded-lg hover:bg-orange-600 transition text-sm font-bold"
+                                >
+                                    <Download className="h-4 w-4" />
+                                    Download
+                                </a>
+                            </div>
+
+                            {/* Upload Excel */}
+                            <div className="p-4 bg-orange-50/50 rounded-lg border border-orange-100">
+                                <p className="font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">Step 2: Upload Filled Excel</p>
+                                <label className="block w-full cursor-pointer">
+                                    <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${importFile ? 'border-green-400 bg-green-50' : 'border-orange-200 hover:border-saffron'}`}>
+                                        {importFile ? (
+                                            <div className="flex items-center justify-center gap-3">
+                                                <FileSpreadsheet className="h-8 w-8 text-green-600" />
+                                                <div className="text-left">
+                                                    <p className="font-playfair text-[#2D1B1B] font-semibold">{importFile.name}</p>
+                                                    <p className="text-xs text-[#4A3737]/70">{(importFile.size / 1024).toFixed(1)} KB</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); setImportFile(null); setImportResult(null) }}
+                                                    className="ml-2 p-1 hover:bg-red-100 rounded-full transition"
+                                                >
+                                                    <X className="h-5 w-5 text-red-500" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <Upload className="h-8 w-8 text-saffron mx-auto mb-2" />
+                                                <p className="font-playfair text-[#2D1B1B] text-sm">Click to upload Excel file</p>
+                                                <p className="text-xs text-[#4A3737]/70">.xlsx, .xls, or .csv</p>
+                                            </>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept=".xlsx,.xls,.csv"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0]
+                                            if (file) {
+                                                setImportFile(file)
+                                                setImportResult(null)
+                                            }
+                                        }}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+
+                            {/* Import Button */}
+                            <button
+                                type="button"
+                                onClick={handleBulkImport}
+                                disabled={!importFile || isImporting}
+                                className="w-full py-3 bg-[#2D1B1B] text-white font-bold uppercase tracking-widest hover:bg-saffron transition-colors rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isImporting ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        Importing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="h-5 w-5" />
+                                        Import Products
+                                    </>
+                                )}
+                            </button>
+
+                            {/* Import Results */}
+                            {importResult && (
+                                <div className={`p-4 rounded-lg ${importResult.success ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}>
+                                    {importResult.success && importResult.summary && (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                                                <span className="font-playfair font-semibold text-emerald-700">Import Completed</span>
+                                            </div>
+                                            <div className="grid grid-cols-4 gap-2 text-center">
+                                                <div className="bg-white/50 rounded-lg p-2">
+                                                    <p className="text-lg font-bold text-[#2D1B1B]">{importResult.summary.total}</p>
+                                                    <p className="text-xs text-[#4A3737]/70">Total</p>
+                                                </div>
+                                                <div className="bg-white/50 rounded-lg p-2">
+                                                    <p className="text-lg font-bold text-green-600">{importResult.summary.created}</p>
+                                                    <p className="text-xs text-[#4A3737]/70">Created</p>
+                                                </div>
+                                                <div className="bg-white/50 rounded-lg p-2">
+                                                    <p className="text-lg font-bold text-blue-600">{importResult.summary.updated}</p>
+                                                    <p className="text-xs text-[#4A3737]/70">Updated</p>
+                                                </div>
+                                                <div className="bg-white/50 rounded-lg p-2">
+                                                    <p className="text-lg font-bold text-red-600">{importResult.summary.failed}</p>
+                                                    <p className="text-xs text-[#4A3737]/70">Failed</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {importResult.errors && importResult.errors.length > 0 && (
+                                        <div className="mt-3 space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <AlertCircle className="h-4 w-4 text-red-600" />
+                                                <span className="font-playfair text-sm font-semibold text-red-700">Errors:</span>
+                                            </div>
+                                            <div className="max-h-32 overflow-y-auto text-sm">
+                                                {importResult.errors.map((err, idx) => (
+                                                    <p key={idx} className="text-red-600 font-playfair">
+                                                        {err.row > 0 ? `Row ${err.row}: ` : ''}{err.error}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Help Text */}
+                            <div className="text-xs text-[#4A3737]/60 font-playfair space-y-1.5 p-3 bg-gray-50 rounded-lg">
+                                <p><strong>Simple Product:</strong> Fill Price, leave Variation columns empty</p>
+                                <p><strong>Variable Product:</strong> Set Type to &quot;variable&quot;, add variations like:<br/>
+                                   &nbsp;&nbsp;Variation Names: <code className="bg-white px-1 rounded">250g, 500g, 1kg</code><br/>
+                                   &nbsp;&nbsp;Variation Prices: <code className="bg-white px-1 rounded">350, 650, 1200</code>
+                                </p>
+                                <p><strong>Update vs Create:</strong> If ID exists → updates product. Empty ID → creates new.</p>
+                            </div>
+                        </motion.div>
+                    )}
                 </div>
 
                 {/* Form */}
