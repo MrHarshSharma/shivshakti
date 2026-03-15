@@ -4,6 +4,7 @@ export interface OrderItem {
     price: number
     quantity: number
     category: string
+    image?: string
 }
 
 export interface Order {
@@ -45,7 +46,8 @@ export const dummyOrders: Order[] = [
                     name: "Nike Air Max 270",
                     price: 12999,
                     quantity: 1,
-                    category: "Running"
+                    category: "Running",
+                    image: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=800"
                 }
             ]
         },
@@ -70,7 +72,8 @@ export const dummyOrders: Order[] = [
                     name: "Adidas Ultraboost 22",
                     price: 15999,
                     quantity: 1,
-                    category: "Running"
+                    category: "Running",
+                    image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800"
                 }
             ]
         },
@@ -95,7 +98,8 @@ export const dummyOrders: Order[] = [
                     name: "Puma RS-X Efekt",
                     price: 9999,
                     quantity: 2,
-                    category: "Casual"
+                    category: "Casual",
+                    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800"
                 }
             ]
         },
@@ -120,7 +124,8 @@ export const dummyOrders: Order[] = [
                     name: "Nike React Infinity Run",
                     price: 13999,
                     quantity: 2,
-                    category: "Running"
+                    category: "Running",
+                    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
                 }
             ]
         },
@@ -145,7 +150,8 @@ export const dummyOrders: Order[] = [
                     name: "Adidas Stan Smith",
                     price: 7999,
                     quantity: 1,
-                    category: "Casual"
+                    category: "Casual",
+                    image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=800"
                 }
             ]
         },
@@ -170,14 +176,16 @@ export const dummyOrders: Order[] = [
                     name: "Nike Air Jordan 1 Mid",
                     price: 11999,
                     quantity: 2,
-                    category: "Basketball"
+                    category: "Basketball",
+                    image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800"
                 },
                 {
                     id: "4",
                     name: "Nike React Infinity Run",
                     price: 13999,
                     quantity: 1,
-                    category: "Running"
+                    category: "Running",
+                    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800"
                 }
             ]
         },
@@ -202,7 +210,8 @@ export const dummyOrders: Order[] = [
                     name: "Adidas NMD R1",
                     price: 10999,
                     quantity: 1,
-                    category: "Lifestyle"
+                    category: "Lifestyle",
+                    image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=800"
                 }
             ]
         },
@@ -227,7 +236,8 @@ export const dummyOrders: Order[] = [
                     name: "Puma Suede Classic",
                     price: 6999,
                     quantity: 1,
-                    category: "Casual"
+                    category: "Casual",
+                    image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=800"
                 }
             ]
         },
@@ -252,7 +262,8 @@ export const dummyOrders: Order[] = [
                     name: "Nike Air Max 270",
                     price: 12999,
                     quantity: 2,
-                    category: "Running"
+                    category: "Running",
+                    image: "https://images.unsplash.com/photo-1543508282-6319a3e2621f?w=800"
                 }
             ]
         },
@@ -277,7 +288,8 @@ export const dummyOrders: Order[] = [
                     name: "Puma Cali Sport",
                     price: 8499,
                     quantity: 1,
-                    category: "Casual"
+                    category: "Casual",
+                    image: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=800"
                 }
             ]
         },

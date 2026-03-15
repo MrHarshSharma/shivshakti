@@ -1,133 +1,257 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Truck, Shield, Gift, Clock } from 'lucide-react'
+import { ArrowRight, Truck, Shield, Gift, Clock, Play, ChevronRight, Star } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 
 export default function HomeClient({ products }: { products: Product[] }) {
+    const [activeShoe, setActiveShoe] = useState(0)
+    const [isLoaded, setIsLoaded] = useState(false)
+
+    useEffect(() => {
+        setIsLoaded(true)
+        const interval = setInterval(() => {
+            setActiveShoe((prev) => (prev + 1) % 3)
+        }, 4000)
+        return () => clearInterval(interval)
+    }, [])
+
+    const featuredShoes = [
+        {
+            name: 'Nike Air Max',
+            tagline: 'Elevate Your Run',
+            image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
+            color: '#FF6B6B',
+            price: '$12,999'
+        },
+        {
+            name: 'Adidas Ultraboost',
+            tagline: 'Infinite Energy',
+            image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&q=80',
+            color: '#4ECDC4',
+            price: '$15,999'
+        },
+        {
+            name: 'Puma RS-X',
+            tagline: 'Bold Statement',
+            image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&q=80',
+            color: '#FFE66D',
+            price: '$9,999'
+        }
+    ]
+
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-b from-[#F9F7F4] to-white overflow-hidden">
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#D29B6C]/5 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-[#D29B6C]/10 to-transparent rounded-full blur-3xl"></div>
+            <section className="relative min-h-screen bg-gradient-to-b from-[#F9F7F4] via-white to-white overflow-hidden">
+                {/* Animated Grid Background */}
+                <div className="absolute inset-0 opacity-[0.4]">
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: 'linear-gradient(#E8E2D8 1px, transparent 1px), linear-gradient(90deg, #E8E2D8 1px, transparent 1px)',
+                        backgroundSize: '60px 60px'
+                    }}></div>
+                </div>
+
+                {/* Gradient Orbs */}
+                <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#D29B6C]/30 to-[#E8B98A]/20 rounded-full blur-[100px] animate-pulse"></div>
+                <div className="absolute top-1/2 left-20 w-[300px] h-[300px] bg-gradient-to-tr from-[#D29B6C]/25 to-[#B8845A]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.7s' }}></div>
+                <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] bg-[#D29B6C]/15 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-[#D29B6C]/10 to-transparent rounded-full blur-[100px]"></div>
 
                 <div className="container mx-auto px-4 lg:px-12 relative z-10">
-                    <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[85vh] py-20">
+                    <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-screen py-24 lg:py-32">
                         {/* Content Side */}
-                        <div className="space-y-8">
+                        <div className={`space-y-8 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                             {/* Premium Badge */}
-                            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white rounded-full shadow-sm border border-[#E8E2D8]">
-                                <div className="w-2 h-2 bg-[#D29B6C] rounded-full"></div>
-                                <span className="text-xs font-medium tracking-wider text-[#4A4A4A] uppercase">Premium Collection 2026</span>
+                            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white shadow-sm rounded-full border border-[#E8E2D8]">
+                                <div className="relative">
+                                    <div className="w-2 h-2 bg-[#D29B6C] rounded-full"></div>
+                                    <div className="absolute inset-0 w-2 h-2 bg-[#D29B6C] rounded-full animate-ping"></div>
+                                </div>
+                                <span className="text-xs font-medium tracking-[0.2em] text-[#6B6B6B] uppercase">Premium Collection 2026</span>
                             </div>
 
                             {/* Main Heading */}
                             <div className="space-y-4">
-                                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#1A1A1A] leading-[1.1] tracking-tight">
-                                    Where Style
-                                    <br />
-                                    Meets{' '}
-                                    <span className="italic font-serif text-[#D29B6C]">Performance</span>
+                                <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-[#1A1A1A] leading-[0.95] tracking-tight">
+                                    <span className="block overflow-hidden">
+                                        <span className={`block transition-transform duration-700 delay-100 ${isLoaded ? 'translate-y-0' : 'translate-y-full'}`}>
+                                            Step Into
+                                        </span>
+                                    </span>
+                                    <span className="block overflow-hidden">
+                                        <span className={`block transition-transform duration-700 delay-200 ${isLoaded ? 'translate-y-0' : 'translate-y-full'}`}>
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D29B6C] via-[#B8845A] to-[#D29B6C]">
+                                                Excellence
+                                            </span>
+                                        </span>
+                                    </span>
                                 </h1>
 
-                                <div className="w-20 h-1 bg-gradient-to-r from-[#D29B6C] to-[#B8845A]"></div>
+                                <div className={`flex items-center gap-4 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className="w-16 h-[2px] bg-gradient-to-r from-[#D29B6C] to-transparent"></div>
+                                    <span className="text-[#6B6B6B] text-sm tracking-[0.3em] uppercase">Since 2020</span>
+                                </div>
                             </div>
 
                             {/* Description */}
-                            <p className="text-lg md:text-xl text-[#6B6B6B] leading-relaxed max-w-xl font-light">
-                                Discover the finest selection of athletic footwear from Nike, Adidas, and Puma.
-                                Expertly curated for those who demand excellence in every step.
+                            <p className={`text-lg md:text-xl text-[#6B6B6B] leading-relaxed max-w-lg font-light transition-all duration-700 delay-400 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                                Curated collection of premium athletic footwear. Where craftsmanship meets innovation, designed for those who refuse to compromise.
                             </p>
 
                             {/* CTA Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                            <div className={`flex flex-col sm:flex-row gap-4 pt-4 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
                                 <Link
                                     href="/products"
-                                    className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#1A1A1A] text-white font-medium rounded-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-[#1A1A1A]/20"
+                                    className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#1A1A1A] text-white font-semibold rounded-full overflow-hidden transition-all hover:shadow-2xl hover:shadow-[#1A1A1A]/20 hover:scale-105"
                                 >
-                                    <span className="relative z-10">Explore Collection</span>
+                                    <span className="relative z-10">Shop Collection</span>
                                     <ArrowRight className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#D29B6C] to-[#B8845A] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 </Link>
 
-                                <Link
-                                    href="/products?category=Running"
-                                    className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#1A1A1A] font-medium rounded-lg border-2 border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all"
+                                <button
+                                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 text-[#1A1A1A] font-medium rounded-full border-2 border-[#E8E2D8] hover:bg-[#F9F7F4] hover:border-[#D29B6C] transition-all"
                                 >
-                                    View Running Shoes
-                                </Link>
+                                    <div className="w-10 h-10 rounded-full bg-[#F9F7F4] flex items-center justify-center group-hover:bg-[#D29B6C] transition-colors">
+                                        <Play className="w-4 h-4 fill-[#D29B6C] text-[#D29B6C] group-hover:fill-white group-hover:text-white ml-0.5 transition-colors" />
+                                    </div>
+                                    Watch Story
+                                </button>
                             </div>
 
-                            {/* Stats */}
-                            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-[#E8E2D8]">
-                                <div>
-                                    <div className="text-3xl font-bold text-[#1A1A1A] mb-1">1000+</div>
-                                    <div className="text-sm text-[#6B6B6B] font-light">Happy Customers</div>
+                            {/* Stats Row */}
+                            <div className={`flex items-center gap-8 lg:gap-12 pt-8 transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                                <div className="group cursor-default">
+                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">12K+</div>
+                                    <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Happy Customers</div>
                                 </div>
-                                <div>
-                                    <div className="text-3xl font-bold text-[#1A1A1A] mb-1">12</div>
-                                    <div className="text-sm text-[#6B6B6B] font-light">Premium Styles</div>
+                                <div className="w-px h-12 bg-[#E8E2D8]"></div>
+                                <div className="group cursor-default">
+                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">50+</div>
+                                    <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Premium Styles</div>
                                 </div>
-                                <div>
-                                    <div className="text-3xl font-bold text-[#1A1A1A] mb-1">4.9★</div>
-                                    <div className="text-sm text-[#6B6B6B] font-light">Rating</div>
+                                <div className="w-px h-12 bg-[#E8E2D8]"></div>
+                                <div className="group cursor-default">
+                                    <div className="flex items-center gap-1 text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">
+                                        4.9 <Star className="w-5 h-5 fill-[#D29B6C] text-[#D29B6C]" />
+                                    </div>
+                                    <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Avg Rating</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Image Side */}
-                        <div className="relative">
-                            {/* Main Product Image */}
-                            <div className="relative">
-                                <div className="absolute -top-10 -right-10 w-96 h-96 bg-[#D29B6C]/20 rounded-full blur-3xl"></div>
-
-                                <div className="relative bg-white rounded-3xl shadow-2xl p-8 lg:p-12">
-                                    <div className="relative aspect-square">
-                                        <Image
-                                            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80"
-                                            alt="Premium Nike Sneakers"
-                                            fill
-                                            className="object-contain drop-shadow-2xl"
-                                            priority
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Floating Price Tag */}
-                                <div className="absolute -bottom-6 -left-6 bg-[#D29B6C] text-white rounded-2xl p-6 shadow-xl">
-                                    <div className="text-xs font-medium mb-1 opacity-90">Starting from</div>
-                                    <div className="text-3xl font-bold">$6,999</div>
-                                </div>
-
-                                {/* Brand Badge */}
-                                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg">
-                                    <div className="text-xs text-[#6B6B6B] mb-1">Featured Brands</div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm font-bold text-[#1A1A1A]">NIKE</span>
-                                        <span className="text-[#D29B6C]">•</span>
-                                        <span className="text-sm font-bold text-[#1A1A1A]">ADIDAS</span>
-                                        <span className="text-[#D29B6C]">•</span>
-                                        <span className="text-sm font-bold text-[#1A1A1A]">PUMA</span>
-                                    </div>
-                                </div>
+                        <div className={`relative lg:h-[700px] transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                            {/* Orange Glow Behind Product */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] lg:w-[500px] lg:h-[500px]">
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#D29B6C]/40 via-[#E8B98A]/30 to-[#D29B6C]/40 rounded-full blur-[80px] animate-pulse"></div>
+                                <div className="absolute inset-12 bg-gradient-to-tr from-[#D29B6C]/50 to-[#B8845A]/30 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                             </div>
 
-                            {/* Decorative Elements */}
-                            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
-                                <div className="absolute top-0 right-0 w-64 h-64 border border-[#D29B6C]/20 rounded-full"></div>
-                                <div className="absolute bottom-0 left-0 w-48 h-48 border border-[#D29B6C]/20 rounded-full"></div>
+                            {/* Rotating Glow Ring */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[550px] lg:h-[550px]">
+                                <div className="absolute inset-0 rounded-full border border-[#D29B6C]/30 animate-[spin_20s_linear_infinite]"></div>
+                                <div className="absolute inset-4 rounded-full border border-[#D29B6C]/20 animate-[spin_25s_linear_infinite_reverse]"></div>
+                                <div className="absolute inset-8 rounded-full border border-dashed border-[#E8E2D8] animate-[spin_30s_linear_infinite]"></div>
+                            </div>
+
+                            {/* Main Product Display */}
+                            <div className="relative z-10 flex items-center justify-center h-full">
+                                {featuredShoes.map((shoe, index) => (
+                                    <div
+                                        key={index}
+                                        className={`absolute transition-all duration-700 ease-out ${activeShoe === index
+                                                ? 'opacity-100 scale-100 rotate-0'
+                                                : 'opacity-0 scale-90 rotate-12'
+                                            }`}
+                                    >
+                                        <div className="relative">
+                                            {/* Shoe Image */}
+                                            <div className="relative w-[320px] h-[320px] lg:w-[450px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl">
+                                                <Image
+                                                    src={shoe.image}
+                                                    alt={shoe.name}
+                                                    fill
+                                                    className="object-cover hover:scale-105 transition-transform duration-500"
+                                                    priority={index === 0}
+                                                />
+                                            </div>
+
+                                            {/* Floating Info Card */}
+                                            <div className="absolute -bottom-4 -right-4 lg:bottom-0 lg:right-0 bg-white rounded-tl-2xl rounded-br-2xl rounded-tr-none rounded-bl-none p-5 border border-[#E8E2D8] shadow-xl">
+                                                <div className="text-xs text-[#6B6B6B] mb-1 uppercase tracking-wider">{shoe.tagline}</div>
+                                                <div className="text-xl font-bold text-[#1A1A1A] mb-2">{shoe.name}</div>
+                                                <div className="text-2xl font-bold text-[#D29B6C]">{shoe.price}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Shoe Selector Dots */}
+                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
+                                {featuredShoes.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setActiveShoe(index)}
+                                        className={`transition-all duration-300 ${activeShoe === index
+                                                ? 'w-8 h-2 bg-[#D29B6C] rounded-full'
+                                                : 'w-2 h-2 bg-[#E8E2D8] rounded-full hover:bg-[#D29B6C]/50'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Brand Tags */}
+                            <div className="absolute top-8 right-8 flex flex-col gap-2">
+                                {['NIKE', 'ADIDAS', 'PUMA'].map((brand, index) => (
+                                    <div
+                                        key={brand}
+                                        className={`px-4 py-2 bg-white shadow-sm rounded-lg border border-[#E8E2D8] text-xs font-bold tracking-wider text-[#1A1A1A] transition-all duration-300 hover:bg-[#F9F7F4] hover:border-[#D29B6C] cursor-pointer ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+                                            }`}
+                                        style={{ transitionDelay: `${600 + index * 100}ms` }}
+                                    >
+                                        {brand}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Accent Line */}
-                <div className="h-px bg-gradient-to-r from-transparent via-[#D29B6C]/30 to-transparent"></div>
+                {/* Bottom Brand Marquee */}
+                <div className="absolute bottom-0 left-0 right-0 border-t border-[#E8E2D8] bg-white/80 backdrop-blur-sm">
+                    <div className="overflow-hidden py-4">
+                        <div className="flex animate-marquee whitespace-nowrap">
+                            {[...Array(2)].map((_, i) => (
+                                <div key={i} className="flex items-center gap-12 mx-6">
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Nike</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Adidas</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Puma</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Premium Quality</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Authentic Products</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Free Shipping</span>
+                                    <span className="text-[#D29B6C]">◆</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Scroll Indicator */}
+                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-[#6B6B6B]">
+                    <span className="text-xs tracking-[0.3em] uppercase">Scroll</span>
+                    <div className="w-px h-12 bg-gradient-to-b from-[#D29B6C] to-transparent animate-bounce"></div>
+                </div>
             </section>
 
             {/* Trust Badges */}
