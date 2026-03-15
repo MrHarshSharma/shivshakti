@@ -25,7 +25,7 @@ export default function Footer() {
                                 href="https://www.instagram.com/dedaycart"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-9 h-9 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#717171] hover:text-[#D29B6C] hover:border-[#D29B6C] transition-colors"
+                                className="w-9 h-9 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#717171] hover:text-[#000000] hover:border-[#000000] transition-colors"
                             >
                                 <Instagram className="w-4 h-4" />
                             </a>
@@ -44,7 +44,7 @@ export default function Footer() {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
+                                        className="text-sm text-[#717171] hover:text-[#000000] transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -66,7 +66,7 @@ export default function Footer() {
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}
-                                        className="text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
+                                        className="text-sm text-[#717171] hover:text-[#000000] transition-colors"
                                     >
                                         {link.name}
                                     </Link>
@@ -82,7 +82,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="mailto:support@dedaycart.com"
-                                    className="flex items-start gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
+                                    className="flex items-start gap-3 text-sm text-[#717171] hover:text-[#000000] transition-colors"
                                 >
                                     <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
                                     support@dedaycart.com
@@ -91,7 +91,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="tel:+14169876543"
-                                    className="flex items-center gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
+                                    className="flex items-center gap-3 text-sm text-[#717171] hover:text-[#000000] transition-colors"
                                 >
                                     <Phone className="w-4 h-4 flex-shrink-0" />
                                     +1 (416) 987-6543

@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         OUT OF STOCK
                     </span>
                 ) : product.isNew ? (
-                    <span className="absolute top-3 left-3 px-2 py-1 bg-[#D29B6C] text-white text-[10px] font-semibold rounded">
+                    <span className="absolute top-3 left-3 px-2 py-1 bg-[#000000] text-white text-[10px] font-semibold rounded">
                         NEW
                     </span>
                 ) : null}
@@ -67,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
                         <button
                             onClick={handleEnquire}
-                            className="px-6 py-2.5 bg-[#E8A968] text-white text-sm font-semibold rounded-lg hover:bg-[#D29B6C] transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                            className="px-6 py-2.5 bg-[#333333] text-white text-sm font-semibold rounded-lg hover:bg-[#000000] transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
                         >
                             <MessageCircle className="h-4 w-4" />
                             Enquire
@@ -86,7 +86,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 )}
 
                 {/* Name */}
-                <h3 className={`text-sm font-medium mb-1 line-clamp-2 transition-colors ${isOutOfStock ? 'text-[#999]' : 'text-[#1A1A1A] group-hover:text-[#D29B6C]'}`}>
+                <h3 className={`text-sm font-medium mb-1 line-clamp-2 transition-colors ${isOutOfStock ? 'text-[#999]' : 'text-[#1A1A1A] group-hover:text-[#000000]'}`}>
                     {product.name}
                 </h3>
 

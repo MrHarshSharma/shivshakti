@@ -57,7 +57,7 @@ export default function ProductsClient({
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-[#EBDDC4] pt-12 pb-12 md:pt-16 md:pb-16">
+            <section className="bg-[#E5E5E5] pt-12 pb-12 md:pt-16 md:pb-16">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -89,13 +89,13 @@ export default function ProductsClient({
                                     onClick={() => handleCategoryChange(category)}
                                     className={`relative px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 whitespace-nowrap ${currentCategory === category
                                         ? 'text-white'
-                                        : 'text-[#4A4A4A] hover:text-[#D29B6C]'
+                                        : 'text-[#4A4A4A] hover:text-[#000000]'
                                         }`}
                                 >
                                     {currentCategory === category && (
                                         <motion.div
                                             layoutId="activeTab"
-                                            className="absolute inset-0 bg-[#D29B6C] rounded-lg"
+                                            className="absolute inset-0 bg-[#000000] rounded-lg"
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                         />
                                     )}
@@ -114,8 +114,8 @@ export default function ProductsClient({
                     <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <p className="text-[#717171]">
                             Showing <span className="font-medium text-[#1A1A1A]">{products.length}</span> of <span className="font-medium text-[#1A1A1A]">{totalProducts}</span> {totalProducts === 1 ? 'product' : 'products'}
-                            {searchQuery && <span> for &quot;<span className="font-medium text-[#D29B6C]">{searchQuery}</span>&quot;</span>}
-                            {currentCategory !== 'All' && <span> in <span className="font-medium text-[#D29B6C]">{currentCategory}</span></span>}
+                            {searchQuery && <span> for &quot;<span className="font-medium text-[#000000]">{searchQuery}</span>&quot;</span>}
+                            {currentCategory !== 'All' && <span> in <span className="font-medium text-[#000000]">{currentCategory}</span></span>}
                         </p>
                         {searchQuery && (
                             <button
@@ -138,7 +138,7 @@ export default function ProductsClient({
                                 exit={{ opacity: 0 }}
                                 className="text-center py-20 bg-[#F8F8F8] rounded-xl border border-[#EBEBEB] max-w-lg mx-auto"
                             >
-                                <div className="w-16 h-16 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-4 text-[#D29B6C]">
+                                <div className="w-16 h-16 bg-[#E5E5E5] rounded-full flex items-center justify-center mx-auto mb-4 text-[#000000]">
                                     {searchQuery ? <Search className="h-8 w-8" /> : <Package className="h-8 w-8" />}
                                 </div>
                                 <p className="text-xl font-semibold text-[#1A1A1A] mb-2">No products found</p>
@@ -152,7 +152,7 @@ export default function ProductsClient({
                                     {searchQuery && (
                                         <button
                                             onClick={clearSearch}
-                                            className="px-6 py-2.5 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors"
+                                            className="px-6 py-2.5 bg-[#000000] text-white font-medium rounded-lg hover:bg-[#000000] transition-colors"
                                         >
                                             Clear Search
                                         </button>
@@ -161,8 +161,8 @@ export default function ProductsClient({
                                         <button
                                             onClick={() => handleCategoryChange('All')}
                                             className={`px-6 py-2.5 font-medium rounded-lg transition-colors ${searchQuery
-                                                ? 'text-[#D29B6C] border border-[#D29B6C] hover:bg-[#FDF8F3]'
-                                                : 'bg-[#D29B6C] text-white hover:bg-[#B8845A]'
+                                                ? 'text-[#000000] border border-[#000000] hover:bg-[#F5F5F5]'
+                                                : 'bg-[#000000] text-white hover:bg-[#000000]'
                                                 }`}
                                         >
                                             View All Categories
@@ -221,7 +221,7 @@ export default function ProductsClient({
                                             key={pageNum}
                                             onClick={() => handlePageChange(pageNum)}
                                             className={`w-10 h-10 rounded-lg font-medium text-sm transition-all ${currentPage === pageNum
-                                                ? 'bg-[#D29B6C] text-white shadow-lg'
+                                                ? 'bg-[#000000] text-white shadow-lg'
                                                 : 'border border-[#EBEBEB] text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                                 }`}
                                         >

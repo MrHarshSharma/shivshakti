@@ -46,30 +46,30 @@ export default function HomeClient({ products }: { products: Product[] }) {
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative min-h-screen bg-gradient-to-b from-[#F9F7F4] via-white to-white overflow-hidden">
+            <section className="relative min-h-screen bg-gradient-to-b from-[#FAFAFA] via-white to-white overflow-hidden">
                 {/* Animated Grid Background */}
                 <div className="absolute inset-0 opacity-[0.4]">
                     <div className="absolute inset-0" style={{
-                        backgroundImage: 'linear-gradient(#E8E2D8 1px, transparent 1px), linear-gradient(90deg, #E8E2D8 1px, transparent 1px)',
+                        backgroundImage: 'linear-gradient(#E5E5E5 1px, transparent 1px), linear-gradient(90deg, #E5E5E5 1px, transparent 1px)',
                         backgroundSize: '60px 60px'
                     }}></div>
                 </div>
 
                 {/* Gradient Orbs */}
-                <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#D29B6C]/30 to-[#E8B98A]/20 rounded-full blur-[100px] animate-pulse"></div>
-                <div className="absolute top-1/2 left-20 w-[300px] h-[300px] bg-gradient-to-tr from-[#D29B6C]/25 to-[#B8845A]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.7s' }}></div>
-                <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] bg-[#D29B6C]/15 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-[#D29B6C]/10 to-transparent rounded-full blur-[100px]"></div>
+                <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-gradient-to-br from-[#000000]/30 to-[#333333]/20 rounded-full blur-[100px] animate-pulse"></div>
+                <div className="absolute top-1/2 left-20 w-[300px] h-[300px] bg-gradient-to-tr from-[#000000]/25 to-[#000000]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.7s' }}></div>
+                <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] bg-[#000000]/15 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-[#000000]/10 to-transparent rounded-full blur-[100px]"></div>
 
                 <div className="container mx-auto px-4 lg:px-12 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-screen py-24 lg:py-32">
                         {/* Content Side */}
                         <div className={`space-y-8 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                             {/* Premium Badge */}
-                            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white shadow-sm rounded-full border border-[#E8E2D8]">
+                            <div className="inline-flex items-center gap-3 px-4 py-2 bg-white shadow-sm rounded-full border border-[#E5E5E5]">
                                 <div className="relative">
-                                    <div className="w-2 h-2 bg-[#D29B6C] rounded-full"></div>
-                                    <div className="absolute inset-0 w-2 h-2 bg-[#D29B6C] rounded-full animate-ping"></div>
+                                    <div className="w-2 h-2 bg-[#000000] rounded-full"></div>
+                                    <div className="absolute inset-0 w-2 h-2 bg-[#000000] rounded-full animate-ping"></div>
                                 </div>
                                 <span className="text-xs font-medium tracking-[0.2em] text-[#6B6B6B] uppercase">Premium Collection 2026</span>
                             </div>
@@ -84,7 +84,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                     </span>
                                     <span className="block overflow-hidden">
                                         <span className={`block transition-transform duration-700 delay-200 ${isLoaded ? 'translate-y-0' : 'translate-y-full'}`}>
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D29B6C] via-[#B8845A] to-[#D29B6C]">
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#000000] via-[#000000] to-[#000000]">
                                                 Excellence
                                             </span>
                                         </span>
@@ -92,7 +92,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                 </h1>
 
                                 <div className={`flex items-center gap-4 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                                    <div className="w-16 h-[2px] bg-gradient-to-r from-[#D29B6C] to-transparent"></div>
+                                    <div className="w-16 h-[2px] bg-gradient-to-r from-[#000000] to-transparent"></div>
                                     <span className="text-[#6B6B6B] text-sm tracking-[0.3em] uppercase">Since 2020</span>
                                 </div>
                             </div>
@@ -110,14 +110,14 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                 >
                                     <span className="relative z-10">Shop Collection</span>
                                     <ArrowRight className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#D29B6C] to-[#B8845A] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#000000] to-[#000000] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 </Link>
 
                                 <button
-                                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 text-[#1A1A1A] font-medium rounded-full border-2 border-[#E8E2D8] hover:bg-[#F9F7F4] hover:border-[#D29B6C] transition-all"
+                                    className="group inline-flex items-center justify-center gap-3 px-8 py-4 text-[#1A1A1A] font-medium rounded-full border-2 border-[#E5E5E5] hover:bg-[#FAFAFA] hover:border-[#000000] transition-all"
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-[#F9F7F4] flex items-center justify-center group-hover:bg-[#D29B6C] transition-colors">
-                                        <Play className="w-4 h-4 fill-[#D29B6C] text-[#D29B6C] group-hover:fill-white group-hover:text-white ml-0.5 transition-colors" />
+                                    <div className="w-10 h-10 rounded-full bg-[#FAFAFA] flex items-center justify-center group-hover:bg-[#000000] transition-colors">
+                                        <Play className="w-4 h-4 fill-[#000000] text-[#000000] group-hover:fill-white group-hover:text-white ml-0.5 transition-colors" />
                                     </div>
                                     Watch Story
                                 </button>
@@ -126,18 +126,18 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             {/* Stats Row */}
                             <div className={`flex items-center gap-8 lg:gap-12 pt-8 transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
                                 <div className="group cursor-default">
-                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">12K+</div>
+                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#000000] transition-colors">12K+</div>
                                     <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Happy Customers</div>
                                 </div>
-                                <div className="w-px h-12 bg-[#E8E2D8]"></div>
+                                <div className="w-px h-12 bg-[#E5E5E5]"></div>
                                 <div className="group cursor-default">
-                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">50+</div>
+                                    <div className="text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#000000] transition-colors">50+</div>
                                     <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Premium Styles</div>
                                 </div>
-                                <div className="w-px h-12 bg-[#E8E2D8]"></div>
+                                <div className="w-px h-12 bg-[#E5E5E5]"></div>
                                 <div className="group cursor-default">
-                                    <div className="flex items-center gap-1 text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#D29B6C] transition-colors">
-                                        4.9 <Star className="w-5 h-5 fill-[#D29B6C] text-[#D29B6C]" />
+                                    <div className="flex items-center gap-1 text-3xl lg:text-4xl font-bold text-[#1A1A1A] mb-1 group-hover:text-[#000000] transition-colors">
+                                        4.9 <Star className="w-5 h-5 fill-[#000000] text-[#000000]" />
                                     </div>
                                     <div className="text-xs text-[#6B6B6B] tracking-wider uppercase">Avg Rating</div>
                                 </div>
@@ -148,15 +148,15 @@ export default function HomeClient({ products }: { products: Product[] }) {
                         <div className={`relative lg:h-[700px] transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                             {/* Orange Glow Behind Product */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] lg:w-[500px] lg:h-[500px]">
-                                <div className="absolute inset-0 bg-gradient-to-br from-[#D29B6C]/40 via-[#E8B98A]/30 to-[#D29B6C]/40 rounded-full blur-[80px] animate-pulse"></div>
-                                <div className="absolute inset-12 bg-gradient-to-tr from-[#D29B6C]/50 to-[#B8845A]/30 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#000000]/40 via-[#333333]/30 to-[#000000]/40 rounded-full blur-[80px] animate-pulse"></div>
+                                <div className="absolute inset-12 bg-gradient-to-tr from-[#000000]/50 to-[#000000]/30 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                             </div>
 
                             {/* Rotating Glow Ring */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] lg:w-[550px] lg:h-[550px]">
-                                <div className="absolute inset-0 rounded-full border border-[#D29B6C]/30 animate-[spin_20s_linear_infinite]"></div>
-                                <div className="absolute inset-4 rounded-full border border-[#D29B6C]/20 animate-[spin_25s_linear_infinite_reverse]"></div>
-                                <div className="absolute inset-8 rounded-full border border-dashed border-[#E8E2D8] animate-[spin_30s_linear_infinite]"></div>
+                                <div className="absolute inset-0 rounded-full border border-[#000000]/30 animate-[spin_20s_linear_infinite]"></div>
+                                <div className="absolute inset-4 rounded-full border border-[#000000]/20 animate-[spin_25s_linear_infinite_reverse]"></div>
+                                <div className="absolute inset-8 rounded-full border border-dashed border-[#E5E5E5] animate-[spin_30s_linear_infinite]"></div>
                             </div>
 
                             {/* Main Product Display */}
@@ -165,8 +165,8 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                     <div
                                         key={index}
                                         className={`absolute transition-all duration-700 ease-out ${activeShoe === index
-                                                ? 'opacity-100 scale-100 rotate-0'
-                                                : 'opacity-0 scale-90 rotate-12'
+                                            ? 'opacity-100 scale-100 rotate-0'
+                                            : 'opacity-0 scale-90 rotate-12'
                                             }`}
                                     >
                                         <div className="relative">
@@ -182,10 +182,10 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                             </div>
 
                                             {/* Floating Info Card */}
-                                            <div className="absolute -bottom-4 -right-4 lg:bottom-0 lg:right-0 bg-white rounded-tl-2xl rounded-br-2xl rounded-tr-none rounded-bl-none p-5 border border-[#E8E2D8] shadow-xl">
+                                            <div className="absolute -bottom-4 -right-4 lg:bottom-0 lg:right-0 bg-white rounded-tl-2xl rounded-br-2xl rounded-tr-none rounded-bl-none p-5 border border-[#E5E5E5] shadow-xl">
                                                 <div className="text-xs text-[#6B6B6B] mb-1 uppercase tracking-wider">{shoe.tagline}</div>
                                                 <div className="text-xl font-bold text-[#1A1A1A] mb-2">{shoe.name}</div>
-                                                <div className="text-2xl font-bold text-[#D29B6C]">{shoe.price}</div>
+                                                <div className="text-2xl font-bold text-[#000000]">{shoe.price}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -199,8 +199,8 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                         key={index}
                                         onClick={() => setActiveShoe(index)}
                                         className={`transition-all duration-300 ${activeShoe === index
-                                                ? 'w-8 h-2 bg-[#D29B6C] rounded-full'
-                                                : 'w-2 h-2 bg-[#E8E2D8] rounded-full hover:bg-[#D29B6C]/50'
+                                            ? 'w-8 h-2 bg-[#000000] rounded-full'
+                                            : 'w-2 h-2 bg-[#E5E5E5] rounded-full hover:bg-[#000000]/50'
                                             }`}
                                     />
                                 ))}
@@ -211,7 +211,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                                 {['NIKE', 'ADIDAS', 'PUMA'].map((brand, index) => (
                                     <div
                                         key={brand}
-                                        className={`px-4 py-2 bg-white shadow-sm rounded-lg border border-[#E8E2D8] text-xs font-bold tracking-wider text-[#1A1A1A] transition-all duration-300 hover:bg-[#F9F7F4] hover:border-[#D29B6C] cursor-pointer ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+                                        className={`px-4 py-2 bg-white shadow-sm rounded-lg border border-[#E5E5E5] text-xs font-bold tracking-wider text-[#1A1A1A] transition-all duration-300 hover:bg-[#FAFAFA] hover:border-[#000000] cursor-pointer ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
                                             }`}
                                         style={{ transitionDelay: `${600 + index * 100}ms` }}
                                     >
@@ -224,23 +224,23 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 </div>
 
                 {/* Bottom Brand Marquee */}
-                <div className="absolute bottom-0 left-0 right-0 border-t border-[#E8E2D8] bg-white/80 backdrop-blur-sm">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-[#E5E5E5] bg-white/80 backdrop-blur-sm">
                     <div className="overflow-hidden py-4">
                         <div className="flex animate-marquee whitespace-nowrap">
                             {[...Array(2)].map((_, i) => (
                                 <div key={i} className="flex items-center gap-12 mx-6">
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Nike</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Adidas</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Puma</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Premium Quality</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Authentic Products</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                     <span className="text-[#1A1A1A]/30 text-sm font-medium tracking-[0.3em] uppercase">Free Shipping</span>
-                                    <span className="text-[#D29B6C]">◆</span>
+                                    <span className="text-[#000000]">◆</span>
                                 </div>
                             ))}
                         </div>
@@ -250,7 +250,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 {/* Scroll Indicator */}
                 <div className="absolute bottom-24 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-[#6B6B6B]">
                     <span className="text-xs tracking-[0.3em] uppercase">Scroll</span>
-                    <div className="w-px h-12 bg-gradient-to-b from-[#D29B6C] to-transparent animate-bounce"></div>
+                    <div className="w-px h-12 bg-gradient-to-b from-[#000000] to-transparent animate-bounce"></div>
                 </div>
             </section>
 
@@ -262,12 +262,12 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             { icon: Truck, title: 'Complimentary Shipping', desc: 'On all orders above $2,000' },
                             { icon: Shield, title: '100% Authentic', desc: 'Verified premium products' },
                             { icon: Gift, title: 'Hassle-Free Returns', desc: '7-day easy return policy' },
-                            { icon: Clock, title: 'Express Delivery', desc: 'Fast 2-4 day shipping' },
+                            { icon: Clock, title: 'Express Delivery', desc: 'Fast 5-10 business day shipping' },
                         ].map((item) => (
-                            <div key={item.title} className="group relative bg-gradient-to-br from-[#F9F7F4] to-white p-6 rounded-2xl border border-[#E8E2D8] hover:border-[#D29B6C] transition-all duration-300 hover:shadow-lg">
+                            <div key={item.title} className="group relative bg-gradient-to-br from-[#FAFAFA] to-white p-6 rounded-2xl border border-[#E5E5E5] hover:border-[#000000] transition-all duration-300 hover:shadow-lg">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-white border border-[#E8E2D8] flex items-center justify-center flex-shrink-0 group-hover:border-[#D29B6C] group-hover:bg-[#D29B6C] transition-all">
-                                        <item.icon className="w-5 h-5 text-[#D29B6C] group-hover:text-white transition-colors" />
+                                    <div className="w-12 h-12 rounded-xl bg-white border border-[#E5E5E5] flex items-center justify-center flex-shrink-0 group-hover:border-[#000000] group-hover:bg-[#000000] transition-all">
+                                        <item.icon className="w-5 h-5 text-[#000000] group-hover:text-white transition-colors" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">{item.title}</h3>
@@ -281,11 +281,11 @@ export default function HomeClient({ products }: { products: Product[] }) {
             </section>
 
             {/* Shop by Category */}
-            <section className="py-16 lg:py-24 bg-gradient-to-b from-[#F9F7F4] to-white">
+            <section className="py-16 lg:py-24 bg-gradient-to-b from-[#FAFAFA] to-white">
                 <div className="container mx-auto px-4 lg:px-12">
                     <div className="text-center mb-14">
                         <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-                            Shop by <span className="italic font-serif text-[#D29B6C]">Category</span>
+                            Shop by <span className="italic font-serif text-[#000000]">Category</span>
                         </h2>
                         <p className="text-lg text-[#6B6B6B] font-light">Find your perfect pair for any occasion</p>
                     </div>
@@ -329,18 +329,18 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 <div className="container mx-auto px-4 lg:px-12">
                     {/* Section Header */}
                     <div className="text-center mb-14">
-                        <div className="inline-block px-4 py-2 bg-[#F9F7F4] rounded-full mb-4">
-                            <span className="text-xs font-medium tracking-wider text-[#D29B6C] uppercase">Curated Selection</span>
+                        <div className="inline-block px-4 py-2 bg-[#FAFAFA] rounded-full mb-4">
+                            <span className="text-xs font-medium tracking-wider text-[#000000] uppercase">Curated Selection</span>
                         </div>
                         <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-                            Trending <span className="italic font-serif text-[#D29B6C]">Sneakers</span>
+                            Trending <span className="italic font-serif text-[#000000]">Sneakers</span>
                         </h2>
                         <p className="text-lg text-[#6B6B6B] font-light mb-8">
                             Handpicked premium styles from Nike, Adidas & Puma
                         </p>
                         <Link
                             href="/products"
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-[#1A1A1A] border-b-2 border-[#D29B6C] hover:text-[#D29B6C] transition-colors pb-1"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-[#1A1A1A] border-b-2 border-[#000000] hover:text-[#000000] transition-colors pb-1"
                         >
                             Explore Full Collection
                             <ArrowRight className="w-4 h-4" />
@@ -368,7 +368,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                     <div className="mt-8 text-center md:hidden">
                         <Link
                             href="/products"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#D29B6C] text-white font-medium rounded-lg"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#000000] text-white font-medium rounded-lg"
                         >
                             View All Products
                             <ArrowRight className="w-4 h-4" />
@@ -382,7 +382,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 <div className="container mx-auto px-4 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-6">
                         {/* Banner 1 */}
-                        <div className="relative bg-[#D29B6C] rounded-xl overflow-hidden p-8 lg:p-10 text-white min-h-[280px] flex flex-col justify-end">
+                        <div className="relative bg-[#000000] rounded-xl overflow-hidden p-8 lg:p-10 text-white min-h-[280px] flex flex-col justify-end">
                             <div className="absolute top-4 right-4 w-24 h-24 bg-white rounded-full opacity-20" />
                             <span className="text-xs font-medium tracking-wider uppercase opacity-80 mb-2">
                                 Team Orders
@@ -404,8 +404,8 @@ export default function HomeClient({ products }: { products: Product[] }) {
 
                         {/* Banner 2 */}
                         <div className="relative bg-white rounded-xl overflow-hidden p-8 lg:p-10 border border-[#EBEBEB] min-h-[280px] flex flex-col justify-end">
-                            <div className="absolute top-4 right-4 w-24 h-24 bg-[#EBDDC4] rounded-full opacity-50" />
-                            <span className="text-xs font-medium tracking-wider uppercase text-[#D29B6C] mb-2">
+                            <div className="absolute top-4 right-4 w-24 h-24 bg-[#E5E5E5] rounded-full opacity-50" />
+                            <span className="text-xs font-medium tracking-wider uppercase text-[#000000] mb-2">
                                 Limited Edition
                             </span>
                             <span className="text-2xl lg:text-3xl font-playfair font-semibold text-[#1A1A1A] mb-3">
@@ -416,7 +416,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             </p>
                             <Link
                                 href="/products"
-                                className="inline-flex items-center gap-2 text-sm font-medium text-[#D29B6C] hover:underline"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-[#000000] hover:underline"
                             >
                                 Shop Now
                                 <ArrowRight className="w-4 h-4" />
@@ -454,8 +454,8 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             },
                         ].map((item, index) => (
                             <div key={index} className="text-center p-6">
-                                <div className="w-12 h-12 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <span className="text-lg font-semibold text-[#D29B6C]">{index + 1}</span>
+                                <div className="w-12 h-12 bg-[#E5E5E5] rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="text-lg font-semibold text-[#000000]">{index + 1}</span>
                                 </div>
                                 <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">{item.title}</h3>
                                 <p className="text-sm text-[#717171] leading-relaxed">{item.desc}</p>
@@ -466,11 +466,11 @@ export default function HomeClient({ products }: { products: Product[] }) {
             </section>
 
             {/* Instagram CTA */}
-            <section className="py-16 lg:py-20 bg-[#EBDDC4] relative overflow-hidden">
+            <section className="py-16 lg:py-20 bg-[#E5E5E5] relative overflow-hidden">
                 {/* Decorative elements */}
-                <div className="absolute top-0 left-0 w-64 h-64 bg-[#D29B6C]/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#D29B6C]/10 rounded-full translate-x-1/3 translate-y-1/3" />
-                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-[#D29B6C]/5 rounded-full" />
+                <div className="absolute top-0 left-0 w-64 h-64 bg-[#000000]/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#000000]/10 rounded-full translate-x-1/3 translate-y-1/3" />
+                <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-[#000000]/5 rounded-full" />
 
                 <div className="container mx-auto px-4 lg:px-8 relative z-10">
                     <div className="max-w-2xl mx-auto text-center">

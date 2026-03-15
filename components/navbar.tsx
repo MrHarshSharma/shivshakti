@@ -150,7 +150,7 @@ export default function Navbar() {
         const regex = new RegExp(`(${query.trim()})`, 'gi')
         const parts = text.split(regex)
         return parts.map((part, i) =>
-            regex.test(part) ? <span key={i} className="text-[#D29B6C] font-semibold">{part}</span> : part
+            regex.test(part) ? <span key={i} className="text-[#000000] font-semibold">{part}</span> : part
         )
     }
 
@@ -164,7 +164,7 @@ export default function Navbar() {
     return (
         <>
             {/* Top Banner */}
-            <div className="bg-[#D29B6C] text-white text-center py-2 text-xs font-medium tracking-wide">
+            <div className="bg-[#000000] text-white text-center py-2 text-xs font-medium tracking-wide">
                 Free Shipping on orders above $999 | Use code WELCOME10 for 10% off
             </div>
 
@@ -182,7 +182,7 @@ export default function Navbar() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onFocus={() => searchQuery.trim().length >= 2 && setShowSearchDropdown(true)}
-                                        className="w-full pl-4 pr-16 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#D29B6C] transition-colors"
+                                        className="w-full pl-4 pr-16 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#000000] transition-colors"
                                     />
                                     <div className="absolute right-3 inset-y-0 flex items-center gap-2">
                                         {searchQuery && !isSearching && (
@@ -195,9 +195,9 @@ export default function Navbar() {
                                             </button>
                                         )}
                                         {isSearching ? (
-                                            <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin" />
+                                            <div className="w-5 h-5 border-2 border-[#000000] border-t-transparent rounded-full animate-spin" />
                                         ) : (
-                                            <button type="submit" className="text-[#666] hover:text-[#D29B6C] flex items-center justify-center">
+                                            <button type="submit" className="text-[#666] hover:text-[#000000] flex items-center justify-center">
                                                 <Search className="w-5 h-5" />
                                             </button>
                                         )}
@@ -224,7 +224,7 @@ export default function Navbar() {
                                             <div className="overflow-y-auto max-h-[320px]">
                                                 {isSearching ? (
                                                     <div className="flex items-center justify-center py-8">
-                                                        <div className="w-6 h-6 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin"></div>
+                                                        <div className="w-6 h-6 border-2 border-[#000000] border-t-transparent rounded-full animate-spin"></div>
                                                     </div>
                                                 ) : searchResults.length > 0 ? (
                                                     <>
@@ -235,7 +235,7 @@ export default function Navbar() {
                                                                     key={product.id}
                                                                     href={`/product/${product.id}`}
                                                                     onClick={() => setShowSearchDropdown(false)}
-                                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#FDF8F3] transition-colors border-b border-[#F5F5F5] last:border-b-0"
+                                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F5F5F5] last:border-b-0"
                                                                 >
                                                                     <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-[#F8F8F8]">
                                                                         <Image
@@ -250,7 +250,7 @@ export default function Navbar() {
                                                                             {highlightMatch(product.name, searchQuery)}
                                                                         </p>
                                                                         <div className="flex items-center gap-2 mt-1">
-                                                                            <span className="text-sm font-semibold text-[#D29B6C]">
+                                                                            <span className="text-sm font-semibold text-[#000000]">
                                                                                 {formatPrice(priceInfo.current)}
                                                                             </span>
                                                                             {priceInfo.original && !priceInfo.isRange && (
@@ -271,7 +271,7 @@ export default function Navbar() {
                                                         {searchCount > searchResults.length && (
                                                             <button
                                                                 onClick={handleSearch}
-                                                                className="w-full py-3 text-sm font-medium text-[#D29B6C] hover:bg-[#FDF8F3] transition-colors"
+                                                                className="w-full py-3 text-sm font-medium text-[#000000] hover:bg-[#F5F5F5] transition-colors"
                                                             >
                                                                 View all {searchCount} results
                                                             </button>
@@ -300,7 +300,7 @@ export default function Navbar() {
                         {/* Center - Logo */}
                         <Link href="/" className="flex-shrink-0">
                             <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-                                Deday<span className="text-[#D29B6C]">Cart</span>
+                                Deday<span className="text-[#000000]">Cart</span>
                             </h1>
                         </Link>
 
@@ -313,7 +313,7 @@ export default function Navbar() {
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowProfilePopup(!showProfilePopup)}
-                                        className="flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                                        className="flex flex-col items-center gap-1 hover:text-[#000000] transition-colors"
                                     >
                                         {user.user_metadata.avatar_url ? (
                                             <div className="relative w-6 h-6 rounded-full overflow-hidden">
@@ -383,7 +383,7 @@ export default function Navbar() {
                             ) : (
                                 <button
                                     onClick={() => loginWithGoogle()}
-                                    className="flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                                    className="flex flex-col items-center gap-1 hover:text-[#000000] transition-colors"
                                 >
                                     <User className="w-6 h-6 text-[#4A4A4A]" />
                                     <span className="text-xs text-[#4A4A4A] hidden md:block">Sign in</span>
@@ -393,12 +393,12 @@ export default function Navbar() {
                             {/* Cart */}
                             <button
                                 onClick={toggleCart}
-                                className="relative flex flex-col items-center gap-1 hover:text-[#D29B6C] transition-colors"
+                                className="relative flex flex-col items-center gap-1 hover:text-[#000000] transition-colors"
                             >
                                 <div className="relative">
                                     <ShoppingBag className="w-6 h-6 text-[#4A4A4A]" />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#D29B6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                        <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#000000] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                             {cartCount}
                                         </span>
                                     )}
@@ -411,7 +411,7 @@ export default function Navbar() {
             </div>
 
             {/* Navigation Bar - Colored Section */}
-            <nav className="sticky top-0 z-50 bg-[#D29B6C] shadow-sm">
+            <nav className="sticky top-0 z-50 bg-[#000000] shadow-sm">
                 <div className="container mx-auto px-4 lg:px-8">
                     <div className="hidden md:flex items-center justify-center gap-8 h-12">
                         {navLinks.map((link) => {
@@ -479,7 +479,7 @@ export default function Navbar() {
                             <div className="flex items-center justify-between p-4 border-b border-[#EBEBEB]">
                                 <Link href="/" onClick={() => setIsMenuOpen(false)}>
                                     <div className="relative h-12 w-12">
-                                        <h2 className="text-xl font-bold text-[#1A1A1A]">Deday<span className="text-[#D29B6C]">Cart</span></h2>
+                                        <h2 className="text-xl font-bold text-[#1A1A1A]">Deday<span className="text-[#000000]">Cart</span></h2>
                                     </div>
                                 </Link>
                                 <button
@@ -498,11 +498,11 @@ export default function Navbar() {
                                         placeholder="Search for..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-4 pr-10 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#D29B6C]"
+                                        className="w-full pl-4 pr-10 py-2.5 border border-[#E0E0E0] rounded-md text-sm focus:outline-none focus:border-[#000000]"
                                     />
                                     <div className="absolute right-3 inset-y-0 flex items-center">
                                         {isSearching ? (
-                                            <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin" />
+                                            <div className="w-5 h-5 border-2 border-[#000000] border-t-transparent rounded-full animate-spin" />
                                         ) : (
                                             <button type="submit" className="flex items-center justify-center">
                                                 <Search className="w-5 h-5 text-[#666]" />
@@ -520,7 +520,7 @@ export default function Navbar() {
                                         </div>
                                         {isSearching ? (
                                             <div className="flex items-center justify-center py-6">
-                                                <div className="w-5 h-5 border-2 border-[#D29B6C] border-t-transparent rounded-full animate-spin"></div>
+                                                <div className="w-5 h-5 border-2 border-[#000000] border-t-transparent rounded-full animate-spin"></div>
                                             </div>
                                         ) : searchResults.length > 0 ? (
                                             searchResults.slice(0, 5).map((product) => {
@@ -542,7 +542,7 @@ export default function Navbar() {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-xs text-[#1A1A1A] truncate">{product.name}</p>
-                                                            <p className="text-xs font-semibold text-[#D29B6C]">{formatPrice(priceInfo.current)}</p>
+                                                            <p className="text-xs font-semibold text-[#000000]">{formatPrice(priceInfo.current)}</p>
                                                         </div>
                                                     </Link>
                                                 )
@@ -566,7 +566,7 @@ export default function Navbar() {
                                                     <Image src={user.user_metadata.avatar_url} alt="Profile" fill className="object-cover" />
                                                 </div>
                                             ) : (
-                                                <div className="w-12 h-12 rounded-full bg-[#D29B6C] flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-full bg-[#000000] flex items-center justify-center">
                                                     <span className="text-white text-lg font-medium">
                                                         {user.user_metadata.full_name?.charAt(0) || 'U'}
                                                     </span>
@@ -582,7 +582,7 @@ export default function Navbar() {
                                     ) : (
                                         <button
                                             onClick={() => { loginWithGoogle(); setIsMenuOpen(false); }}
-                                            className="w-full py-3 bg-[#D29B6C] text-white text-sm font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
+                                            className="w-full py-3 bg-[#000000] text-white text-sm font-semibold rounded-lg hover:bg-[#000000] transition-colors"
                                         >
                                             Sign In with Google
                                         </button>
@@ -600,7 +600,7 @@ export default function Navbar() {
                                             href={link.href}
                                             onClick={() => setIsMenuOpen(false)}
                                             className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === link.href
-                                                ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                                ? 'text-[#000000] bg-[#F5F5F5]'
                                                 : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                                 }`}
                                         >
@@ -614,7 +614,7 @@ export default function Navbar() {
                                         href="/my-orders"
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === '/my-orders'
-                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                            ? 'text-[#000000] bg-[#F5F5F5]'
                                             : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                             }`}
                                     >
@@ -627,7 +627,7 @@ export default function Navbar() {
                                         href="/admin"
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === '/admin'
-                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                            ? 'text-[#000000] bg-[#F5F5F5]'
                                             : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                             }`}
                                     >

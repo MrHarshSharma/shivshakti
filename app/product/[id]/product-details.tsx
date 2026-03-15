@@ -139,7 +139,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             <div className="bg-[#F8F8F8] border-b border-[#EBEBEB]">
                 <div className="container mx-auto px-6 py-4">
                     <div className="flex items-center gap-2 text-sm">
-                        <Link href="/products" className="text-[#717171] hover:text-[#D29B6C] transition-colors">
+                        <Link href="/products" className="text-[#717171] hover:text-[#000000] transition-colors">
                             Shop
                         </Link>
                         <ChevronRight className="w-4 h-4 text-[#EBEBEB]" />
@@ -199,13 +199,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 <>
                                     <button
                                         onClick={() => paginate(-1)}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#000000] transition-all opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronLeft className="h-5 w-5" />
                                     </button>
                                     <button
                                         onClick={() => paginate(1)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#000000] transition-all opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronRight className="h-5 w-5" />
                                     </button>
@@ -218,7 +218,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     OUT OF STOCK
                                 </span>
                             ) : product.isNew ? (
-                                <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#D29B6C] text-white text-xs font-semibold rounded-md z-10">
+                                <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#000000] text-white text-xs font-semibold rounded-md z-10">
                                     NEW
                                 </span>
                             ) : null}
@@ -239,8 +239,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                         key={idx}
                                         onClick={() => setPage([idx, idx > imageIndex ? 1 : -1])}
                                         className={`relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 transition-all border-2 ${imageIndex === idx
-                                            ? 'border-[#D29B6C] ring-2 ring-[#D29B6C]/20'
-                                            : 'border-[#EBEBEB] hover:border-[#D29B6C]/50'
+                                            ? 'border-[#000000] ring-2 ring-[#000000]/20'
+                                            : 'border-[#EBEBEB] hover:border-[#000000]/50'
                                             }`}
                                     >
                                         <Image
@@ -263,7 +263,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 {product.categories.map((category, idx) => (
                                     <span
                                         key={idx}
-                                        className="text-xs font-medium text-[#D29B6C] uppercase tracking-wide"
+                                        className="text-xs font-medium text-[#000000] uppercase tracking-wide"
                                     >
                                         {category}
                                     </span>
@@ -303,8 +303,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                             key={variation.id}
                                             onClick={() => setSelectedVariation(variation)}
                                             className={`px-4 py-3 rounded-lg border transition-all text-sm ${selectedVariation?.id === variation.id
-                                                ? 'border-[#D29B6C] bg-[#EBDDC4] text-[#D29B6C]'
-                                                : 'border-[#EBEBEB] bg-white text-[#4A4A4A] hover:border-[#D29B6C]/50'
+                                                ? 'border-[#000000] bg-[#E5E5E5] text-[#000000]'
+                                                : 'border-[#EBEBEB] bg-white text-[#4A4A4A] hover:border-[#000000]/50'
                                                 }`}
                                         >
                                             <div className="font-medium">{variation.name}</div>
@@ -332,7 +332,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 <div className="flex items-center border border-[#EBEBEB] rounded-lg flex-shrink-0">
                                     <button
                                         onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
-                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#000000]"
                                         disabled={quantity <= 1}
                                     >
                                         <Minus className="h-4 w-4" />
@@ -340,7 +340,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     <span className="w-10 text-center font-semibold text-[#1A1A1A]">{quantity}</span>
                                     <button
                                         onClick={() => handleQuantityChange(quantity + 1)}
-                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#000000]"
                                     >
                                         <Plus className="h-4 w-4" />
                                     </button>
@@ -351,7 +351,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     onClick={handleAddToCart}
                                     className={`flex-1 px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${showSuccess
                                         ? 'bg-emerald-500 text-white'
-                                        : 'bg-[#D29B6C] text-white hover:bg-[#B8845A]'
+                                        : 'bg-[#000000] text-white hover:bg-[#000000]'
                                         }`}
                                 >
                                     {showSuccess ? (
@@ -382,7 +382,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     }
                                     setShowBulkModal(true)
                                 }}
-                                className="w-full px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-white border-2 border-[#D29B6C] text-[#D29B6C] hover:bg-[#D29B6C] hover:text-white mb-8"
+                                className="w-full px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-white border-2 border-[#000000] text-[#000000] hover:bg-[#000000] hover:text-white mb-8"
                             >
                                 <MessageCircle className="h-5 w-5" />
                                 Bulk Order via WhatsApp
@@ -401,7 +401,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         {/* Trust Badges */}
                         <div className="grid grid-cols-2 gap-4 p-4 bg-[#F8F8F8] rounded-xl mb-8">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#D29B6C]">
+                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#000000]">
                                     <Truck className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -410,7 +410,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#D29B6C]">
+                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#000000]">
                                     <Shield className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -419,7 +419,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#D29B6C]">
+                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#000000]">
                                     <Gift className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -428,7 +428,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#D29B6C]">
+                                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#000000]">
                                     <Shield className="h-5 w-5" />
                                 </div>
                                 <div>
@@ -506,7 +506,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     <select
                                         value={bulkSize}
                                         onChange={(e) => setBulkSize(e.target.value)}
-                                        className="w-full px-4 py-3 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D29B6C] focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#000000] focus:border-transparent"
                                     >
                                         <option value="">Select size</option>
                                         {product.product_type === 'variable' && product.variations ? (
@@ -535,7 +535,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     <div className="flex items-center border border-[#EBEBEB] rounded-lg">
                                         <button
                                             onClick={() => setBulkQuantity(Math.max(1, bulkQuantity - 1))}
-                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#000000]"
                                         >
                                             <Minus className="h-4 w-4" />
                                         </button>
@@ -548,7 +548,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                         />
                                         <button
                                             onClick={() => setBulkQuantity(bulkQuantity + 1)}
-                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#000000]"
                                         >
                                             <Plus className="h-4 w-4" />
                                         </button>

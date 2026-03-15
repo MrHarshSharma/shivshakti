@@ -65,7 +65,7 @@ export default function AboutPage() {
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative bg-[#EBDDC4] pt-16 pb-16 md:pt-24 md:pb-24">
+            <section className="relative bg-[#E5E5E5] pt-16 pb-16 md:pt-24 md:pb-24">
                 <div className="container mx-auto px-6">
                     <div className="max-w-3xl mx-auto text-center">
                         <motion.div
@@ -73,11 +73,11 @@ export default function AboutPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <span className="inline-block px-4 py-2 bg-white text-[#D29B6C] text-sm font-medium rounded-full mb-6">
+                            <span className="inline-block px-4 py-2 bg-white text-[#000000] text-sm font-medium rounded-full mb-6">
                                 Premium Footwear Destination
                             </span>
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A1A1A] mb-6 leading-tight">
-                                Where Style Meets <span className="text-[#D29B6C]">Performance</span>
+                                Where Style Meets <span className="text-[#000000]">Performance</span>
                             </h1>
                             <p className="text-lg md:text-xl text-[#4A4A4A] leading-relaxed">
                                 Your trusted destination for authentic athletic footwear from Nike, Adidas, and Puma.
@@ -97,7 +97,7 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                             className="relative"
                         >
-                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#F9F7F4] to-white">
+                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#FAFAFA] to-white">
                                 <Image
                                     src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600"
                                     alt="DedayCart Premium Sneakers"
@@ -105,7 +105,7 @@ export default function AboutPage() {
                                     className="object-cover"
                                 />
                             </div>
-                            <div className="absolute -bottom-6 -right-6 bg-[#D29B6C] text-white p-6 rounded-xl shadow-lg hidden md:block">
+                            <div className="absolute -bottom-6 -right-6 bg-[#000000] text-white p-6 rounded-xl shadow-lg hidden md:block">
                                 <p className="text-3xl font-bold">1000+</p>
                                 <p className="text-sm opacity-90">Happy Customers</p>
                             </div>
@@ -118,7 +118,7 @@ export default function AboutPage() {
                             className="space-y-6"
                         >
                             <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A]">The DedayCart Story</h2>
-                            <div className="w-16 h-1 bg-[#D29B6C] rounded-full" />
+                            <div className="w-16 h-1 bg-[#000000] rounded-full" />
                             <div className="text-[#4A4A4A] space-y-4 leading-relaxed">
                                 <p>
                                     DedayCart was founded with a singular vision: to bring authentic, premium athletic footwear to sneaker enthusiasts across Canada. We believe that the right pair of shoes can transform not just your performance, but your entire day.
@@ -153,7 +153,7 @@ export default function AboutPage() {
                                 transition={{ delay: i * 0.1 }}
                                 className="text-center"
                             >
-                                <p className="text-3xl md:text-4xl font-bold text-[#D29B6C]">
+                                <p className="text-3xl md:text-4xl font-bold text-[#000000]">
                                     <AnimatedCounter value={stat.value} suffix={stat.suffix} duration={2000} />
                                 </p>
                                 <p className="text-[#717171] mt-1">{stat.label}</p>
@@ -195,9 +195,9 @@ export default function AboutPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.15 }}
-                                className="p-8 rounded-xl bg-[#F8F8F8] border border-[#EBEBEB] hover:border-[#D29B6C]/20 hover:shadow-lg transition-all duration-300 group"
+                                className="p-8 rounded-xl bg-[#F8F8F8] border border-[#EBEBEB] hover:border-[#000000]/20 hover:shadow-lg transition-all duration-300 group"
                             >
-                                <div className="w-14 h-14 bg-[#EBDDC4] rounded-xl flex items-center justify-center mb-6 text-[#D29B6C] group-hover:bg-[#D29B6C] group-hover:text-white transition-colors duration-300">
+                                <div className="w-14 h-14 bg-[#E5E5E5] rounded-xl flex items-center justify-center mb-6 text-[#000000] group-hover:bg-[#000000] group-hover:text-white transition-colors duration-300">
                                     {v.icon}
                                 </div>
                                 <h3 className="text-xl font-bold mb-3 text-[#1A1A1A]">{v.title}</h3>
@@ -234,7 +234,7 @@ export default function AboutPage() {
                                         transition={{ delay: i * 0.1 }}
                                         className="flex items-center gap-4"
                                     >
-                                        <div className="w-10 h-10 bg-[#D29B6C] text-white rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <div className="w-10 h-10 bg-[#000000] text-white rounded-lg flex items-center justify-center flex-shrink-0">
                                             {item.icon}
                                         </div>
                                         <p className="text-[#4A4A4A]">{item.text}</p>
@@ -246,7 +246,7 @@ export default function AboutPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="relative aspect-[1/1] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#F9F7F4] to-white"
+                            className="relative aspect-[1/1] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#FAFAFA] to-white"
                         >
                             <Image
                                 src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600"
@@ -268,14 +268,14 @@ export default function AboutPage() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                         >
-                            <Sparkles className="h-10 w-10 text-[#D29B6C] mx-auto mb-6" />
+                            <Sparkles className="h-10 w-10 text-[#000000] mx-auto mb-6" />
                             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Step Into Your Best</h2>
                             <p className="text-white/70 text-lg mb-8 leading-relaxed">
                                 Discover premium sneakers that combine style, comfort, and performance. Your perfect pair is waiting.
                             </p>
                             <Link
                                 href="/products"
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-[#D29B6C] text-white font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-[#000000] text-white font-semibold rounded-lg hover:bg-[#000000] transition-colors"
                             >
                                 Shop Now <ArrowRight className="h-5 w-5" />
                             </Link>

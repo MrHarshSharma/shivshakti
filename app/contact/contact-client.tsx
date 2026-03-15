@@ -7,7 +7,7 @@ export default function ContactClient() {
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="bg-[#EBDDC4] pt-16 pb-16 md:pt-20 md:pb-20">
+            <section className="bg-[#E5E5E5] pt-16 pb-16 md:pt-20 md:pb-20">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -33,9 +33,9 @@ export default function ContactClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.1 }}
-                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#D29B6C]/20 hover:shadow-lg transition-all duration-300"
+                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#000000]/20 hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="w-14 h-14 bg-[#EBDDC4] rounded-xl flex items-center justify-center mb-6 text-[#D29B6C]">
+                                <div className="w-14 h-14 bg-[#E5E5E5] rounded-xl flex items-center justify-center mb-6 text-[#000000]">
                                     <MapPin className="h-7 w-7" />
                                 </div>
                                 <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">Visit Our Store</h3>
@@ -49,15 +49,15 @@ export default function ContactClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.2 }}
-                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#D29B6C]/20 hover:shadow-lg transition-all duration-300"
+                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#000000]/20 hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="w-14 h-14 bg-[#EBDDC4] rounded-xl flex items-center justify-center mb-6 text-[#D29B6C]">
+                                <div className="w-14 h-14 bg-[#E5E5E5] rounded-xl flex items-center justify-center mb-6 text-[#000000]">
                                     <Mail className="h-7 w-7" />
                                 </div>
                                 <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">Email Us</h3>
                                 <a
                                     href="mailto:support@dedaycart.com"
-                                    className="text-[#D29B6C] hover:underline font-medium"
+                                    className="text-[#000000] hover:underline font-medium"
                                 >
                                     support@dedaycart.com
                                 </a>
@@ -69,15 +69,15 @@ export default function ContactClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.3 }}
-                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#D29B6C]/20 hover:shadow-lg transition-all duration-300"
+                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#000000]/20 hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="w-14 h-14 bg-[#EBDDC4] rounded-xl flex items-center justify-center mb-6 text-[#D29B6C]">
+                                <div className="w-14 h-14 bg-[#E5E5E5] rounded-xl flex items-center justify-center mb-6 text-[#000000]">
                                     <Phone className="h-7 w-7" />
                                 </div>
                                 <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">Call Us</h3>
                                 <a
                                     href="tel:+14169876543"
-                                    className="text-[#D29B6C] hover:underline font-medium text-lg"
+                                    className="text-[#000000] hover:underline font-medium text-lg"
                                 >
                                     +1 (416) 987-6543
                                 </a>
@@ -89,9 +89,9 @@ export default function ContactClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: 0.4 }}
-                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#D29B6C]/20 hover:shadow-lg transition-all duration-300"
+                                className="bg-[#F8F8F8] rounded-xl p-8 border border-[#EBEBEB] hover:border-[#000000]/20 hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="w-14 h-14 bg-[#EBDDC4] rounded-xl flex items-center justify-center mb-6 text-[#D29B6C]">
+                                <div className="w-14 h-14 bg-[#E5E5E5] rounded-xl flex items-center justify-center mb-6 text-[#000000]">
                                     <Clock className="h-7 w-7" />
                                 </div>
                                 <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">Business Hours</h3>
@@ -113,11 +113,11 @@ export default function ContactClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.5 }}
-                            className="mt-12 bg-[#EBDDC4] rounded-xl p-8 md:p-12 text-center relative overflow-hidden"
+                            className="mt-12 bg-[#E5E5E5] rounded-xl p-8 md:p-12 text-center relative overflow-hidden"
                         >
                             {/* Decorative elements */}
-                            <div className="absolute top-0 left-0 w-32 h-32 bg-[#D29B6C]/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                            <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#D29B6C]/10 rounded-full translate-x-1/3 translate-y-1/3" />
+                            <div className="absolute top-0 left-0 w-32 h-32 bg-[#000000]/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-0 right-0 w-40 h-40 bg-[#000000]/10 rounded-full translate-x-1/3 translate-y-1/3" />
 
                             <div className="relative z-10">
 

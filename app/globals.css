@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  /* Clean Modern E-commerce Palette */
+  /* Clean Black & White Color Scheme */
 
   /* Backgrounds */
   --bg-white: #FFFFFF;
-  --bg-light: #F8F8F8;
-  --bg-subtle: #F3F3F3;
+  --bg-light: #FAFAFA;
+  --bg-subtle: #F5F5F5;
 
-  /* Primary - Dusty Orange & Latte */
-  --primary: #D29B6C;
-  --primary-dark: #B8845A;
-  --primary-light: #E0B08A;
-  --primary-subtle: #EBDDC4;
+  /* Primary - Black & White */
+  --primary: #000000;
+  --primary-dark: #000000;
+  --primary-light: #333333;
+  --primary-subtle: #E5E5E5;
 
   /* Text Colors */
-  --text-primary: #1A1A1A;
-  --text-secondary: #4A4A4A;
-  --text-muted: #717171;
-  --text-light: #9B9B9B;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-muted: #666666;
+  --text-light: #999999;
 
   /* Borders */
-  --border-light: #EBEBEB;
-  --border-default: #E0E0E0;
+  --border-light: #E5E5E5;
+  --border-default: #CCCCCC;
 
   /* Status Colors */
-  --success: #0A8A50;
-  --warning: #F5A623;
-  --error: #D0021B;
+  --success: #000000;
+  --warning: #333333;
+  --error: #000000;
 
   /* Legacy mappings */
   --saffron: var(--primary);
@@ -196,7 +196,7 @@ input::placeholder, textarea::placeholder {
 }
 
 .badge-success {
-  background: #E8F5EF;
+  background: #E5E5E5;
   color: var(--success);
 }
 
@@ -216,7 +216,7 @@ input::placeholder, textarea::placeholder {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, #000000 0%, #333333 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
