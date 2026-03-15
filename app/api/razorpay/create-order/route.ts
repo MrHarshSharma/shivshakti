@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { amount, currency = 'INR', customerName, customerPhone } = body
+        const { amount, currency = 'CAD', customerName, customerPhone } = body
 
         // Validate required fields
         if (!amount || amount <= 0) {

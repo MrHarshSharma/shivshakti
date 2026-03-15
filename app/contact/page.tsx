@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import ContactClient from './contact-client'
 
 export const metadata: Metadata = {
-    title: 'Contact Us | Shivshakti Heritage & Luxury',
-    description: 'Get in touch with Shivshakti for inquiries about our premium Indian artifacts, textiles, and shipping. Visit our Nagpur studio or contact us online.',
+    title: 'Contact Us | DedayCart Premium Sneakers',
+    description: 'Get in touch with DedayCart for inquiries about our premium Nike, Adidas, and Puma sneakers. Visit our Toronto store or contact us online.',
     openGraph: {
-        title: 'Contact Shivshakti | Heritage & Luxury Studio',
-        description: 'Visit our Nagpur studio or contact us for inquiries about heritage artifacts and premium gifting.',
-        url: 'https://shivshakti.vercel.app/contact',
-        siteName: 'Shivshakti',
-        locale: 'en_IN',
+        title: 'Contact DedayCart | Premium Sneaker Store',
+        description: 'Visit our Toronto store or contact us for inquiries about authentic athletic footwear.',
+        url: 'https://dedaycart.vercel.app/contact',
+        siteName: 'DedayCart',
+        locale: 'en_CA',
         type: 'website',
     },
 }
@@ -18,24 +18,24 @@ export default function ContactPage() {
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Store',
-        name: 'Shivshakti Heritage',
-        image: 'https://shivshakti.vercel.app/icon.png',
-        '@id': 'https://shivshakti.vercel.app',
-        url: 'https://shivshakti.vercel.app/contact',
-        telephone: '9890379728',
-        priceRange: '₹₹₹',
+        name: 'DedayCart Premium Sneakers',
+        image: 'https://dedaycart.vercel.app/icon.png',
+        '@id': 'https://dedaycart.vercel.app',
+        url: 'https://dedaycart.vercel.app/contact',
+        telephone: '+1-416-987-6543',
+        priceRange: '$$$',
         address: {
             '@type': 'PostalAddress',
-            streetAddress: 'Shivshakti Heritage Studio',
-            addressLocality: 'Nagpur',
-            addressRegion: 'Maharashtra',
-            postalCode: '440001',
-            addressCountry: 'IN',
+            streetAddress: '123 Queen Street West',
+            addressLocality: 'Toronto',
+            addressRegion: 'Ontario',
+            postalCode: 'M5H 2M9',
+            addressCountry: 'CA',
         },
         geo: {
             '@type': 'GeoCoordinates',
-            latitude: 26.9124,
-            longitude: 75.7873,
+            latitude: 43.6532,
+            longitude: -79.3832,
         },
         openingHoursSpecification: [
             {
@@ -54,11 +54,11 @@ export default function ContactPage() {
         ],
         contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '9890379728',
+            telephone: '+1-416-987-6543',
             contactType: 'customer service',
-            email: 'shivshaktiprovision18@gmail.com',
-            areaServed: 'IN',
-            availableLanguage: ['en', 'hi'],
+            email: 'support@dedaycart.com',
+            areaServed: 'CA',
+            availableLanguage: ['en', 'fr'],
         },
     }
 

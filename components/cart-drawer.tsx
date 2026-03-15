@@ -45,7 +45,7 @@ export default function CartDrawer() {
     useEffect(() => {
         if (appliedCoupon && cartTotal < appliedCoupon.min_cost) {
             setAppliedCoupon(null)
-            setCouponError(`Coupon removed: Minimum spend of ₹${appliedCoupon.min_cost} not met`)
+            setCouponError(`Coupon removed: Minimum spend of $${appliedCoupon.min_cost} not met`)
         }
     }, [cartTotal, appliedCoupon])
 
@@ -64,7 +64,7 @@ export default function CartDrawer() {
     // Load customer data from localStorage on mount and when user changes
     useEffect(() => {
         if (user) {
-            const savedUserData = localStorage.getItem(`shivshakti_customer_${user.email}`)
+            const savedUserData = localStorage.getItem(`dedaycart_customer_${user.email}`)
             if (savedUserData) {
                 try {
                     const parsedData = JSON.parse(savedUserData)
@@ -80,7 +80,7 @@ export default function CartDrawer() {
                 name: user.user_metadata.full_name || ''
             }))
         } else {
-            const globalData = localStorage.getItem('shivshakti_customer_data')
+            const globalData = localStorage.getItem('dedaycart_customer_data')
             if (globalData) {
                 try {
                     setCustomerData(JSON.parse(globalData))
@@ -224,8 +224,8 @@ export default function CartDrawer() {
                     mode: 'Store Pickup',
                 }).catch(err => console.error('Email sending failed:', err))
 
-                localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
-                localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
+                localStorage.setItem('dedaycart_customer_data', JSON.stringify(customerData))
+                localStorage.setItem(`dedaycart_customer_${user.email}`, JSON.stringify(customerData))
                 window.dispatchEvent(new Event('customerDataUpdated'))
 
                 setIsOrderPlaced(true)
@@ -256,7 +256,7 @@ export default function CartDrawer() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     amount: finalTotal,
-                    currency: 'INR',
+                    currency: 'CAD',
                     customerName: customerData.name,
                     customerPhone: customerData.phone,
                     customerEmail: user.email,
@@ -273,7 +273,7 @@ export default function CartDrawer() {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
                 amount: orderData.amount,
                 currency: orderData.currency,
-                name: 'Shivshakti',
+                name: 'DedayCart',
                 description: 'Order Payment',
                 order_id: orderData.orderId,
                 prefill: {
@@ -349,8 +349,8 @@ export default function CartDrawer() {
                             mode: 'Doorstep Delivery',
                         }).catch(err => console.error('Email sending failed:', err))
 
-                        localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
-                        localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
+                        localStorage.setItem('dedaycart_customer_data', JSON.stringify(customerData))
+                        localStorage.setItem(`dedaycart_customer_${user.email}`, JSON.stringify(customerData))
                         window.dispatchEvent(new Event('customerDataUpdated'))
 
                         setIsOrderPlaced(true)
@@ -440,7 +440,7 @@ export default function CartDrawer() {
                                     </motion.div>
                                     <div>
                                         <h3 className="text-xl font-semibold text-[#1A1A1A] mb-1">Order Placed!</h3>
-                                        <p className="text-[#717171]">Thank you for shopping with Shivshakti.</p>
+                                        <p className="text-[#717171]">Thank you for shopping with DedayCart.</p>
                                     </div>
                                 </div>
                             ) : showCustomerForm ? (
@@ -660,7 +660,7 @@ export default function CartDrawer() {
                                                         </button>
                                                     </div>
                                                     <p className="font-semibold text-[#1A1A1A]">
-                                                        ₹{((item.selectedVariation ? item.selectedVariation.price : item.price) * item.quantity).toLocaleString()}
+                                                        ${((item.selectedVariation ? item.selectedVariation.price : item.price) * item.quantity).toLocaleString()}
                                                     </p>
                                                 </div>
                                             </div>
@@ -710,7 +710,7 @@ export default function CartDrawer() {
                                             <Ticket className="h-4 w-4 text-emerald-600" />
                                             <div>
                                                 <p className="text-xs font-semibold text-emerald-700">{appliedCoupon.code}</p>
-                                                <p className="text-xs text-emerald-600">{appliedCoupon.off_percent}% off - Saved ₹{discountAmount}</p>
+                                                <p className="text-xs text-emerald-600">{appliedCoupon.off_percent}% off - Saved ${discountAmount}</p>
                                             </div>
                                         </div>
                                         <button
@@ -726,17 +726,17 @@ export default function CartDrawer() {
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center text-sm text-[#717171]">
                                         <span>Subtotal</span>
-                                        <span>₹{cartTotal.toLocaleString()}</span>
+                                        <span>${cartTotal.toLocaleString()}</span>
                                     </div>
                                     {appliedCoupon && (
                                         <div className="flex justify-between items-center text-sm text-emerald-600">
                                             <span>Discount</span>
-                                            <span>-₹{discountAmount.toLocaleString()}</span>
+                                            <span>-${discountAmount.toLocaleString()}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between items-center pt-2 border-t border-[#EBEBEB]">
                                         <span className="font-medium text-[#1A1A1A]">Total</span>
-                                        <span className="text-xl font-bold text-[#1A1A1A]">₹{finalTotal.toLocaleString()}</span>
+                                        <span className="text-xl font-bold text-[#1A1A1A]">${finalTotal.toLocaleString()}</span>
                                     </div>
                                 </div>
 

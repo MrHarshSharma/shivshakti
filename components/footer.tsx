@@ -15,21 +15,14 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <Link href="/" className="inline-block mb-4">
-                            <div className="relative h-20 w-20">
-                                <Image
-                                    src="/logo.png"
-                                    alt="Shivshakti"
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
+                            <h2 className="text-2xl font-bold text-[#1A1A1A]">DedayCart</h2>
                         </Link>
                         <p className="text-sm text-[#717171] leading-relaxed mb-4">
-                            Premium handcrafted gift hampers and artisanal products. Made with love in Nagpur, India.
+                            Your trusted destination for premium athletic footwear. Nike, Adidas, Puma, and more.
                         </p>
                         <div className="flex items-center gap-3">
                             <a
-                                href="https://www.instagram.com/shiv_shakti_provision"
+                                href="https://www.instagram.com/dedaycart"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-9 h-9 rounded-full bg-white border border-[#EBEBEB] flex items-center justify-center text-[#717171] hover:text-[#D29B6C] hover:border-[#D29B6C] transition-colors"
@@ -66,7 +59,7 @@ export default function Footer() {
                         <ul className="space-y-3">
                             {[
                                 { name: 'Shipping Policy', href: '/shipping-policy' },
-                                { name: 'Return & Refund', href: '/refund-policy' },
+                                { name: 'Refund Policy', href: '/refund-policy' },
                                 { name: 'Terms & Conditions', href: '/terms-and-conditions' },
                                 { name: 'Privacy Policy', href: '/privacy-policy' },
                             ].map((link) => (
@@ -88,26 +81,26 @@ export default function Footer() {
                         <ul className="space-y-3">
                             <li>
                                 <a
-                                    href="mailto:shivshaktiprovision18@gmail.com"
+                                    href="mailto:support@dedaycart.com"
                                     className="flex items-start gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                 >
                                     <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                    shivshaktiprovision18@gmail.com
+                                    support@dedaycart.com
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="tel:+919890379728"
+                                    href="tel:+14169876543"
                                     className="flex items-center gap-3 text-sm text-[#717171] hover:text-[#D29B6C] transition-colors"
                                 >
                                     <Phone className="w-4 h-4 flex-shrink-0" />
-                                    +91 98903 79728
+                                    +1 (416) 987-6543
                                 </a>
                             </li>
                             <li>
                                 <div className="flex items-start gap-3 text-sm text-[#717171]">
                                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                    Nagpur, Maharashtra, India
+                                    Toronto, Ontario, Canada
                                 </div>
                             </li>
                         </ul>
@@ -117,7 +110,7 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="py-4 border-t border-[#EBEBEB] flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-[#717171]">
-                        © {currentYear} Shivshakti. All rights reserved.
+                        © {currentYear} DedayCart. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4">
                         <span className="text-xs text-[#717171]">We accept:</span>

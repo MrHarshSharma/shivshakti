@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ShoppingBag, Minus, Plus, Check, ChevronRight, Truck, Shield, Gift, RotateCcw } from 'lucide-react'
+import { ChevronLeft, ShoppingBag, Minus, Plus, Check, ChevronRight, Truck, Shield, Gift, MessageCircle, X } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
 import { Product } from '@/data/products'
 
@@ -44,6 +44,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     const [selectedVariation, setSelectedVariation] = useState<any>(getInitialVariation)
     const [showSuccess, setShowSuccess] = useState(false)
     const [[page, direction], setPage] = useState([0, 0])
+    const [showBulkModal, setShowBulkModal] = useState(false)
+    const [bulkQuantity, setBulkQuantity] = useState(10)
+    const [bulkSize, setBulkSize] = useState('')
 
     const id = product.id.toString()
 
@@ -88,6 +91,27 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     const handleQuantityChange = (newQuantity: number) => {
         setQuantity(newQuantity)
     }
+
+    const handleBulkOrder = () => {
+        const productName = product.name
+        const size = bulkSize || 'Size not selected'
+        const quantity = bulkQuantity
+        const message = `Hello, we would like to order ${quantity} pairs of ${productName} in ${size}. Please let us know the availability.`
+        const whatsappNumber = '919665654326' // +91 9665654326
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+        window.open(whatsappUrl, '_blank')
+        setShowBulkModal(false)
+    }
+
+    const handleEnquire = () => {
+        const productName = product.name
+        const message = `Hello, I would like to enquire about the availability of ${productName}. When will it be back in stock?`
+        const whatsappNumber = '919665654326' // +91 9665654326
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+        window.open(whatsappUrl, '_blank')
+    }
+
+    const isOutOfStock = product.in_stock === false
 
     const imageIndex = product.images && product.images.length > 0 ? page % product.images.length : 0
 
@@ -164,7 +188,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                         src={product.images && product.images.length > 0 ? product.images[imageIndex] : '/placeholder-product.png'}
                                         alt={`${product.name} image ${imageIndex + 1}`}
                                         fill
-                                        className="object-cover"
+                                        className={`object-cover ${isOutOfStock ? 'grayscale opacity-60' : ''}`}
                                         priority
                                     />
                                 </motion.div>
@@ -189,11 +213,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                             )}
 
                             {/* Badges */}
-                            {product.isNew && (
+                            {isOutOfStock ? (
+                                <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#4A4A4A] text-white text-xs font-semibold rounded-md z-10">
+                                    OUT OF STOCK
+                                </span>
+                            ) : product.isNew ? (
                                 <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#D29B6C] text-white text-xs font-semibold rounded-md z-10">
                                     NEW
                                 </span>
-                            )}
+                            ) : null}
 
                             {/* Image Counter */}
                             {product.images && product.images.length > 1 && (
@@ -219,7 +247,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                             src={img}
                                             alt={`${product.name} thumbnail ${idx + 1}`}
                                             fill
-                                            className="object-cover"
+                                            className={`object-cover ${isOutOfStock ? 'grayscale opacity-60' : ''}`}
                                         />
                                     </button>
                                 ))}
@@ -251,7 +279,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         {/* Price */}
                         <div className="flex items-baseline gap-3 mb-6">
                             <span className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
-                                ₹{(selectedVariation?.price ?? product.price ?? 0).toLocaleString()}
+                                ${(selectedVariation?.price ?? product.price ?? 0).toLocaleString()}
                             </span>
                             {selectedVariation && (
                                 <span className="text-sm text-[#717171]">
@@ -266,7 +294,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         </div>
 
                         {/* Variation Selector */}
-                        {product.product_type === 'variable' && product.variations && product.variations.length > 0 && (
+                        {product.product_type === 'variable' && product.variations && product.variations.length > 0 && !isOutOfStock && (
                             <div className="mb-8">
                                 <h3 className="text-sm font-semibold text-[#1A1A1A] mb-3">Select Option</h3>
                                 <div className="flex flex-wrap gap-2">
@@ -280,54 +308,95 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                                 }`}
                                         >
                                             <div className="font-medium">{variation.name}</div>
-                                            <div className="text-xs opacity-70 mt-0.5">₹{variation.price.toLocaleString()}</div>
+                                            <div className="text-xs opacity-70 mt-0.5">${variation.price.toLocaleString()}</div>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        {/* Quantity & Add to Cart */}
-                        <div className="flex items-center gap-3 mb-8">
-                            {/* Quantity Selector */}
-                            <div className="flex items-center border border-[#EBEBEB] rounded-lg flex-shrink-0">
+                        {/* Quantity & Add to Cart / Enquire Button */}
+                        {isOutOfStock ? (
+                            <div className="mb-4">
                                 <button
-                                    onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
-                                    className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
-                                    disabled={quantity <= 1}
+                                    onClick={handleEnquire}
+                                    className="w-full px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-[#4A4A4A] text-white hover:bg-[#333333]"
                                 >
-                                    <Minus className="h-4 w-4" />
-                                </button>
-                                <span className="w-10 text-center font-semibold text-[#1A1A1A]">{quantity}</span>
-                                <button
-                                    onClick={() => handleQuantityChange(quantity + 1)}
-                                    className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
-                                >
-                                    <Plus className="h-4 w-4" />
+                                    <MessageCircle className="h-5 w-5" />
+                                    Enquire Now
                                 </button>
                             </div>
+                        ) : (
+                            <div className="flex items-center gap-3 mb-4">
+                                {/* Quantity Selector */}
+                                <div className="flex items-center border border-[#EBEBEB] rounded-lg flex-shrink-0">
+                                    <button
+                                        onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
+                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                        disabled={quantity <= 1}
+                                    >
+                                        <Minus className="h-4 w-4" />
+                                    </button>
+                                    <span className="w-10 text-center font-semibold text-[#1A1A1A]">{quantity}</span>
+                                    <button
+                                        onClick={() => handleQuantityChange(quantity + 1)}
+                                        className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                    </button>
+                                </div>
 
-                            {/* Add to Cart Button */}
+                                {/* Add to Cart Button */}
+                                <button
+                                    onClick={handleAddToCart}
+                                    className={`flex-1 px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${showSuccess
+                                        ? 'bg-emerald-500 text-white'
+                                        : 'bg-[#D29B6C] text-white hover:bg-[#B8845A]'
+                                        }`}
+                                >
+                                    {showSuccess ? (
+                                        <>
+                                            <Check className="h-5 w-5" />
+                                            Added to Bag
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ShoppingBag className="h-5 w-5" />
+                                            {isInCart ? 'Update Bag' : 'Add to Bag'}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Bulk Order Button - Only show if in stock */}
+                        {!isOutOfStock && (
                             <button
-                                onClick={handleAddToCart}
-                                className={`flex-1 px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${showSuccess
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-[#D29B6C] text-white hover:bg-[#B8845A]'
-                                    }`}
+                                onClick={() => {
+                                    // Set default size when opening modal
+                                    if (product.product_type === 'variable' && product.variations && product.variations.length > 0) {
+                                        const defaultVar = product.variations.find(v => v.is_default) || product.variations[0]
+                                        setBulkSize(defaultVar.name)
+                                    } else {
+                                        setBulkSize('9')
+                                    }
+                                    setShowBulkModal(true)
+                                }}
+                                className="w-full px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-white border-2 border-[#D29B6C] text-[#D29B6C] hover:bg-[#D29B6C] hover:text-white mb-8"
                             >
-                                {showSuccess ? (
-                                    <>
-                                        <Check className="h-5 w-5" />
-                                        Added to Bag
-                                    </>
-                                ) : (
-                                    <>
-                                        <ShoppingBag className="h-5 w-5" />
-                                        {isInCart ? 'Update Bag' : 'Add to Bag'}
-                                    </>
-                                )}
+                                <MessageCircle className="h-5 w-5" />
+                                Bulk Order via WhatsApp
                             </button>
-                        </div>
+                        )}
+
+                        {/* Out of Stock Badge */}
+                        {isOutOfStock && (
+                            <div className="mb-8 p-4 bg-[#F8F8F8] border border-[#EBEBEB] rounded-lg">
+                                <p className="text-sm text-[#4A4A4A] text-center">
+                                    <span className="font-semibold text-[#1A1A1A]">Out of Stock</span> - Click "Enquire Now" to get notified when available
+                                </p>
+                            </div>
+                        )}
 
                         {/* Trust Badges */}
                         <div className="grid grid-cols-2 gap-4 p-4 bg-[#F8F8F8] rounded-xl mb-8">
@@ -337,7 +406,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-[#1A1A1A]">Free Delivery</p>
-                                    <p className="text-xs text-[#717171]">On orders above ₹999</p>
+                                    <p className="text-xs text-[#717171]">On orders above $999</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -354,17 +423,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     <Gift className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-[#1A1A1A]">Gift Wrapping</p>
-                                    <p className="text-xs text-[#717171]">Available on request</p>
+                                    <p className="text-sm font-medium text-[#1A1A1A]">Easy Returns</p>
+                                    <p className="text-xs text-[#717171]">7-day return policy</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-[#D29B6C]">
-                                    <RotateCcw className="h-5 w-5" />
+                                    <Shield className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-[#1A1A1A]">Easy Returns</p>
-                                    <p className="text-xs text-[#717171]">7 days return policy</p>
+                                    <p className="text-sm font-medium text-[#1A1A1A]">100% Authentic</p>
+                                    <p className="text-xs text-[#717171]">Genuine products only</p>
                                 </div>
                             </div>
                         </div>
@@ -389,6 +458,117 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     </div>
                 </div>
             </div>
+
+            {/* Bulk Order Modal */}
+            <AnimatePresence>
+                {showBulkModal && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowBulkModal(false)}
+                            className="fixed inset-0 bg-black/50 z-50"
+                        />
+
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8">
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-[#1A1A1A]">Bulk Order</h2>
+                                    <button
+                                        onClick={() => setShowBulkModal(false)}
+                                        className="p-2 hover:bg-[#F8F8F8] rounded-lg transition-colors"
+                                    >
+                                        <X className="h-5 w-5 text-[#4A4A4A]" />
+                                    </button>
+                                </div>
+
+                                {/* Product Info */}
+                                <div className="mb-6 p-4 bg-[#F8F8F8] rounded-xl">
+                                    <p className="text-sm text-[#717171] mb-1">Product</p>
+                                    <p className="font-semibold text-[#1A1A1A]">{product.name}</p>
+                                </div>
+
+                                {/* Size Dropdown */}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-2">
+                                        Size *
+                                    </label>
+                                    <select
+                                        value={bulkSize}
+                                        onChange={(e) => setBulkSize(e.target.value)}
+                                        className="w-full px-4 py-3 border border-[#EBEBEB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D29B6C] focus:border-transparent"
+                                    >
+                                        <option value="">Select size</option>
+                                        {product.product_type === 'variable' && product.variations ? (
+                                            product.variations.map((variation) => (
+                                                <option key={variation.id} value={variation.name}>
+                                                    {variation.name}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                            </>
+                                        )}
+                                    </select>
+                                </div>
+
+                                {/* Quantity Input */}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-semibold text-[#1A1A1A] mb-2">
+                                        Quantity *
+                                    </label>
+                                    <div className="flex items-center border border-[#EBEBEB] rounded-lg">
+                                        <button
+                                            onClick={() => setBulkQuantity(Math.max(1, bulkQuantity - 1))}
+                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                        >
+                                            <Minus className="h-4 w-4" />
+                                        </button>
+                                        <input
+                                            type="number"
+                                            value={bulkQuantity}
+                                            onChange={(e) => setBulkQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                            className="flex-1 text-center font-semibold text-[#1A1A1A] focus:outline-none"
+                                            min="1"
+                                        />
+                                        <button
+                                            onClick={() => setBulkQuantity(bulkQuantity + 1)}
+                                            className="p-3 hover:bg-[#F8F8F8] transition-colors text-[#4A4A4A] hover:text-[#D29B6C]"
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    onClick={handleBulkOrder}
+                                    disabled={!bulkSize}
+                                    className="w-full px-6 py-3.5 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-[#25D366] text-white hover:bg-[#20BA5A] disabled:bg-[#EBEBEB] disabled:text-[#717171] disabled:cursor-not-allowed"
+                                >
+                                    <MessageCircle className="h-5 w-5" />
+                                    Send via WhatsApp
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

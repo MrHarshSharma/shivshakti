@@ -1,6 +1,5 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
 
 // Disable static caching - always fetch fresh data
 export const dynamic = 'force-dynamic'
@@ -71,11 +70,6 @@ export async function POST(request: Request) {
                 { status: 500 }
             )
         }
-
-        // Revalidate cached pages after create
-        revalidatePath('/api/products')
-        revalidatePath('/products')
-        revalidatePath('/admin/products')
 
         return NextResponse.json(
             {

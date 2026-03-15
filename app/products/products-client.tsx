@@ -26,7 +26,7 @@ export default function ProductsClient({
 }: ProductsClientProps) {
     const router = useRouter()
 
-    const categories = ['All', 'Hampers', 'Gourmet', 'Dry fruits']
+    const categories = ['All', 'Running', 'Casual', 'Sports', 'Basketball', 'Lifestyle']
 
     const buildUrl = (params: { page?: number; category?: string; search?: string }) => {
         const url = new URLSearchParams()
@@ -71,7 +71,7 @@ export default function ProductsClient({
                         <p className="text-[#4A4A4A] text-lg leading-relaxed">
                             {searchQuery
                                 ? `Showing results for "${searchQuery}"`
-                                : 'Explore our carefully curated selection of premium gift hampers, ensuring a touch of luxury in every detail.'
+                                : 'Discover premium athletic footwear from Nike, Adidas, and Puma. Find the perfect sneakers for your style and performance needs.'
                             }
                         </p>
                     </motion.div>

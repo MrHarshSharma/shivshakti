@@ -169,7 +169,7 @@ export default function CouponManagement() {
                     <h1 className="font-cinzel text-4xl sm:text-5xl text-[#2D1B1B] mb-2 font-bold tracking-tight">
                         Coupon <span className="text-saffron">Management</span>
                     </h1>
-                    <p className="text-[#4A3737]/70 font-playfair text-lg">Create and oversee your promotional heritage treasures.</p>
+                    <p className="text-[#4A3737]/70 font-playfair text-lg">Create and oversee your promotional discount codes.</p>
                 </div>
 
                 {/* Global Feedback Messages */}
@@ -250,7 +250,7 @@ export default function CouponManagement() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Min Spend (₹)</label>
+                                    <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#4A3737]/60 mb-2">Min Spend ($)</label>
                                     <input
                                         type="text"
                                         value={newCoupon.min_cost}
@@ -374,7 +374,7 @@ export default function CouponManagement() {
                                                                 <span className="font-bold text-magenta">{coupon.off_percent}% OFF</span>
                                                             </td>
                                                             <td className="py-4 px-4">
-                                                                <span className="text-[#4A3737]/60 font-playfair">₹{coupon.min_cost || '0'}</span>
+                                                                <span className="text-[#4A3737]/60 font-playfair">${coupon.min_cost || '0'}</span>
                                                             </td>
                                                             <td className="py-4 px-4">
                                                                 <div className="space-y-0.5">

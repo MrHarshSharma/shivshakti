@@ -25,7 +25,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
     order_id,
     orders,
     cost,
-    date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
+    date = new Date().toLocaleDateString('en-CA', { day: 'numeric', month: 'long', year: 'numeric' }),
     mode,
 }) => {
     return (
@@ -53,7 +53,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                     {/* Logo */}
                     <img
                         src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
-                        alt="Shivshakti"
+                        alt="DedayCart"
                         style={{
                             width: '120px',
                             height: 'auto',
@@ -169,7 +169,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                                         }}>Qty: {item.units}</div>
                                     </td>
                                     <td style={{ padding: '15px 0', verticalAlign: 'top', textAlign: 'right', fontWeight: 'bold', color: '#2D1B1B' }}>
-                                        ₹{item.price * item.units}
+                                        ${item.price * item.units}
                                     </td>
                                 </tr>
                             ))}
@@ -189,23 +189,23 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                             <tbody>
                                 <tr>
                                     <td style={{ padding: '5px 0', fontSize: '14px', color: '#666666' }}>Subtotal</td>
-                                    <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>₹{cost.subtotal || cost.total}</td>
+                                    <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>${cost.subtotal || cost.total}</td>
                                 </tr>
                                 {cost.discount ? (
                                     <tr>
                                         <td style={{ padding: '5px 0', fontSize: '14px', color: '#16a34a' }}>Discount</td>
-                                        <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#16a34a', fontWeight: 'bold' }}>-₹{cost.discount}</td>
+                                        <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#16a34a', fontWeight: 'bold' }}>-${cost.discount}</td>
                                     </tr>
                                 ) : null}
                                 {cost.shipping ? (
                                     <tr>
                                         <td style={{ padding: '5px 0', fontSize: '14px', color: '#666666' }}>Shipping</td>
-                                        <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>₹{cost.shipping}</td>
+                                        <td style={{ padding: '5px 0', textAlign: 'right', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>${cost.shipping}</td>
                                     </tr>
                                 ) : null}
                                 <tr style={{ borderTop: '1px solid #e5e7eb' }}>
                                     <td style={{ padding: '15px 0 0', fontSize: '18px', color: '#2D1B1B', fontWeight: 'bold' }}>Total</td>
-                                    <td style={{ padding: '15px 0 0', textAlign: 'right', fontSize: '18px', color: '#D97706', fontWeight: 'bold' }}>₹{cost.total}</td>
+                                    <td style={{ padding: '15px 0 0', textAlign: 'right', fontSize: '18px', color: '#D97706', fontWeight: 'bold' }}>${cost.total}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -253,7 +253,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                         lineHeight: '1.5',
                         margin: '0 0 10px',
                     }}>
-                        &copy; {new Date().getFullYear()} Shivshakti Provision. All rights reserved.
+                        &copy; {new Date().getFullYear()} DedayCart Provision. All rights reserved.
                     </p>
                     <p style={{
                         fontSize: '12px',

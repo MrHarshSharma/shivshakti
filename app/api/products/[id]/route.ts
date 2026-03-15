@@ -1,6 +1,5 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
 
 // Disable static caching - always fetch fresh data
 export const dynamic = 'force-dynamic'
@@ -127,13 +126,6 @@ export async function PUT(
 
         console.log('Update Successful for ID:', id)
 
-        // Revalidate cached pages after update
-        revalidatePath(`/api/products/${id}`)
-        revalidatePath('/api/products')
-        revalidatePath('/products')
-        revalidatePath(`/products/${id}`)
-        revalidatePath('/admin/products')
-
         return NextResponse.json({
             success: true,
             message: 'Product updated successfully',
@@ -212,11 +204,6 @@ export async function DELETE(
                 { status: 500 }
             )
         }
-
-        // Revalidate cached pages after delete
-        revalidatePath('/api/products')
-        revalidatePath('/products')
-        revalidatePath('/admin/products')
 
         return NextResponse.json({
             success: true,

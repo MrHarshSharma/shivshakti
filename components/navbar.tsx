@@ -8,6 +8,7 @@ import { useAuth } from '@/context/auth-context'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { getAllProducts } from '@/data/products'
 
 interface SearchProduct {
     id: string | number
@@ -63,16 +64,37 @@ export default function Navbar() {
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
-    // Debounced search
+    // Debounced search - using static products
     useEffect(() => {
-        const timer = setTimeout(async () => {
+        const timer = setTimeout(() => {
             if (searchQuery.trim().length >= 2) {
                 setIsSearching(true)
                 try {
-                    const res = await fetch(`/api/products/search?q=${encodeURIComponent(searchQuery.trim())}`)
-                    const data = await res.json()
-                    setSearchResults(data.products || [])
-                    setSearchCount(data.count || 0)
+                    const allProducts = getAllProducts()
+                    const query = searchQuery.trim().toLowerCase()
+
+                    // Filter products by name, description, brand, or categories
+                    const filtered = allProducts.filter(product => {
+                        const nameMatch = product.name?.toLowerCase().includes(query)
+                        const brandMatch = product.brand?.toLowerCase().includes(query)
+                        const categoryMatch = product.categories?.some(cat =>
+                            cat.toLowerCase().includes(query)
+                        )
+
+                        // Try to parse description if it's JSON
+                        let descriptionMatch = false
+                        try {
+                            const desc = JSON.parse(product.description)
+                            descriptionMatch = desc.productDescription?.toLowerCase().includes(query)
+                        } catch {
+                            descriptionMatch = product.description?.toLowerCase().includes(query)
+                        }
+
+                        return nameMatch || brandMatch || categoryMatch || descriptionMatch
+                    })
+
+                    setSearchResults(filtered.slice(0, 5)) // Show max 5 results
+                    setSearchCount(filtered.length)
                     setShowSearchDropdown(true)
                 } catch (error) {
                     console.error('Search error:', error)
@@ -115,9 +137,9 @@ export default function Navbar() {
     }
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('en-IN', {
+        return new Intl.NumberFormat('en-CA', {
             style: 'currency',
-            currency: 'INR',
+            currency: 'CAD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(price)
@@ -143,7 +165,7 @@ export default function Navbar() {
         <>
             {/* Top Banner */}
             <div className="bg-[#D29B6C] text-white text-center py-2 text-xs font-medium tracking-wide">
-                Free Shipping on orders above ₹999 | Use code WELCOME10 for 10% off
+                Free Shipping on orders above $999 | Use code WELCOME10 for 10% off
             </div>
 
             {/* Main Header - White Section */}
@@ -277,15 +299,9 @@ export default function Navbar() {
 
                         {/* Center - Logo */}
                         <Link href="/" className="flex-shrink-0">
-                            <div className="relative h-20 w-30 md:h-24 md:w-30">
-                                <Image
-                                    src="/logo.png"
-                                    alt="Heart and Hampers"
-                                    fill
-                                    className="object-contain"
-                                    priority
-                                />
-                            </div>
+                            <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
+                                Deday<span className="text-[#D29B6C]">Cart</span>
+                            </h1>
                         </Link>
 
                         {/* Right - Actions */}
@@ -463,7 +479,7 @@ export default function Navbar() {
                             <div className="flex items-center justify-between p-4 border-b border-[#EBEBEB]">
                                 <Link href="/" onClick={() => setIsMenuOpen(false)}>
                                     <div className="relative h-12 w-12">
-                                        <Image src="/logo.png" alt="Heart and Hampers" fill className="object-contain" />
+                                        <h2 className="text-xl font-bold text-[#1A1A1A]">Deday<span className="text-[#D29B6C]">Cart</span></h2>
                                     </div>
                                 </Link>
                                 <button

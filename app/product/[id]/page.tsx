@@ -1,32 +1,17 @@
-import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { notFound } from 'next/navigation'
 import type { Metadata, ResolvingMetadata } from 'next'
 import ProductDetails from './product-details'
-import { Product } from '@/data/products'
+import { getProductById } from '@/data/products'
 
-// ISR: Revalidate every 10 minutes - product pages are cached at edge
-export const revalidate = 600
+export const dynamic = 'force-dynamic'
 
 interface PageProps {
     params: Promise<{ id: string }>
 }
 
-async function getProduct(id: string) {
-    // If ID is undefined, return null immediately
+function getProduct(id: string) {
     if (!id || id === 'undefined') return null
-
-    const supabase = createServiceRoleClient()
-    const { data: product, error } = await supabase
-        .from('product')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-    if (error || !product) {
-        return null
-    }
-
-    return product as Product
+    return getProductById(id) || null
 }
 
 export async function generateMetadata(
@@ -34,7 +19,7 @@ export async function generateMetadata(
     parent: ResolvingMetadata
 ): Promise<Metadata> {
     const { id } = await params
-    const product = await getProduct(id)
+    const product = getProduct(id)
 
     if (!product) {
         return {
@@ -71,7 +56,7 @@ export async function generateMetadata(
 
 export default async function ProductPage({ params }: PageProps) {
     const { id } = await params
-    const product = await getProduct(id)
+    const product = getProduct(id)
 
     if (!product) {
         notFound()

@@ -11,7 +11,7 @@ export const OrderCancelledEmail: React.FC<OrderCancelledEmailProps> = ({
     order_id,
     user_email,
     reason,
-    date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
+    date = new Date().toLocaleDateString('en-CA', { day: 'numeric', month: 'long', year: 'numeric' }),
 }) => {
     return (
         <div style={{
@@ -38,7 +38,7 @@ export const OrderCancelledEmail: React.FC<OrderCancelledEmailProps> = ({
                     {/* Logo */}
                     <img
                         src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
-                        alt="Shivshakti"
+                        alt="DedayCart"
                         style={{
                             width: '80px',
                             height: 'auto',
@@ -165,7 +165,7 @@ export const OrderCancelledEmail: React.FC<OrderCancelledEmailProps> = ({
                         color: '#999999',
                         margin: '0',
                     }}>
-                        System Notification • Shivshakti Admin
+                        System Notification • DedayCart Admin
                     </p>
                 </div>
             </div>

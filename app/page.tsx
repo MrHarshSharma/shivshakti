@@ -1,52 +1,39 @@
-import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import HomeClient from '@/components/home-client'
-import { Product } from '@/data/products'
+import { getAllProducts } from '@/data/products'
 import type { Metadata } from 'next'
 
-// ISR: Revalidate every 5 minutes - page is cached and served instantly from edge
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Shivshakti | Heritage Indian Artifacts & Luxuryampers',
-  description: 'Discover authentic Indian heritage with Shivshakti. Curated luxury hampers, artisanal decor, and premium gifts handcrafted in Maharashtra.',
-  keywords: ['Indian luxury artifacts', 'heritage gifts', 'premium hampers', 'Nagpur', 'Maharashtra handicrafts', 'corporate gifting', 'Shivshakti'],
+  title: 'DedayCart | Premium Sneakers & Athletic Footwear',
+  description: 'Discover the latest collection of Nike, Adidas, and Puma sneakers at DedayCart. Premium athletic footwear for running, sports, and lifestyle.',
+  keywords: ['Nike shoes', 'Adidas sneakers', 'Puma footwear', 'running shoes', 'athletic shoes', 'sports shoes', 'DedayCart'],
   openGraph: {
-    title: 'Shivshakti | Indian Heritage & Luxury Gifting',
-    description: 'Authentic handcrafted artifacts and premium gourmet hampers from Maharashtra.',
-    url: 'https://shivshakti.vercel.app',
-    siteName: 'Shivshakti',
-    locale: 'en_IN',
+    title: 'DedayCart | Premium Sneakers & Athletic Footwear',
+    description: 'Shop the latest Nike, Adidas, and Puma sneakers. Free shipping on orders over $2000.',
+    url: 'https://dedaycart.vercel.app',
+    siteName: 'DedayCart',
+    locale: 'en_CA',
     type: 'website',
     images: [
       {
-        url: '/hero-hamper.png',
+        url: '/hero-shoes.png',
         width: 1200,
         height: 630,
-        alt: 'Shivshakti Luxury Hamper',
+        alt: 'DedayCart Premium Sneakers',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Shivshakti | Heritage & Luxury',
-    description: 'Curated premium Indian artifacts and luxury hampers.',
-    images: ['/hero-hamper.png'],
+    title: 'DedayCart | Premium Sneakers',
+    description: 'Shop Nike, Adidas, and Puma sneakers at the best prices.',
+    images: ['/hero-shoes.png'],
   },
 }
 
-async function getProducts() {
-  const supabase = createServiceRoleClient()
-  const { data, error } = await supabase
-    .from('product')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error) {
-    console.error('Error fetching products:', error)
-    return []
-  }
-
-  return (data || []) as Product[]
+function getProducts() {
+  return getAllProducts()
 }
 
 export default async function Home() {
@@ -55,19 +42,19 @@ export default async function Home() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Shivshakti Heritage & Luxury',
-    url: 'https://shivshakti.vercel.app',
-    logo: 'https://shivshakti.vercel.app/icon.png',
-    description: 'Curated collection of premium Indian artifacts and textiles.',
+    name: 'DedayCart',
+    url: 'https://dedaycart.vercel.app',
+    logo: 'https://dedaycart.vercel.app/icon.png',
+    description: 'Premium sneakers and athletic footwear from top brands like Nike, Adidas, and Puma.',
     sameAs: [
-      'https://instagram.com/shivshakti',
-      'https://facebook.com/shivshakti',
+      'https://instagram.com/dedaycart',
+      'https://facebook.com/dedaycart',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '9890379728',
+      telephone: '+1-416-987-6543',
       contactType: 'customer service',
-      email: 'shivshaktiprovision18@gmail.com',
+      email: 'support@dedaycart.com',
     },
   }
 

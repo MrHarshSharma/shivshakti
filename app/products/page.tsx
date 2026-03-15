@@ -1,8 +1,7 @@
-import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import ProductsClient from './products-client'
+import { getAllProducts } from '@/data/products'
 
-// Cache this page and revalidate every 60 seconds
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 const PRODUCTS_PER_PAGE = 12
 
@@ -12,23 +11,10 @@ interface GetProductsParams {
     search?: string
 }
 
-async function getProducts({ page, category, search }: GetProductsParams) {
-    const supabase = createServiceRoleClient()
+function getProducts({ page, category, search }: GetProductsParams) {
+    const allProducts = getAllProducts()
 
-    // First fetch all products
-    let query = supabase
-        .from('product')
-        .select('id, name, description, price, categories, images, product_type, variations, created_at')
-        .order('created_at', { ascending: false })
-
-    const { data: allProducts, error } = await query
-
-    if (error) {
-        console.error('Error fetching products:', error)
-        return { products: [], total: 0, totalPages: 0 }
-    }
-
-    let filtered = allProducts || []
+    let filtered = allProducts
 
     // Apply search filter
     if (search) {
@@ -70,7 +56,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     const category = params.category || 'All'
     const search = params.search || ''
 
-    const { products, total, totalPages } = await getProducts({ page, category, search })
+    const { products, total, totalPages } = getProducts({ page, category, search })
 
     return (
         <ProductsClient

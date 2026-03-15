@@ -530,7 +530,7 @@ export default function AdminAddProductPage() {
 
                                         <div>
                                             <label className="block font-playfair text-xs font-semibold text-[#2D1B1B] mb-1">
-                                                Price (₹) *
+                                                Price ($) *
                                             </label>
                                             <input
                                                 type="number"
@@ -654,7 +654,7 @@ export default function AdminAddProductPage() {
                     {productType === 'simple' && (
                         <div>
                             <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                                Price (₹) *
+                                Price ($) *
                             </label>
                             <input
                                 type="number"

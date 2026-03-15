@@ -1,6 +1,5 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
-import { revalidatePath } from 'next/cache'
 import * as XLSX from 'xlsx'
 
 interface ProductRow {
@@ -255,11 +254,6 @@ export async function POST(request: Request) {
                 summary.failed++
             }
         }
-
-        // Revalidate cached pages
-        revalidatePath('/api/products')
-        revalidatePath('/products')
-        revalidatePath('/admin/products')
 
         return NextResponse.json({
             success: true,

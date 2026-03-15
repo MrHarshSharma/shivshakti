@@ -26,13 +26,13 @@ export default function ShippingPolicyPage() {
                     <section className="space-y-4">
                         <div className="flex items-center gap-3 mb-4">
                             <Truck className="h-6 w-6 text-saffron" />
-                            <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Domestic Shipping (India)</h2>
+                            <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Domestic Shipping (Canada)</h2>
                         </div>
-                        <p>At Shivshakti, we understand the importance of receiving your heritage collections safely and promptly.</p>
+                        <p>At DedayCart, we understand the importance of receiving your premium sneakers safely and promptly.</p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li><strong>Standard Delivery:</strong> 5-7 business days.</li>
                             <li><strong>Express Delivery:</strong> 2-3 business days (available at extra cost in select cities).</li>
-                            <li><strong>Free Shipping:</strong> Enjoy free standard shipping on all orders above ₹4,999.</li>
+                            <li><strong>Free Shipping:</strong> Enjoy free standard shipping on all orders above $150 CAD.</li>
                         </ul>
                     </section>
 
@@ -41,7 +41,7 @@ export default function ShippingPolicyPage() {
                             <Globe className="h-6 w-6 text-saffron" />
                             <h2 className="font-cinzel text-2xl text-[#2D1B1B]">International Shipping</h2>
                         </div>
-                        <p>We take pride in sharing Indian craftsmanship globally. International delivery typically takes 10-15 business days depending on the destination and customs processes.</p>
+                        <p>We ship authentic athletic footwear globally from our Toronto location. International delivery typically takes 10-15 business days depending on the destination and customs processes.</p>
                         <p className="text-sm italic">Note: International shipping charges and custom duties are borne by the customer.</p>
                     </section>
 
@@ -55,8 +55,8 @@ export default function ShippingPolicyPage() {
                     </section>
 
                     <section className="bg-[#FEFBF5] p-6 rounded-xl border-l-4 border-saffron">
-                        <h3 className="font-bold text-[#2D1B1B] mb-2">Damaged in Transit?</h3>
-                        <p className="text-sm">While we take extreme care in packaging, if your product arrives damaged, please notify us within 24 hours of delivery with photographic evidence. We will arrange a replacement or refund promptly.</p>
+                        <h3 className="font-bold text-[#2D1B1B] mb-2">Important Note</h3>
+                        <p className="text-sm">We take extreme care in packaging all orders. Please note that we follow a strict no return and no refund policy. Ensure you review your order carefully before placing it.</p>
                     </section>
                 </motion.div>
             </div>

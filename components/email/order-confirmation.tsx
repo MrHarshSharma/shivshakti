@@ -51,7 +51,7 @@ export const OrderConfirmationEmail: React.FC<OrderEmailData> = ({
                         fontSize: '28px',
                         textTransform: 'uppercase',
                         letterSpacing: '2px'
-                    }}>Shivshakti</h1>
+                    }}>DedayCart</h1>
                 </div>
 
                 {/* Content */}
@@ -94,7 +94,7 @@ export const OrderConfirmationEmail: React.FC<OrderEmailData> = ({
                                             </div>
                                         </td>
                                         <td style={{ padding: '15px 0', verticalAlign: 'top', textAlign: 'right', fontWeight: 'bold', color: '#2D1B1B' }}>
-                                            ₹{item.price * item.units}
+                                            ${item.price * item.units}
                                         </td>
                                     </tr>
                                 ))}
@@ -113,23 +113,23 @@ export const OrderConfirmationEmail: React.FC<OrderEmailData> = ({
                             <tbody>
                                 <tr>
                                     <td style={{ padding: '5px 0', color: '#4A3737' }}>Subtotal</td>
-                                    <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold' }}>₹{cost.subtotal || cost.total}</td>
+                                    <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold' }}>${cost.subtotal || cost.total}</td>
                                 </tr>
                                 {cost.discount ? (
                                     <tr>
                                         <td style={{ padding: '5px 0', color: '#16a34a' }}>Discount</td>
-                                        <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold', color: '#16a34a' }}>-₹{cost.discount}</td>
+                                        <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold', color: '#16a34a' }}>-${cost.discount}</td>
                                     </tr>
                                 ) : null}
                                 {cost.shipping ? (
                                     <tr>
                                         <td style={{ padding: '5px 0', color: '#4A3737' }}>Shipping</td>
-                                        <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold' }}>₹{cost.shipping}</td>
+                                        <td style={{ padding: '5px 0', textAlign: 'right', fontWeight: 'bold' }}>${cost.shipping}</td>
                                     </tr>
                                 ) : null}
                                 <tr style={{ borderTop: '1px solid #e5e7eb' }}>
                                     <td style={{ padding: '15px 0 0', color: '#2D1B1B', fontWeight: 'bold', fontSize: '18px' }}>Total</td>
-                                    <td style={{ padding: '15px 0 0', textAlign: 'right', fontWeight: 'bold', fontSize: '18px', color: '#D97706' }}>₹{cost.total}</td>
+                                    <td style={{ padding: '15px 0 0', textAlign: 'right', fontWeight: 'bold', fontSize: '18px', color: '#D97706' }}>${cost.total}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -146,7 +146,7 @@ export const OrderConfirmationEmail: React.FC<OrderEmailData> = ({
                     color: '#999999'
                 }}>
                     <p style={{ margin: '0 0 10px' }}>
-                        &copy; {new Date().getFullYear()} Shivshakti. All rights reserved.
+                        &copy; {new Date().getFullYear()} DedayCart. All rights reserved.
                     </p>
                     <p style={{ margin: 0 }}>
                         Thank you for choosing tradition and quality.

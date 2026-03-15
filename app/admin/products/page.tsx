@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Plus, Edit, Trash2, Search, Package } from 'lucide-react'
-import { Product } from '@/data/products'
+import { Product, getAllProducts } from '@/data/products'
 
 interface AdminProduct extends Product {
     created_at: string
@@ -27,12 +27,9 @@ export default function AdminProductsPage() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('/api/products', { cache: 'no-store' })
-            const data = await response.json()
-
-            if (data.success) {
-                setProducts(data.products || [])
-            }
+            // Get products from local product list
+            const localProducts = getAllProducts() as AdminProduct[]
+            setProducts(localProducts)
         } catch (error) {
             console.error('Error fetching products:', error)
         } finally {
@@ -56,13 +53,10 @@ export default function AdminProductsPage() {
         if (!confirm('Are you sure you want to delete this product?')) return
 
         try {
-            const response = await fetch(`/api/products/${productId}`, {
-                method: 'DELETE',
-            })
-
-            if (response.ok) {
-                fetchProducts()
-            }
+            // For local product list, just filter out the deleted product from state
+            // Note: This won't persist - you would need to implement backend persistence
+            setProducts(prevProducts => prevProducts.filter(p => p.id !== productId))
+            alert('Product deleted from view (Note: This is temporary and won\'t persist on reload)')
         } catch (error) {
             console.error('Error deleting product:', error)
         }
@@ -121,13 +115,13 @@ export default function AdminProductsPage() {
                                     <div className="border-y sm:border-y-0 sm:border-x border-orange-50 py-3 sm:py-0 sm:px-6">
                                         <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Avg Price</p>
                                         <p className="text-xl font-bold text-[#2D1B1B] font-cinzel">
-                                            ₹{Math.round(filteredProducts.reduce((sum, p) => sum + p.price, 0) / filteredProducts.length)}
+                                            ${Math.round(filteredProducts.reduce((sum, p) => sum + p.price, 0) / filteredProducts.length)}
                                         </p>
                                     </div>
                                     <div className="sm:pl-6">
                                         <p className="text-[#4A3737]/50 text-[10px] uppercase font-bold tracking-widest mb-1">Total Value</p>
                                         <p className="text-xl font-bold text-saffron font-cinzel">
-                                            ₹{filteredProducts.reduce((sum, p) => sum + p.price, 0).toLocaleString()}
+                                            ${filteredProducts.reduce((sum, p) => sum + p.price, 0).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>
@@ -195,10 +189,10 @@ export default function AdminProductsPage() {
                                                     const prices = (product as any).variations.map((v: any) => v.price)
                                                     const minPrice = Math.min(...prices)
                                                     const maxPrice = Math.max(...prices)
-                                                    return minPrice === maxPrice ? `₹${minPrice}` : `₹${minPrice} - ₹${maxPrice}`
+                                                    return minPrice === maxPrice ? `$${minPrice}` : `$${minPrice} - $${maxPrice}`
                                                 })()
                                             ) : (
-                                                `₹${product.price}`
+                                                `$${product.price}`
                                             )}
                                         </span>
                                     </div>

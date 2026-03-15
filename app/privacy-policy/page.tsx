@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
                             <ShieldAlert className="h-6 w-6 text-saffron" />
                             <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Data Collection</h2>
                         </div>
-                        <p>We respect your privacy and are committed to protecting it. When you visit Shivshakti, we collect information you provide directly to us, such as when you create an account, place an order, or contact us for support.</p>
+                        <p>We respect your privacy and are committed to protecting it. When you visit DedayCart, we collect information you provide directly to us, such as when you create an account, place an order, or contact us for support.</p>
                         <p>This includes your name, email address, phone number, shipping address, and payment preferences.</p>
                     </section>
 

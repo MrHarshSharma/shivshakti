@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ShoppingBag, Package, Clock, CheckCircle, XCircle, ChevronLeft, ChevronRight, Truck, Store } from 'lucide-react'
 import { formatDate } from '@/utils/date'
 import Image from 'next/image'
+import { getAllOrders } from '@/data/orders'
 
 interface Order {
     id: number
@@ -48,16 +49,28 @@ export default function MyOrdersPage() {
     const fetchOrders = useCallback(async (page: number) => {
         setIsLoading(true)
         try {
-            const params = new URLSearchParams({
-                page: page.toString(),
-                limit: ITEMS_PER_PAGE.toString()
+            // Get orders from local data
+            const allOrders = getAllOrders()
+
+            // Sort by created_at descending (newest first)
+            const sortedOrders = [...allOrders].sort((a, b) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
+
+            // Implement pagination
+            const total = sortedOrders.length
+            const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
+            const startIndex = (page - 1) * ITEMS_PER_PAGE
+            const endIndex = startIndex + ITEMS_PER_PAGE
+            const paginatedOrders = sortedOrders.slice(startIndex, endIndex)
+
+            setOrders(paginatedOrders as any)
+            setPagination({
+                page,
+                limit: ITEMS_PER_PAGE,
+                total,
+                totalPages
             })
-            const response = await fetch(`/api/user/orders?${params}`)
-            const data = await response.json()
-            if (data.success) {
-                setOrders(data.orders || [])
-                setPagination(data.pagination)
-            }
         } catch (error) {
             console.error('Error fetching orders:', error)
         } finally {
@@ -247,12 +260,12 @@ export default function MyOrdersPage() {
                                                             <div className="flex-1 min-w-0">
                                                                 <h3 className="font-medium text-[#1A1A1A] truncate">{item.name}</h3>
                                                                 <p className="text-sm text-[#717171]">
-                                                                    Qty: {item.quantity} x ₹{item.price.toLocaleString()}
+                                                                    Qty: {item.quantity} x ${item.price.toLocaleString()}
                                                                 </p>
                                                             </div>
                                                             <div className="text-right">
                                                                 <p className="font-semibold text-[#1A1A1A]">
-                                                                    ₹{(item.price * item.quantity).toLocaleString()}
+                                                                    ${(item.price * item.quantity).toLocaleString()}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -263,7 +276,7 @@ export default function MyOrdersPage() {
                                                 <div className="mt-5 pt-4 border-t border-[#EBEBEB] flex items-center justify-between">
                                                     <div>
                                                         <span className="text-sm text-[#717171]">Order Total</span>
-                                                        <p className="text-xl font-bold text-[#1A1A1A]">₹{order.order.total.toLocaleString()}</p>
+                                                        <p className="text-xl font-bold text-[#1A1A1A]">${order.order.total.toLocaleString()}</p>
                                                     </div>
 
                                                     {order.status === 'pending' && (

@@ -74,13 +74,13 @@ export default function AboutPage() {
                             transition={{ duration: 0.6 }}
                         >
                             <span className="inline-block px-4 py-2 bg-white text-[#D29B6C] text-sm font-medium rounded-full mb-6">
-                                Since 1986
+                                Premium Footwear Destination
                             </span>
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A1A1A] mb-6 leading-tight">
-                                Our Heritage, <span className="text-[#D29B6C]">Your Story</span>
+                                Where Style Meets <span className="text-[#D29B6C]">Performance</span>
                             </h1>
                             <p className="text-lg md:text-xl text-[#4A4A4A] leading-relaxed">
-                                Elevated Gifting, Rooted in Tradition. A Refined Expression of Taste & Care — serving generations since 1986.
+                                Your trusted destination for authentic athletic footwear from Nike, Adidas, and Puma.
                             </p>
                         </motion.div>
                     </div>
@@ -97,17 +97,17 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                             className="relative"
                         >
-                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-white flex items-center justify-center p-4">
+                            <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#F9F7F4] to-white">
                                 <Image
-                                    src="/logo.png"
-                                    alt="Shivshakti Heritage"
+                                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600"
+                                    alt="DedayCart Premium Sneakers"
                                     fill
-                                    className="object-contain p-4"
+                                    className="object-cover"
                                 />
                             </div>
                             <div className="absolute -bottom-6 -right-6 bg-[#D29B6C] text-white p-6 rounded-xl shadow-lg hidden md:block">
-                                <p className="text-3xl font-bold">38+</p>
-                                <p className="text-sm opacity-90">Years of Excellence</p>
+                                <p className="text-3xl font-bold">1000+</p>
+                                <p className="text-sm opacity-90">Happy Customers</p>
                             </div>
                         </motion.div>
 
@@ -117,17 +117,17 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                             className="space-y-6"
                         >
-                            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A]">The Shivshakti Journey</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A]">The DedayCart Story</h2>
                             <div className="w-16 h-1 bg-[#D29B6C] rounded-full" />
                             <div className="text-[#4A4A4A] space-y-4 leading-relaxed">
                                 <p>
-                                    Shivshakti was established in Nagpur in 1986 as a trusted provision store, built on the values of quality, consistency, and care. Over the decades, we have earned the confidence of generations through our commitment to excellence and thoughtful service.
+                                    DedayCart was founded with a singular vision: to bring authentic, premium athletic footwear to sneaker enthusiasts across Canada. We believe that the right pair of shoes can transform not just your performance, but your entire day.
                                 </p>
                                 <p>
-                                    In 2008, we extended this legacy into curated gifting. What began as a natural progression soon became a defining part of our brand — premium hampers crafted with refined taste, attention to detail, and an understanding of meaningful celebrations.
+                                    As an authorized retailer of Nike, Adidas, and Puma, we guarantee 100% authentic products. Every sneaker in our collection is carefully selected for its quality, design, and performance capabilities. From running shoes engineered for speed to lifestyle sneakers that make a statement, we curate only the finest.
                                 </p>
                                 <p>
-                                    Today, Shiv Shakti represents elevated gifting rooted in tradition. From fine dry fruits and chocolates to thoughtfully designed hampers, every offering reflects our belief that gifting should feel personal, elegant, and timeless.
+                                    Today, DedayCart stands as Toronto's trusted destination for premium sneakers. With fast shipping, easy returns, and a commitment to customer satisfaction, we're redefining the sneaker shopping experience in Canada.
                                 </p>
                             </div>
                         </motion.div>
@@ -140,10 +140,10 @@ export default function AboutPage() {
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {[
-                            { value: 38, suffix: "+", label: "Years of Trust" },
-                            { value: 50000, suffix: "K+", label: "Happy Customers" },
-                            { value: 1000, suffix: "+", label: "Products Curated" },
-                            { value: 100, suffix: "%", label: "Quality Assured" },
+                            { value: 1000, suffix: "+", label: "Happy Customers" },
+                            { value: 12, suffix: "+", label: "Premium Styles" },
+                            { value: 3, suffix: "", label: "Top Brands" },
+                            { value: 100, suffix: "%", label: "Authentic Products" },
                         ].map((stat, i) => (
                             <motion.div
                                 key={i}
@@ -168,20 +168,20 @@ export default function AboutPage() {
                 <div className="container mx-auto px-6">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-4">What We Stand For</h2>
-                        <p className="text-[#717171] max-w-2xl mx-auto">Our core values define every product we curate and every customer interaction we have.</p>
+                        <p className="text-[#717171] max-w-2xl mx-auto">Our core values define every product we stock and every customer interaction we have.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
                                 icon: <ShieldCheck className="h-7 w-7" />,
-                                title: "Authentic Quality",
-                                description: "We source only the finest materials and work directly with verified suppliers to ensure every piece meets our premium standards."
+                                title: "100% Authentic",
+                                description: "As an authorized retailer, we guarantee genuine Nike, Adidas, and Puma products. Every sneaker comes with official brand authentication."
                             },
                             {
                                 icon: <Heart className="h-7 w-7" />,
-                                title: "Thoughtful Curation",
-                                description: "Every gift from Shivshakti is carefully curated with love and attention to detail, making each moment special."
+                                title: "Curated Selection",
+                                description: "Every sneaker at DedayCart is carefully selected for quality, style, and performance. We only stock what we'd wear ourselves."
                             },
                             {
                                 icon: <Users className="h-7 w-7" />,
@@ -215,16 +215,16 @@ export default function AboutPage() {
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-6">Why Choose Shivshakti?</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] mb-6">Why Choose DedayCart?</h2>
                             <p className="text-[#4A4A4A] mb-8 leading-relaxed">
-                                With nearly four decades of experience, we understand what makes gifting truly special. Our commitment to quality and customer satisfaction sets us apart.
+                                We're not just another sneaker store. We're passionate about helping you find the perfect pair that matches your style and performance needs.
                             </p>
                             <div className="space-y-4">
                                 {[
-                                    { icon: <Award className="h-5 w-5" />, text: "Premium quality products sourced from trusted suppliers" },
-                                    { icon: <Package className="h-5 w-5" />, text: "Elegant packaging that makes every gift memorable" },
-                                    { icon: <Clock className="h-5 w-5" />, text: "Timely delivery with careful handling" },
-                                    { icon: <Heart className="h-5 w-5" />, text: "Personalized service for all your gifting needs" },
+                                    { icon: <Award className="h-5 w-5" />, text: "100% authentic products from Nike, Adidas, and Puma" },
+                                    { icon: <Package className="h-5 w-5" />, text: "Secure packaging with fast 2-4 day delivery" },
+                                    { icon: <Clock className="h-5 w-5" />, text: "Easy 7-day returns for hassle-free shopping" },
+                                    { icon: <Heart className="h-5 w-5" />, text: "Expert customer support for all your sneaker questions" },
                                 ].map((item, i) => (
                                     <motion.div
                                         key={i}
@@ -246,13 +246,13 @@ export default function AboutPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="relative aspect-[1/1] rounded-2xl overflow-hidden shadow-lg bg-white"
+                            className="relative aspect-[1/1] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-[#F9F7F4] to-white"
                         >
                             <Image
-                                src="/logo.png"
-                                alt="Premium Gift Hampers"
+                                src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600"
+                                alt="Premium Sneakers Collection"
                                 fill
-                                className="object-contain p-4"
+                                className="object-cover"
                             />
                         </motion.div>
                     </div>
@@ -269,15 +269,15 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                         >
                             <Sparkles className="h-10 w-10 text-[#D29B6C] mx-auto mb-6" />
-                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Curating Excellence</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Step Into Your Best</h2>
                             <p className="text-white/70 text-lg mb-8 leading-relaxed">
-                                Thoughtfully selected, beautifully presented, and defined by uncompromising quality in every detail.
+                                Discover premium sneakers that combine style, comfort, and performance. Your perfect pair is waiting.
                             </p>
                             <Link
                                 href="/products"
                                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#D29B6C] text-white font-semibold rounded-lg hover:bg-[#B8845A] transition-colors"
                             >
-                                Explore Collections <ArrowRight className="h-5 w-5" />
+                                Shop Now <ArrowRight className="h-5 w-5" />
                             </Link>
                         </motion.div>
                     </div>

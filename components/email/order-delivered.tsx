@@ -28,7 +28,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
     address,
     orders = [],
     cost,
-    date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
+    date = new Date().toLocaleDateString('en-CA', { day: 'numeric', month: 'long', year: 'numeric' }),
 }) => {
     return (
         <div style={{
@@ -55,7 +55,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                     {/* Logo */}
                     <img
                         src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
-                        alt="Shivshakti"
+                        alt="DedayCart"
                         style={{
                             width: '120px',
                             height: 'auto',
@@ -122,7 +122,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                         color: '#4A3737',
                         margin: '20px 0 0',
                     }}>
-                        Thank you for shopping with Shivshakti. We look forward to serving you again soon!
+                        Thank you for shopping with DedayCart. We look forward to serving you again soon!
                     </p>
 
                     {/* Customer Details */}
@@ -194,13 +194,13 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                                             fontSize: '12px',
                                             color: '#6b7280',
                                             margin: '0',
-                                        }}>Qty: {item.units} × ₹{item.price}</p>
+                                        }}>Qty: {item.units} × ${item.price}</p>
                                     </div>
                                     <div style={{
                                         fontSize: '14px',
                                         color: '#2D1B1B',
                                         fontWeight: 'bold',
-                                    }}>₹{item.price * item.units}</div>
+                                    }}>${item.price * item.units}</div>
                                 </div>
                             ))}
 
@@ -225,7 +225,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                                             color: '#15803d',
                                             fontWeight: 'bold',
                                             fontFamily: '"Cinzel", serif',
-                                        }}>₹{cost.total}</span>
+                                        }}>${cost.total}</span>
                                     </div>
                                 </div>
                             )}
@@ -245,7 +245,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                         lineHeight: '1.5',
                         margin: '0 0 10px',
                     }}>
-                        &copy; {new Date().getFullYear()} Shivshakti Provision. All rights reserved.
+                        &copy; {new Date().getFullYear()} DedayCart Provision. All rights reserved.
                     </p>
                     <p style={{
                         fontSize: '12px',

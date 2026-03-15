@@ -382,7 +382,7 @@ export default function AdminEditProductPage() {
                     {productType === 'simple' ? (
                         <div>
                             <label className="block font-playfair text-sm font-semibold text-[#2D1B1B] mb-2">
-                                Price (₹) *
+                                Price ($) *
                             </label>
                             <input
                                 type="number"
@@ -429,7 +429,7 @@ export default function AdminEditProductPage() {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">Price (₹)</label>
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-[#4A3737]/60 mb-1">Price ($)</label>
                                                 <input
                                                     type="number"
                                                     required

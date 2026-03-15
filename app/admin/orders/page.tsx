@@ -7,6 +7,7 @@ import { ArrowLeft, Search, Filter, Download, ChevronDown, Loader2, ChevronLeft,
 import { formatDate } from '@/utils/date'
 import { sendOrderAcceptedEmail, sendOrderDeliveredEmail, sendCustomerCancellationEmail } from '@/utils/emailjs'
 import { useSearchParams } from 'next/navigation'
+import { getAllOrders, getOrdersByStatus, searchOrders } from '@/data/orders'
 
 interface Order {
     id: number
@@ -81,20 +82,39 @@ export default function AdminOrdersPage() {
     const fetchOrders = useCallback(async (page: number) => {
         setIsLoading(true)
         try {
-            const params = new URLSearchParams({
-                page: page.toString(),
-                limit: '20',
-                search: searchTerm,
-                status: statusFilter
-            })
+            // Get orders from local data
+            let filteredOrders = getAllOrders()
 
-            const response = await fetch(`/api/orders/list?${params}`)
-            const data = await response.json()
-
-            if (data.success) {
-                setOrders(data.orders || [])
-                setPagination(data.pagination)
+            // Apply search filter
+            if (searchTerm) {
+                filteredOrders = searchOrders(searchTerm)
             }
+
+            // Apply status filter
+            if (statusFilter && statusFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => order.status === statusFilter)
+            }
+
+            // Sort by created_at descending (newest first)
+            filteredOrders.sort((a, b) =>
+                new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            )
+
+            // Implement pagination
+            const limit = 20
+            const total = filteredOrders.length
+            const totalPages = Math.ceil(total / limit)
+            const startIndex = (page - 1) * limit
+            const endIndex = startIndex + limit
+            const paginatedOrders = filteredOrders.slice(startIndex, endIndex)
+
+            setOrders(paginatedOrders)
+            setPagination({
+                page,
+                limit,
+                total,
+                totalPages
+            })
         } catch (error) {
             console.error('Error fetching orders:', error)
         } finally {
@@ -108,85 +128,84 @@ export default function AdminOrdersPage() {
 
     const getStatusBadge = (status: string) => {
         const styles = {
-            pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-            processing: 'bg-blue-100 text-blue-700 border-blue-200',
-            completed: 'bg-green-100 text-green-700 border-green-200',
-            cancelled: 'bg-red-100 text-red-700 border-red-200'
+            pending: 'bg-orange-100 text-orange-800 border-2 border-orange-300',
+            confirmed: 'bg-blue-100 text-blue-800 border-2 border-blue-300',
+            shipped: 'bg-indigo-100 text-indigo-800 border-2 border-indigo-300',
+            delivered: 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300',
+            cancelled: 'bg-red-100 text-red-800 border-2 border-red-300'
         }
         return styles[status as keyof typeof styles] || styles.pending
     }
 
     const getPaymentStatusBadge = (status: string) => {
-        const s = status?.toLowerCase() || ''
-        if (s === 'store payment') {
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        const styles = {
+            paid: 'bg-emerald-100 text-emerald-800 border-2 border-emerald-300',
+            pending: 'bg-orange-100 text-orange-800 border-2 border-orange-300',
+            refunded: 'bg-purple-100 text-purple-800 border-2 border-purple-300',
+            failed: 'bg-red-100 text-red-800 border-2 border-red-300'
         }
-        return 'bg-emerald-50 text-emerald-700 border-emerald-100'
+        return styles[status?.toLowerCase() as keyof typeof styles] || styles.pending
     }
 
     const updateOrderStatus = async (orderId: number, newStatus: string) => {
         setUpdatingOrderId(orderId)
         try {
-            const response = await fetch(`/api/orders/${orderId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: newStatus }),
-            })
+            // Update order status in local state
+            const order = orders.find(o => o.id === orderId)
+            if (order && order.status !== newStatus) {
+                // Prepare order items for email
+                const emailOrders = order.order?.items?.map(item => ({
+                    name: (item as any).variation ? `${item.name} (${(item as any).variation.name})` : item.name,
+                    price: (item as any).variation ? (item as any).variation.price : item.price,
+                    units: item.quantity,
+                    image: (item as any).image
+                })) || []
 
-            if (response.ok) {
-                // Send emails based on new status if changed
-                const order = orders.find(o => o.id === orderId)
-                if (order && order.status !== newStatus) {
-                    // Prepare order items for email
-                    const emailOrders = order.order?.items?.map(item => ({
-                        name: (item as any).variation ? `${item.name} (${(item as any).variation.name})` : item.name,
-                        price: (item as any).variation ? (item as any).variation.price : item.price,
-                        units: item.quantity,
-                        image: (item as any).image
-                    })) || []
-
-                    const emailCost = {
-                        total: order.order?.total || 0
-                    }
-
-                    if (newStatus === 'processing') {
-                        await sendOrderAcceptedEmail({
-                            name: order.name,
-                            order_id: order.id,
-                            email: order.email || '',
-                            phone: order.phone,
-                            address: order.address,
-                            orders: emailOrders,
-                            cost: emailCost
-                        })
-                    } else if (newStatus === 'completed') {
-                        await sendOrderDeliveredEmail({
-                            name: order.name,
-                            order_id: order.id,
-                            email: order.email || '',
-                            phone: order.phone,
-                            address: order.address,
-                            orders: emailOrders,
-                            cost: emailCost
-                        })
-                    } else if (newStatus === 'cancelled') {
-                        await sendCustomerCancellationEmail({
-                            name: order.name,
-                            order_id: order.id,
-                            email: order.email || '',
-                            phone: order.phone,
-                            address: order.address,
-                            orders: emailOrders,
-                            cost: emailCost
-                        })
-                    }
+                const emailCost = {
+                    total: order.order?.total || 0
                 }
 
-                // Refresh current page
-                await fetchOrders(pagination.page)
+                if (newStatus === 'confirmed') {
+                    await sendOrderAcceptedEmail({
+                        name: order.name,
+                        order_id: order.id,
+                        email: order.email || '',
+                        phone: order.phone,
+                        address: order.address,
+                        orders: emailOrders,
+                        cost: emailCost
+                    })
+                } else if (newStatus === 'delivered') {
+                    await sendOrderDeliveredEmail({
+                        name: order.name,
+                        order_id: order.id,
+                        email: order.email || '',
+                        phone: order.phone,
+                        address: order.address,
+                        orders: emailOrders,
+                        cost: emailCost
+                    })
+                } else if (newStatus === 'cancelled') {
+                    await sendCustomerCancellationEmail({
+                        name: order.name,
+                        order_id: order.id,
+                        email: order.email || '',
+                        phone: order.phone,
+                        address: order.address,
+                        orders: emailOrders,
+                        cost: emailCost
+                    })
+                }
             }
+
+            // Update local state
+            setOrders(prevOrders =>
+                prevOrders.map(o =>
+                    o.id === orderId ? { ...o, status: newStatus } : o
+                )
+            )
+
+            // Note: This change won't persist on page reload
         } catch (error) {
             console.error('Error updating order status:', error)
         } finally {
@@ -263,8 +282,9 @@ export default function AdminOrdersPage() {
                             >
                                 <option value="all">All Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="completed">Completed</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
@@ -356,7 +376,7 @@ export default function AdminOrdersPage() {
                                                 </div>
                                             </td>
 
-                                            <td className="py-6 px-6 font-cinzel text-sm text-[#2D1B1B] font-bold">₹{order.order?.total || 0}</td>
+                                            <td className="py-6 px-6 font-cinzel text-sm text-[#2D1B1B] font-bold">${order.order?.total || 0}</td>
                                             <td className="py-6 px-6 font-playfair text-xs text-[#4A3737]/60 italic font-medium">
                                                 {formatDate(order.created_at)}
                                             </td>
@@ -371,11 +391,17 @@ export default function AdminOrdersPage() {
                                                         value={order.status}
                                                         onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                                                         disabled={updatingOrderId === order.id}
-                                                        className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                        className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                        style={{
+                                                            WebkitAppearance: 'none',
+                                                            MozAppearance: 'none',
+                                                            appearance: 'none'
+                                                        }}
                                                     >
                                                         <option value="pending">Pending</option>
-                                                        <option value="processing">Processing</option>
-                                                        <option value="completed">Completed</option>
+                                                        <option value="confirmed">Confirmed</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
                                                         <option value="cancelled">Cancelled</option>
                                                     </select>
                                                     <div className="absolute right-3 pointer-events-none">
