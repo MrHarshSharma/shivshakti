@@ -3,9 +3,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Search, Filter, Download, ChevronDown, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Search, Filter, Download, ChevronDown, Loader2, ChevronLeft, ChevronRight, X, Package } from 'lucide-react'
 import { formatDate } from '@/utils/date'
-import { sendOrderAcceptedEmail, sendOrderDeliveredEmail, sendCustomerCancellationEmail } from '@/utils/emailjs'
+import { sendOrderAcceptedEmail, sendOrderDeliveredEmail, sendCustomerCancellationEmail, sendOrderShippedEmail } from '@/utils/emailjs'
 import { useSearchParams } from 'next/navigation'
 
 interface Order {
@@ -52,6 +52,11 @@ export default function AdminOrdersPage() {
     const [searchInput, setSearchInput] = useState('') // For debounced input
     const [statusFilter, setStatusFilter] = useState('all')
     const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null)
+
+    // Tracking modal state
+    const [showTrackingModal, setShowTrackingModal] = useState(false)
+    const [trackingId, setTrackingId] = useState('')
+    const [pendingShipOrder, setPendingShipOrder] = useState<Order | null>(null)
 
     const searchParams = useSearchParams()
 
@@ -109,8 +114,9 @@ export default function AdminOrdersPage() {
     const getStatusBadge = (status: string) => {
         const styles = {
             pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-            processing: 'bg-blue-100 text-blue-700 border-blue-200',
-            completed: 'bg-green-100 text-green-700 border-green-200',
+            preparing: 'bg-blue-100 text-blue-700 border-blue-200',
+            shipped: 'bg-purple-100 text-purple-700 border-purple-200',
+            delivered: 'bg-green-100 text-green-700 border-green-200',
             cancelled: 'bg-red-100 text-red-700 border-red-200'
         }
         return styles[status as keyof typeof styles] || styles.pending
@@ -124,7 +130,32 @@ export default function AdminOrdersPage() {
         return 'bg-emerald-50 text-emerald-700 border-emerald-100'
     }
 
-    const updateOrderStatus = async (orderId: number, newStatus: string) => {
+    const handleStatusChange = (orderId: number, newStatus: string) => {
+        const order = orders.find(o => o.id === orderId)
+        if (!order) return
+
+        // If changing to shipped, show tracking modal
+        if (newStatus === 'shipped') {
+            setPendingShipOrder(order)
+            setTrackingId('')
+            setShowTrackingModal(true)
+            return
+        }
+
+        // Otherwise proceed with normal status update
+        updateOrderStatus(orderId, newStatus)
+    }
+
+    const handleTrackingSubmit = async () => {
+        if (!pendingShipOrder || !trackingId.trim()) return
+
+        setShowTrackingModal(false)
+        await updateOrderStatus(pendingShipOrder.id, 'shipped', trackingId.trim())
+        setPendingShipOrder(null)
+        setTrackingId('')
+    }
+
+    const updateOrderStatus = async (orderId: number, newStatus: string, trackingIdParam?: string) => {
         setUpdatingOrderId(orderId)
         try {
             const response = await fetch(`/api/orders/${orderId}`, {
@@ -132,7 +163,10 @@ export default function AdminOrdersPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ status: newStatus }),
+                body: JSON.stringify({
+                    status: newStatus,
+                    ...(trackingIdParam && { tracking_id: trackingIdParam })
+                }),
             })
 
             if (response.ok) {
@@ -151,7 +185,7 @@ export default function AdminOrdersPage() {
                         total: order.order?.total || 0
                     }
 
-                    if (newStatus === 'processing') {
+                    if (newStatus === 'preparing') {
                         await sendOrderAcceptedEmail({
                             name: order.name,
                             order_id: order.id,
@@ -161,7 +195,18 @@ export default function AdminOrdersPage() {
                             orders: emailOrders,
                             cost: emailCost
                         })
-                    } else if (newStatus === 'completed') {
+                    } else if (newStatus === 'shipped' && trackingIdParam) {
+                        await sendOrderShippedEmail({
+                            name: order.name,
+                            order_id: order.id,
+                            email: order.email || '',
+                            tracking_id: trackingIdParam,
+                            phone: order.phone,
+                            address: order.address,
+                            orders: emailOrders,
+                            cost: emailCost
+                        })
+                    } else if (newStatus === 'delivered') {
                         await sendOrderDeliveredEmail({
                             name: order.name,
                             order_id: order.id,
@@ -263,8 +308,9 @@ export default function AdminOrdersPage() {
                             >
                                 <option value="all">All Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="completed">Completed</option>
+                                <option value="preparing">Preparing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
                                 <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
@@ -369,13 +415,14 @@ export default function AdminOrdersPage() {
                                                 <div className="relative inline-flex items-center group">
                                                     <select
                                                         value={order.status}
-                                                        onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                                                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
                                                         disabled={updatingOrderId === order.id}
                                                         className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
                                                     >
                                                         <option value="pending">Pending</option>
-                                                        <option value="processing">Processing</option>
-                                                        <option value="completed">Completed</option>
+                                                        <option value="preparing">Preparing</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
                                                         <option value="cancelled">Cancelled</option>
                                                     </select>
                                                     <div className="absolute right-3 pointer-events-none">
@@ -451,6 +498,100 @@ export default function AdminOrdersPage() {
                     )}
                 </div>
             </div>
+
+            {/* Tracking ID Modal */}
+            {showTrackingModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={() => {
+                            setShowTrackingModal(false)
+                            setPendingShipOrder(null)
+                            setTrackingId('')
+                        }}
+                    />
+
+                    {/* Modal */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+                    >
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-white/20 rounded-lg">
+                                        <Package className="h-5 w-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-white">Ship Order</h3>
+                                        <p className="text-purple-200 text-sm">Order #{pendingShipOrder?.id}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setShowTrackingModal(false)
+                                        setPendingShipOrder(null)
+                                        setTrackingId('')
+                                    }}
+                                    className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                                >
+                                    <X className="h-5 w-5 text-white" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6">
+                            <div className="mb-4">
+                                <p className="text-sm text-gray-600 mb-1">Customer</p>
+                                <p className="font-semibold text-gray-900">{pendingShipOrder?.name}</p>
+                            </div>
+
+                            <div className="mb-6">
+                                <label htmlFor="tracking-id" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Tracking ID <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    id="tracking-id"
+                                    type="text"
+                                    value={trackingId}
+                                    onChange={(e) => setTrackingId(e.target.value)}
+                                    placeholder="Enter tracking ID..."
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg font-mono tracking-wider"
+                                    autoFocus
+                                />
+                                <p className="mt-2 text-xs text-gray-500">
+                                    This tracking ID will be sent to the customer via email.
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowTrackingModal(false)
+                                        setPendingShipOrder(null)
+                                        setTrackingId('')
+                                    }}
+                                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleTrackingSubmit}
+                                    disabled={!trackingId.trim()}
+                                    className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    <Package className="h-4 w-4" />
+                                    Ship Order
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
         </div>
     )
 }

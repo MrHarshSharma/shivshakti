@@ -8,7 +8,7 @@ export async function PATCH(
     try {
         const { id } = await params
         const body = await request.json()
-        const { status } = body
+        const { status, tracking_id } = body
 
         if (!status) {
             return NextResponse.json(
@@ -19,9 +19,15 @@ export async function PATCH(
 
         const supabase = createServiceRoleClient()
 
+        // Build update object
+        const updateData: { status: string; tracking_id?: string } = { status }
+        if (tracking_id) {
+            updateData.tracking_id = tracking_id
+        }
+
         const { data, error } = await supabase
             .from('orders')
-            .update({ status })
+            .update(updateData)
             .eq('id', id)
             .select()
             .single()

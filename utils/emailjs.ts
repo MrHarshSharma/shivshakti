@@ -4,6 +4,7 @@ import { OrderReceivedEmail } from '@/components/email/order-received'
 import { OrderAcceptedEmail } from '@/components/email/order-accepted'
 import { OrderDeliveredEmail } from '@/components/email/order-delivered'
 import { CustomerOrderCancelledEmail } from '@/components/email/customer-order-cancelled'
+import { OrderShippedEmail } from '@/components/email/order-shipped'
 import React from 'react'
 
 interface OrderEmailData {
@@ -124,6 +125,66 @@ export async function sendOrderAcceptedEmail(data: {
         return true
     } catch (error) {
         console.error('Failed to send accepted email:', error)
+        return false
+    }
+}
+
+export async function sendOrderShippedEmail(data: {
+    name: string;
+    order_id: number;
+    email: string;
+    tracking_id: string;
+    phone?: string;
+    address?: string;
+    orders?: Array<{
+        name: string;
+        price: number;
+        units: number;
+        image?: string;
+    }>;
+    cost?: {
+        total: number;
+        subtotal?: number;
+        discount?: number;
+        shipping?: number;
+        tax?: number;
+    };
+}): Promise<boolean> {
+    try {
+        const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+        const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+        const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+        if (!serviceId || !templateId || !publicKey) return false
+
+        const messageHtml = renderToStaticMarkup(
+            React.createElement(OrderShippedEmail, {
+                name: data.name,
+                order_id: data.order_id,
+                tracking_id: data.tracking_id,
+                phone: data.phone,
+                address: data.address,
+                orders: data.orders,
+                cost: data.cost
+            })
+        )
+
+        const templateParams = {
+            name: data.name,
+            order_id: data.order_id,
+            message_html: messageHtml,
+            to_email: data.email,
+            subject: `Order #${data.order_id} Shipped - Tracking ID: ${data.tracking_id} - Shivshakti`,
+            from_name: 'Shivshakti',
+            reply_to: process.env.NEXT_PUBLIC_ADMIN_EMAIL || ''
+        }
+
+        console.log('Sending Shipped Email Params:', JSON.stringify(templateParams, null, 2))
+
+        await emailjs.send(serviceId, templateId, templateParams, publicKey)
+        return true
+    } catch (error) {
+        console.error('Failed to send shipped email:', error)
         return false
     }
 }
