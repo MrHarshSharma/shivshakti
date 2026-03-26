@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
@@ -16,6 +16,11 @@ interface ProductsClientProps {
     searchQuery: string
 }
 
+// Capitalize first letter of each word
+const toTitleCase = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
 export default function ProductsClient({
     products,
     currentPage,
@@ -25,8 +30,29 @@ export default function ProductsClient({
     searchQuery
 }: ProductsClientProps) {
     const router = useRouter()
+    const [categories, setCategories] = useState<string[]>(['All'])
+    const [activeCategory, setActiveCategory] = useState(currentCategory)
 
-    const categories = ['All', 'Hampers', 'Gourmet', 'Dry fruits']
+    // Sync activeCategory with URL when prop changes (back/forward navigation)
+    useEffect(() => {
+        setActiveCategory(currentCategory)
+    }, [currentCategory])
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('/api/categories')
+                const data = await response.json()
+                if (data.success && data.categories) {
+                    const categoryNames = data.categories.map((c: { category: string }) => c.category)
+                    setCategories(['All', ...categoryNames])
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error)
+            }
+        }
+        fetchCategories()
+    }, [])
 
     const buildUrl = (params: { page?: number; category?: string; search?: string }) => {
         const url = new URLSearchParams()
@@ -43,6 +69,7 @@ export default function ProductsClient({
     }
 
     const handleCategoryChange = (category: string) => {
+        setActiveCategory(category) // Instant UI update
         router.push(buildUrl({ category, page: 1 }))
     }
 
@@ -87,19 +114,19 @@ export default function ProductsClient({
                                 <button
                                     key={category}
                                     onClick={() => handleCategoryChange(category)}
-                                    className={`relative px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 whitespace-nowrap ${currentCategory === category
+                                    className={`relative px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 whitespace-nowrap ${activeCategory === category
                                         ? 'text-white'
                                         : 'text-[#4A4A4A] hover:text-[#D29B6C]'
                                         }`}
                                 >
-                                    {currentCategory === category && (
+                                    {activeCategory === category && (
                                         <motion.div
                                             layoutId="activeTab"
                                             className="absolute inset-0 bg-[#D29B6C] rounded-lg"
                                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                         />
                                     )}
-                                    <span className="relative z-10">{category}</span>
+                                    <span className="relative z-10">{toTitleCase(category)}</span>
                                 </button>
                             ))}
                         </div>

@@ -6,9 +6,9 @@ import { Upload, X, Plus, Save, Loader2, ChevronDown, ArrowLeft, FileSpreadsheet
 import Image from 'next/image'
 import Link from 'next/link'
 
-const PREDEFINED_CATEGORIES = ['Gourmet', 'Hampers', 'Dry fruits', 'Other']
-
 export default function AdminAddProductPage() {
+    const [availableCategories, setAvailableCategories] = useState<string[]>([])
+    const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
     const [productType, setProductType] = useState<'simple' | 'variable'>('simple')
     const [formData, setFormData] = useState({
         name: '',
@@ -29,6 +29,7 @@ export default function AdminAddProductPage() {
     }>>([{ id: '1', name: '', price: '', stock: '', sku: '', is_default: true }])
     const [images, setImages] = useState<string[]>([])
     const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [isDragging, setIsDragging] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [showDropdown, setShowDropdown] = useState(false)
@@ -58,6 +59,24 @@ export default function AdminAddProductPage() {
         autoResizeTextarea(e.target)
     }
 
+    // Fetch categories from database
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('/api/categories')
+                const data = await response.json()
+                if (data.success) {
+                    setAvailableCategories(data.categories.map((c: { category: string }) => c.category))
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error)
+            } finally {
+                setIsCategoriesLoading(false)
+            }
+        }
+        fetchCategories()
+    }, [])
+
     // Handle clicking outside of dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -72,12 +91,48 @@ export default function AdminAddProductPage() {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
         if (!files) return
+        processFiles(files)
+    }
 
-        const newFiles = Array.from(files)
-        const newImageUrls = newFiles.map(file => URL.createObjectURL(file))
+    const processFiles = (files: FileList | File[]) => {
+        const validFiles = Array.from(files).filter(file =>
+            file.type.startsWith('image/')
+        )
+        if (validFiles.length === 0) return
 
-        setImageFiles(prev => [...prev, ...newFiles])
+        const newImageUrls = validFiles.map(file => URL.createObjectURL(file))
+        setImageFiles(prev => [...prev, ...validFiles])
         setImages(prev => [...prev, ...newImageUrls])
+    }
+
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(true)
+    }
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        // Only set dragging to false if we're leaving the drop zone entirely
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return
+        setIsDragging(false)
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragging(false)
+
+        const files = e.dataTransfer.files
+        if (files && files.length > 0) {
+            processFiles(files)
+        }
     }
 
     const removeImage = (index: number) => {
@@ -692,22 +747,28 @@ export default function AdminAddProductPage() {
                             {/* Dropdown */}
                             {showDropdown && (
                                 <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-white border border-orange-100 rounded-xl shadow-xl overflow-hidden py-1">
-                                    {PREDEFINED_CATEGORIES.map((cat) => (
-                                        <button
-                                            key={cat}
-                                            type="button"
-                                            onClick={() => addCategory(cat)}
-                                            className="w-full text-left px-4 py-3 font-playfair text-sm hover:bg-orange-50 transition-colors flex items-center justify-between group"
-                                        >
-                                            <span className={formData.categories.includes(cat) ? 'text-saffron font-bold' : 'text-[#4A3737]'}>
-                                                {cat}
-                                            </span>
-                                            {formData.categories.includes(cat) && (
-                                                <span className="text-[10px] bg-orange-100 text-saffron px-2 py-0.5 rounded-full font-bold">Selected</span>
-                                            )}
-                                        </button>
-                                    ))}
-                                    {PREDEFINED_CATEGORIES.length > 0 && formData.categoryInput && !PREDEFINED_CATEGORIES.some(c => c.toLowerCase() === formData.categoryInput.trim().toLowerCase()) && (
+                                    {isCategoriesLoading ? (
+                                        <div className="px-4 py-3 text-center text-[#4A3737]/50 text-sm">Loading categories...</div>
+                                    ) : availableCategories.length === 0 ? (
+                                        <div className="px-4 py-3 text-center text-[#4A3737]/50 text-sm">No categories found. Add one below.</div>
+                                    ) : (
+                                        availableCategories.map((cat) => (
+                                            <button
+                                                key={cat}
+                                                type="button"
+                                                onClick={() => addCategory(cat)}
+                                                className="w-full text-left px-4 py-3 font-playfair text-sm hover:bg-orange-50 transition-colors flex items-center justify-between group"
+                                            >
+                                                <span className={formData.categories.includes(cat) ? 'text-saffron font-bold' : 'text-[#4A3737]'}>
+                                                    {cat}
+                                                </span>
+                                                {formData.categories.includes(cat) && (
+                                                    <span className="text-[10px] bg-orange-100 text-saffron px-2 py-0.5 rounded-full font-bold">Selected</span>
+                                                )}
+                                            </button>
+                                        ))
+                                    )}
+                                    {formData.categoryInput && !availableCategories.some(c => c.toLowerCase() === formData.categoryInput.trim().toLowerCase()) && (
                                         <div className="border-t border-orange-50 p-2">
                                             <button
                                                 type="button"
@@ -748,11 +809,22 @@ export default function AdminAddProductPage() {
                             Product Images *
                         </label>
 
-                        {/* Upload Button */}
-                        <label className="block w-full cursor-pointer">
-                            <div className="border-2 border-dashed border-orange-200 rounded-lg p-8 text-center hover:border-saffron transition-colors bg-orange-50/30">
-                                <Upload className="h-12 w-12 text-saffron mx-auto mb-3" />
-                                <p className="font-playfair text-[#2D1B1B] font-semibold mb-1">Click to upload images</p>
+                        {/* Upload Button with Drag & Drop */}
+                        <label
+                            className="block w-full cursor-pointer"
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                        >
+                            <div className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${isDragging
+                                ? 'border-saffron bg-saffron/10 scale-[1.02]'
+                                : 'border-orange-200 hover:border-saffron bg-orange-50/30'
+                                }`}>
+                                <Upload className={`h-12 w-12 mx-auto mb-3 transition-colors ${isDragging ? 'text-saffron animate-bounce' : 'text-saffron'}`} />
+                                <p className="font-playfair text-[#2D1B1B] font-semibold mb-1">
+                                    {isDragging ? 'Drop images here' : 'Drag & drop or click to upload'}
+                                </p>
                                 <p className="text-sm text-[#4A3737]/70">PNG, JPG up to 10MB (multiple files allowed)</p>
                             </div>
                             <input
