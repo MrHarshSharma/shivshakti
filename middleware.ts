@@ -6,6 +6,45 @@ export async function middleware(request: NextRequest) {
     const { nextUrl } = request
     const response = await updateSession(request)
 
+    // Check if the logged-in user is blocked
+    const supabaseCheck = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return request.cookies.getAll()
+                },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value)
+                    )
+                },
+            },
+        }
+    )
+
+    const { data: { user: currentUser } } = await supabaseCheck.auth.getUser()
+
+    if (currentUser?.email && !nextUrl.pathname.startsWith('/blocked') && !nextUrl.pathname.startsWith('/auth')) {
+        try {
+            const { createServiceRoleClient } = await import('@/utils/supabase/service-role')
+            const serviceRole = createServiceRoleClient()
+            const { data: userData } = await serviceRole
+                .from('users')
+                .select('user_roles')
+                .eq('email', currentUser.email.toLowerCase())
+                .single()
+
+            if (userData?.user_roles === 'blocked') {
+                await supabaseCheck.auth.signOut()
+                return NextResponse.redirect(new URL('/blocked', request.url))
+            }
+        } catch (e) {
+            // Don't block navigation if check fails
+        }
+    }
+
     // Protect all /admin routes and sensitive admin APIs
     const isAdminRoute = nextUrl.pathname.startsWith('/admin')
     const isUserOrderRoute = nextUrl.pathname.startsWith('/my-orders')
@@ -42,12 +81,36 @@ export async function middleware(request: NextRequest) {
 
         // 2. Admin Check for Admin Routes/APIs
         if (isAdminRoute || isAdminApi) {
-            if (!user || !user.email || !adminEmails.includes(user.email)) {
-                // For API routes, return a JSON error
+            let hasAccess = false
+
+            if (user?.email) {
+                // Super admins always have access
+                if (adminEmails.includes(user.email)) {
+                    hasAccess = true
+                } else {
+                    // Check user_roles column for admin or editor role
+                    try {
+                        const { createServiceRoleClient } = await import('@/utils/supabase/service-role')
+                        const serviceRole = createServiceRoleClient()
+                        const { data: userData } = await serviceRole
+                            .from('users')
+                            .select('user_roles')
+                            .eq('email', user.email.toLowerCase())
+                            .single()
+
+                        if (userData?.user_roles === 'admin' || userData?.user_roles === 'editor') {
+                            hasAccess = true
+                        }
+                    } catch (e) {
+                        // Access denied if check fails
+                    }
+                }
+            }
+
+            if (!hasAccess) {
                 if (isAdminApi) {
                     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
                 }
-                // For page routes, redirect to home
                 return NextResponse.redirect(new URL('/', request.url))
             }
         }

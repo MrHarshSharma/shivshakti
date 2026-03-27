@@ -25,7 +25,7 @@ interface SearchProduct {
 
 export default function Navbar() {
     const { toggleCart, cartCount } = useCart()
-    const { user, loginWithGoogle, logout, isAdmin, loading } = useAuth()
+    const { user, loginWithGoogle, logout, isAdmin, isEditor, loading } = useAuth()
     const [showProfilePopup, setShowProfilePopup] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -335,7 +335,7 @@ export default function Navbar() {
                                                             {user.email}
                                                         </p>
                                                     </div>
-                                                    {!isAdmin && (
+                                                    {!isEditor && (
                                                         <Link
                                                             href="/my-orders"
                                                             onClick={() => setShowProfilePopup(false)}
@@ -344,13 +344,13 @@ export default function Navbar() {
                                                             My Orders
                                                         </Link>
                                                     )}
-                                                    {isAdmin && (
+                                                    {isEditor && (
                                                         <Link
                                                             href="/admin"
                                                             onClick={() => setShowProfilePopup(false)}
                                                             className="block px-4 py-2.5 text-sm text-[#4A4A4A] hover:bg-[#F8F8F8] transition-colors"
                                                         >
-                                                            Admin Dashboard
+                                                            Dashboard
                                                         </Link>
                                                     )}
                                                     <button
@@ -414,7 +414,7 @@ export default function Navbar() {
                                 </Link>
                             )
                         })}
-                        {user && !isAdmin && (
+                        {user && !isEditor && (
                             <Link
                                 href="/my-orders"
                                 className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/my-orders'
@@ -426,7 +426,7 @@ export default function Navbar() {
                                 TRACK ORDER
                             </Link>
                         )}
-                        {isAdmin && (
+                        {isEditor && (
                             <Link
                                 href="/admin"
                                 className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/admin'
@@ -593,7 +593,7 @@ export default function Navbar() {
                                         </Link>
                                     )
                                 })}
-                                {user && !isAdmin && (
+                                {user && !isEditor && (
                                     <Link
                                         href="/my-orders"
                                         onClick={() => setIsMenuOpen(false)}
@@ -606,7 +606,7 @@ export default function Navbar() {
                                         Track Order
                                     </Link>
                                 )}
-                                {isAdmin && (
+                                {isEditor && (
                                     <Link
                                         href="/admin"
                                         onClick={() => setIsMenuOpen(false)}
@@ -616,7 +616,7 @@ export default function Navbar() {
                                             }`}
                                     >
                                         <LayoutDashboard className="w-5 h-5" />
-                                        Admin Dashboard
+                                        Dashboard
                                     </Link>
                                 )}
                             </div>

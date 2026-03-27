@@ -25,6 +25,19 @@ export async function GET(request: Request) {
                         avatar_url: user.user_metadata.avatar_url,
                         last_login: new Date().toISOString()
                     }, { onConflict: 'id' })
+
+                // Check if the user is blocked
+                const { data: userData } = await serviceRole
+                    .from('users')
+                    .select('user_roles')
+                    .eq('email', user.email!.toLowerCase())
+                    .single()
+
+                if (userData?.user_roles === 'blocked') {
+                    // Sign out the blocked user
+                    await supabase.auth.signOut()
+                    return NextResponse.redirect(`${origin}/blocked`)
+                }
             } catch (syncError) {
                 console.error('Error syncing user data:', syncError)
                 // Don't block login if sync fails

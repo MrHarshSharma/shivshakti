@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/context/auth-context'
 import {
     ShoppingBag,
     Package,
@@ -11,7 +12,9 @@ import {
     Clock,
     Plus,
     Ticket,
-    Tag
+    Tag,
+    Users,
+    Loader2
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -30,6 +33,7 @@ export default function AdminDashboard() {
         totalProducts: 0
     })
     const [isLoading, setIsLoading] = useState(true)
+    const { isAdmin } = useAuth()
 
     useEffect(() => {
         fetchDashboardData()
@@ -136,7 +140,13 @@ export default function AdminDashboard() {
                                 </span>
                             </div>
                             <h3 className="text-[#4A3737]/60 text-xs font-bold uppercase tracking-widest mb-1 font-playfair">{stat.title}</h3>
-                            <p className="text-3xl font-bold text-[#2D1B1B] font-cinzel tracking-tight">{stat.value}</p>
+                            <div className="h-9 flex items-center">
+                                {isLoading ? (
+                                    <Loader2 className={`h-6 w-6 animate-spin ${stat.color}`} />
+                                ) : (
+                                    <p className="text-3xl font-bold text-[#2D1B1B] font-cinzel tracking-tight">{stat.value}</p>
+                                )}
+                            </div>
 
                             {/* Decorative line */}
                             <div className={`absolute bottom-0 left-8 right-8 h-1 rounded-t-full transition-all duration-500 opacity-0 group-hover:opacity-100 ${stat.accent === 'emerald' ? 'bg-emerald-400' :
@@ -243,6 +253,26 @@ export default function AdminDashboard() {
                             </div>
                         </motion.div>
                     </Link>
+
+                    {isAdmin && (
+                    <Link href="/admin/users">
+                        <motion.div
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            className="relative h-48 bg-gradient-to-br from-slate-500 via-slate-600 to-slate-800 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
+                        >
+                            <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
+                                <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                                    <Users className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-cinzel text-2xl font-bold mb-1 text-white">Manage Users</h3>
+                                    <p className="text-white/80 text-sm font-playfair">Control access & roles</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </Link>
+                    )}
                 </div>
             </div>
         </div>
