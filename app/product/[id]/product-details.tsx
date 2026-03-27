@@ -45,6 +45,22 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     const [showSuccess, setShowSuccess] = useState(false)
     const [[page, direction], setPage] = useState([0, 0])
 
+    // Hover zoom state
+    const [isZooming, setIsZooming] = useState(false)
+    const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
+    const imageContainerRef = React.useRef<HTMLDivElement>(null)
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!imageContainerRef.current) return
+        const rect = imageContainerRef.current.getBoundingClientRect()
+        const x = ((e.clientX - rect.left) / rect.width) * 100
+        const y = ((e.clientY - rect.top) / rect.height) * 100
+        setZoomPosition({ x, y })
+    }
+
+    const handleMouseEnter = () => setIsZooming(true)
+    const handleMouseLeave = () => setIsZooming(false)
+
     const id = product.id.toString()
 
     const paginate = (newDirection: number) => {
@@ -134,7 +150,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
                     {/* Image Section */}
                     <div className="space-y-4">
-                        <div className="relative aspect-square bg-[#F8F8F8] rounded-xl overflow-hidden group">
+                        <div
+                            ref={imageContainerRef}
+                            className="relative aspect-square bg-[#F8F8F8] rounded-xl overflow-hidden group cursor-zoom-in"
+                            onMouseMove={handleMouseMove}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.div
                                     key={page}
@@ -158,7 +180,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                         x: { type: "spring", stiffness: 300, damping: 30 },
                                         opacity: { duration: 0.2 }
                                     }}
-                                    className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                                    className="absolute inset-0"
                                 >
                                     <Image
                                         src={product.images && product.images.length > 0 ? product.images[imageIndex] : '/placeholder-product.png'}
@@ -170,18 +192,35 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                 </motion.div>
                             </AnimatePresence>
 
+                            {/* Hover Zoom Overlay */}
+                            {isZooming && (
+                                <div
+                                    className="absolute inset-0 z-20 pointer-events-none"
+                                    style={{
+                                        backgroundImage: `url(${product.images && product.images.length > 0 ? product.images[imageIndex] : '/placeholder-product.png'})`,
+                                        backgroundSize: '250%',
+                                        backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                                        backgroundRepeat: 'no-repeat',
+                                    }}
+                                />
+                            )}
+
                             {/* Navigation Arrows */}
                             {product.images && product.images.length > 1 && (
                                 <>
                                     <button
                                         onClick={() => paginate(-1)}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
+                                        onMouseEnter={() => setIsZooming(false)}
+                                        onMouseLeave={() => setIsZooming(true)}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronLeft className="h-5 w-5" />
                                     </button>
                                     <button
                                         onClick={() => paginate(1)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
+                                        onMouseEnter={() => setIsZooming(false)}
+                                        onMouseLeave={() => setIsZooming(true)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white shadow-md text-[#4A4A4A] hover:text-[#D29B6C] transition-all opacity-0 group-hover:opacity-100"
                                     >
                                         <ChevronRight className="h-5 w-5" />
                                     </button>
@@ -190,14 +229,14 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
                             {/* Badges */}
                             {product.isNew && (
-                                <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#D29B6C] text-white text-xs font-semibold rounded-md z-10">
+                                <span className="absolute top-4 left-4 px-3 py-1.5 bg-[#D29B6C] text-white text-xs font-semibold rounded-md z-30">
                                     NEW
                                 </span>
                             )}
 
                             {/* Image Counter */}
                             {product.images && product.images.length > 1 && (
-                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 bg-black/50 rounded-full text-white text-xs font-medium">
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 bg-black/50 rounded-full text-white text-xs font-medium">
                                     {imageIndex + 1} / {product.images.length}
                                 </div>
                             )}
