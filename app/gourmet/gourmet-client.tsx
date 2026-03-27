@@ -4,76 +4,61 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
-import { Package, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Package, Search, X, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-interface ProductsClientProps {
+interface GourmetClientProps {
     products: Product[]
     currentPage: number
     totalPages: number
     totalProducts: number
-    currentCategory: string
     searchQuery: string
+    currentSort: 'latest' | 'oldest'
 }
 
-// Capitalize first letter of each word
-const toTitleCase = (str: string) => {
-    return str.replace(/\b\w/g, (char) => char.toUpperCase())
-}
-
-export default function ProductsClient({
+export default function GourmetClient({
     products,
     currentPage,
     totalPages,
     totalProducts,
-    currentCategory,
-    searchQuery
-}: ProductsClientProps) {
+    searchQuery,
+    currentSort
+}: GourmetClientProps) {
     const router = useRouter()
-    const [categories, setCategories] = useState<string[]>(['All'])
-    const [activeCategory, setActiveCategory] = useState(currentCategory)
+    const [localSearch, setLocalSearch] = useState(searchQuery)
+    const [activeSort, setActiveSort] = useState(currentSort)
 
-    // Sync activeCategory with URL when prop changes (back/forward navigation)
+    // Sync local state with props
     useEffect(() => {
-        setActiveCategory(currentCategory)
-    }, [currentCategory])
+        setLocalSearch(searchQuery)
+    }, [searchQuery])
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await fetch('/api/categories')
-                const data = await response.json()
-                if (data.success && data.categories) {
-                    // Exclude Gourmet - it has its own dedicated page at /gourmet
-                    const categoryNames = data.categories
-                        .map((c: { category: string }) => c.category)
-                        .filter((name: string) => name.toLowerCase() !== 'gourmet')
-                    setCategories(['All', ...categoryNames])
-                }
-            } catch (error) {
-                console.error('Error fetching categories:', error)
-            }
-        }
-        fetchCategories()
-    }, [])
+        setActiveSort(currentSort)
+    }, [currentSort])
 
-    const buildUrl = (params: { page?: number; category?: string; search?: string }) => {
+    const buildUrl = (params: { page?: number; search?: string; sort?: string }) => {
         const url = new URLSearchParams()
         const page = params.page ?? currentPage
-        const category = params.category ?? currentCategory
         const search = params.search ?? searchQuery
+        const sort = params.sort ?? currentSort
 
         if (page > 1) url.set('page', page.toString())
-        if (category && category !== 'All') url.set('category', category)
         if (search) url.set('search', search)
+        if (sort && sort !== 'latest') url.set('sort', sort)
 
         const queryString = url.toString()
-        return `/products${queryString ? `?${queryString}` : ''}`
+        return `/gourmet${queryString ? `?${queryString}` : ''}`
     }
 
-    const handleCategoryChange = (category: string) => {
-        setActiveCategory(category) // Instant UI update
-        router.push(buildUrl({ category, page: 1 }))
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        router.push(buildUrl({ search: localSearch.trim(), page: 1 }))
+    }
+
+    const handleSortChange = (sort: 'latest' | 'oldest') => {
+        setActiveSort(sort)
+        router.push(buildUrl({ sort, page: 1 }))
     }
 
     const handlePageChange = (page: number) => {
@@ -81,6 +66,7 @@ export default function ProductsClient({
     }
 
     const clearSearch = () => {
+        setLocalSearch('')
         router.push(buildUrl({ search: '', page: 1 }))
     }
 
@@ -96,42 +82,73 @@ export default function ProductsClient({
                         className="text-center max-w-2xl mx-auto"
                     >
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
-                            {searchQuery ? 'Search Results' : 'Our Collection'}
+                            Gourmet Collection
                         </h1>
                         <p className="text-[#4A4A4A] text-lg leading-relaxed">
-                            {searchQuery
-                                ? `Showing results for "${searchQuery}"`
-                                : 'Explore our carefully curated selection of premium gift hampers, ensuring a touch of luxury in every detail.'
-                            }
+                            Discover our exquisite gourmet selection, featuring premium quality ingredients and artisanal craftsmanship in every product.
                         </p>
                     </motion.div>
                 </div>
             </section>
 
-            {/* Category Tabs */}
+            {/* Filters Section */}
             <div className="sticky top-0 md:top-12 z-30 bg-white border-b border-[#EBEBEB] shadow-sm">
                 <div className="container mx-auto px-6">
-                    <div className="flex justify-center py-4 overflow-x-auto scrollbar-hide">
-                        <div className="inline-flex gap-2 p-1 bg-[#F8F8F8] rounded-lg">
-                            {categories.map((category) => (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+                        {/* Search Bar */}
+                        <form onSubmit={handleSearch} className="relative w-full sm:w-80">
+                            <input
+                                type="text"
+                                placeholder="Search gourmet products..."
+                                value={localSearch}
+                                onChange={(e) => setLocalSearch(e.target.value)}
+                                className="w-full pl-4 pr-20 py-2.5 border border-[#E0E0E0] rounded-lg text-sm focus:outline-none focus:border-[#D29B6C] transition-colors"
+                            />
+                            <div className="absolute right-2 inset-y-0 flex items-center gap-1">
+                                {localSearch && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setLocalSearch('')}
+                                        className="p-1 text-[#999] hover:text-[#666] transition-colors"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
                                 <button
-                                    key={category}
-                                    onClick={() => handleCategoryChange(category)}
-                                    className={`relative px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-300 whitespace-nowrap ${activeCategory === category
-                                        ? 'text-white'
-                                        : 'text-[#4A4A4A] hover:text-[#D29B6C]'
-                                        }`}
+                                    type="submit"
+                                    className="p-1.5 bg-[#D29B6C] text-white rounded-md hover:bg-[#B8845A] transition-colors"
                                 >
-                                    {activeCategory === category && (
-                                        <motion.div
-                                            layoutId="activeTab"
-                                            className="absolute inset-0 bg-[#D29B6C] rounded-lg"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                    <span className="relative z-10">{toTitleCase(category)}</span>
+                                    <Search className="w-4 h-4" />
                                 </button>
-                            ))}
+                            </div>
+                        </form>
+
+                        {/* Sort Filter */}
+                        <div className="flex items-center gap-2">
+                            <ArrowUpDown className="w-4 h-4 text-[#717171]" />
+                            <span className="text-sm text-[#717171]">Sort:</span>
+                            <div className="inline-flex gap-1 p-1 bg-[#F8F8F8] rounded-lg">
+                                <button
+                                    onClick={() => handleSortChange('latest')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        activeSort === 'latest'
+                                            ? 'bg-[#D29B6C] text-white'
+                                            : 'text-[#4A4A4A] hover:text-[#D29B6C]'
+                                    }`}
+                                >
+                                    Latest
+                                </button>
+                                <button
+                                    onClick={() => handleSortChange('oldest')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        activeSort === 'oldest'
+                                            ? 'bg-[#D29B6C] text-white'
+                                            : 'text-[#4A4A4A] hover:text-[#D29B6C]'
+                                    }`}
+                                >
+                                    Oldest
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,12 +157,11 @@ export default function ProductsClient({
             {/* Products Section */}
             <section className="py-12 md:py-16">
                 <div className="container mx-auto px-6">
-                    {/* Search indicator & Results count */}
+                    {/* Results count */}
                     <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <p className="text-[#717171]">
                             Showing <span className="font-medium text-[#1A1A1A]">{products.length}</span> of <span className="font-medium text-[#1A1A1A]">{totalProducts}</span> {totalProducts === 1 ? 'product' : 'products'}
                             {searchQuery && <span> for &quot;<span className="font-medium text-[#D29B6C]">{searchQuery}</span>&quot;</span>}
-                            {currentCategory !== 'All' && <span> in <span className="font-medium text-[#D29B6C]">{currentCategory}</span></span>}
                         </p>
                         {searchQuery && (
                             <button
@@ -171,38 +187,25 @@ export default function ProductsClient({
                                 <div className="w-16 h-16 bg-[#EBDDC4] rounded-full flex items-center justify-center mx-auto mb-4 text-[#D29B6C]">
                                     {searchQuery ? <Search className="h-8 w-8" /> : <Package className="h-8 w-8" />}
                                 </div>
-                                <p className="text-xl font-semibold text-[#1A1A1A] mb-2">No products found</p>
+                                <p className="text-xl font-semibold text-[#1A1A1A] mb-2">No gourmet products found</p>
                                 <p className="text-[#717171]">
                                     {searchQuery
-                                        ? `No results for "${searchQuery}"${currentCategory !== 'All' ? ` in ${currentCategory}` : ''}.`
-                                        : `We don't have products in "${currentCategory}" yet.`
+                                        ? `No results for "${searchQuery}" in our gourmet collection.`
+                                        : 'Our gourmet collection is coming soon.'
                                     }
                                 </p>
-                                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-                                    {searchQuery && (
-                                        <button
-                                            onClick={clearSearch}
-                                            className="px-6 py-2.5 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors"
-                                        >
-                                            Clear Search
-                                        </button>
-                                    )}
-                                    {currentCategory !== 'All' && (
-                                        <button
-                                            onClick={() => handleCategoryChange('All')}
-                                            className={`px-6 py-2.5 font-medium rounded-lg transition-colors ${searchQuery
-                                                ? 'text-[#D29B6C] border border-[#D29B6C] hover:bg-[#FDF8F3]'
-                                                : 'bg-[#D29B6C] text-white hover:bg-[#B8845A]'
-                                                }`}
-                                        >
-                                            View All Categories
-                                        </button>
-                                    )}
-                                </div>
+                                {searchQuery && (
+                                    <button
+                                        onClick={clearSearch}
+                                        className="mt-6 px-6 py-2.5 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors"
+                                    >
+                                        Clear Search
+                                    </button>
+                                )}
                             </motion.div>
                         ) : (
                             <motion.div
-                                key={`${currentCategory}-${currentPage}`}
+                                key={`gourmet-${currentPage}-${currentSort}`}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}

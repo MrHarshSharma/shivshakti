@@ -1,36 +1,36 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
-import ProductsClient from './products-client'
+import GourmetClient from './gourmet-client'
 
 // Cache this page and revalidate every 60 seconds
 export const revalidate = 60
 
 const PRODUCTS_PER_PAGE = 12
 
-interface GetProductsParams {
+interface GetGourmetProductsParams {
     page: number
-    category?: string
     search?: string
+    sort?: 'latest' | 'oldest'
 }
 
-async function getProducts({ page, category, search }: GetProductsParams) {
+async function getGourmetProducts({ page, search, sort = 'latest' }: GetGourmetProductsParams) {
     const supabase = createServiceRoleClient()
 
-    // First fetch all products
+    // Fetch all products
     let query = supabase
         .from('product')
         .select('id, name, description, price, categories, images, product_type, variations, created_at')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: sort === 'oldest' })
 
     const { data: allProducts, error } = await query
 
     if (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching gourmet products:', error)
         return { products: [], total: 0, totalPages: 0 }
     }
 
-    // Exclude gourmet products - they have their own dedicated page at /gourmet
+    // Filter only gourmet products
     let filtered = (allProducts || []).filter(p =>
-        !p.categories?.some((c: string) => c.toLowerCase() === 'gourmet')
+        p.categories?.some((c: string) => c.toLowerCase() === 'gourmet')
     )
 
     // Apply search filter
@@ -39,14 +39,6 @@ async function getProducts({ page, category, search }: GetProductsParams) {
         filtered = filtered.filter(p =>
             p.name?.toLowerCase().includes(searchLower) ||
             p.description?.toLowerCase().includes(searchLower)
-        )
-    }
-
-    // Apply category filter (case-insensitive)
-    if (category && category !== 'All') {
-        const categoryLower = category.toLowerCase()
-        filtered = filtered.filter(p =>
-            p.categories?.some((c: string) => c.toLowerCase() === categoryLower)
         )
     }
 
@@ -64,25 +56,25 @@ async function getProducts({ page, category, search }: GetProductsParams) {
 }
 
 interface PageProps {
-    searchParams: Promise<{ page?: string; category?: string; search?: string }>
+    searchParams: Promise<{ page?: string; search?: string; sort?: 'latest' | 'oldest' }>
 }
 
-export default async function ProductsPage({ searchParams }: PageProps) {
+export default async function GourmetPage({ searchParams }: PageProps) {
     const params = await searchParams
     const page = Math.max(1, parseInt(params.page || '1', 10))
-    const category = params.category || 'All'
     const search = params.search || ''
+    const sort = params.sort || 'latest'
 
-    const { products, total, totalPages } = await getProducts({ page, category, search })
+    const { products, total, totalPages } = await getGourmetProducts({ page, search, sort })
 
     return (
-        <ProductsClient
+        <GourmetClient
             products={products}
             currentPage={page}
             totalPages={totalPages}
             totalProducts={total}
-            currentCategory={category}
             searchQuery={search}
+            currentSort={sort}
         />
     )
 }

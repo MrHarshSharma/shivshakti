@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingBag, User, Menu, X, ChevronDown, Search, Home, Package, Info, Mail, ClipboardList, LayoutDashboard } from 'lucide-react'
+import { ShoppingBag, User, Menu, X, ChevronDown, Search, Home, Package, Info, Mail, ClipboardList, LayoutDashboard, Sparkles, Gift } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -33,8 +33,10 @@ export default function Navbar() {
     const [searchCount, setSearchCount] = useState(0)
     const [showSearchDropdown, setShowSearchDropdown] = useState(false)
     const [isSearching, setIsSearching] = useState(false)
+    const [showShopDropdown, setShowShopDropdown] = useState(false)
     const searchRef = useRef<HTMLDivElement>(null)
     const mobileSearchRef = useRef<HTMLDivElement>(null)
+    const shopDropdownRef = useRef<HTMLDivElement>(null)
     const pathname = usePathname()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -52,11 +54,14 @@ export default function Navbar() {
         }
     }, [pathname, searchParams])
 
-    // Close dropdown when clicking outside
+    // Close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
                 setShowSearchDropdown(false)
+            }
+            if (shopDropdownRef.current && !shopDropdownRef.current.contains(event.target as Node)) {
+                setShowShopDropdown(false)
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
@@ -134,9 +139,13 @@ export default function Navbar() {
 
     const navLinks = [
         { name: 'Home', href: '/', icon: Home },
-        { name: 'All Products', href: '/products', icon: Package },
         { name: 'About Us', href: '/about', icon: Info },
         { name: 'Contact Us', href: '/contact', icon: Mail },
+    ]
+
+    const shopDropdownItems = [
+        { name: 'Hampers', href: '/products', icon: Gift },
+        { name: 'Gourmet', href: '/gourmet', icon: Sparkles },
     ]
 
     return (
@@ -398,7 +407,72 @@ export default function Navbar() {
             <nav className="sticky top-0 z-50 bg-[#D29B6C] shadow-sm">
                 <div className="container mx-auto px-4 lg:px-8">
                     <div className="hidden md:flex items-center justify-center gap-8 h-12">
-                        {navLinks.map((link) => {
+                        {/* Home Link */}
+                        <Link
+                            href="/"
+                            className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/'
+                                ? 'text-white'
+                                : 'text-white/80 hover:text-white'
+                                }`}
+                        >
+                            <Home className="w-4 h-4" />
+                            HOME
+                        </Link>
+
+                        {/* Shop Dropdown */}
+                        <div
+                            ref={shopDropdownRef}
+                            className="relative"
+                            onMouseEnter={() => setShowShopDropdown(true)}
+                            onMouseLeave={() => setShowShopDropdown(false)}
+                        >
+                            <button
+                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                                    pathname === '/products' || pathname === '/gourmet'
+                                        ? 'text-white'
+                                        : 'text-white/80 hover:text-white'
+                                }`}
+                            >
+                                <Package className="w-4 h-4" />
+                                SHOP
+                                <ChevronDown className={`w-4 h-4 transition-transform ${showShopDropdown ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            <AnimatePresence>
+                                {showShopDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-[60]"
+                                    >
+                                    <div className="bg-white rounded-lg shadow-xl border border-[#EBEBEB] py-2">
+                                        {shopDropdownItems.map((item) => {
+                                            const Icon = item.icon
+                                            return (
+                                                <Link
+                                                    key={item.name}
+                                                    href={item.href}
+                                                    className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                        pathname === item.href
+                                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                                            : 'text-[#4A4A4A] hover:bg-[#F8F8F8] hover:text-[#D29B6C]'
+                                                    }`}
+                                                >
+                                                    <Icon className="w-4 h-4" />
+                                                    {item.name}
+                                                </Link>
+                                            )
+                                        })}
+                                    </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Other Nav Links */}
+                        {navLinks.filter(link => link.name !== 'Home').map((link) => {
                             const Icon = link.icon
                             return (
                                 <Link
@@ -576,7 +650,43 @@ export default function Navbar() {
 
                             {/* Navigation Links */}
                             <div className="py-2">
-                                {navLinks.map((link) => {
+                                {/* Home Link */}
+                                <Link
+                                    href="/"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${pathname === '/'
+                                        ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                        : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                        }`}
+                                >
+                                    <Home className="w-5 h-5" />
+                                    Home
+                                </Link>
+
+                                {/* Shop Section */}
+                                <div className="px-4 py-2 text-xs font-semibold text-[#999] uppercase tracking-wider">
+                                    Shop
+                                </div>
+                                {shopDropdownItems.map((item) => {
+                                    const Icon = item.icon
+                                    return (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 pl-6 text-sm font-medium transition-colors ${pathname === item.href
+                                                ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                                : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                                }`}
+                                        >
+                                            <Icon className="w-5 h-5" />
+                                            {item.name}
+                                        </Link>
+                                    )
+                                })}
+
+                                {/* Other Nav Links */}
+                                {navLinks.filter(link => link.name !== 'Home').map((link) => {
                                     const Icon = link.icon
                                     return (
                                         <Link
