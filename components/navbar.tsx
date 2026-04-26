@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingBag, User, Menu, X, ChevronDown, Search, Home, Package, Info, Mail, ClipboardList, LayoutDashboard, Sparkles, Gift } from 'lucide-react'
+import { ShoppingBag, User, Menu, X, ChevronDown, Search, Home, Package, Info, Mail, ClipboardList, LayoutDashboard, Tag } from 'lucide-react'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -143,10 +143,21 @@ export default function Navbar() {
         { name: 'Contact Us', href: '/contact', icon: Mail },
     ]
 
-    const shopDropdownItems = [
-        { name: 'Hampers', href: '/products', icon: Gift },
-        { name: 'Gourmet', href: '/gourmet', icon: Sparkles },
-    ]
+    const [categories, setCategories] = useState<{ id: number; category: string; position: number }[]>([])
+
+    useEffect(() => {
+        fetch('/api/categories')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) setCategories(data.categories)
+            })
+            .catch(() => {})
+    }, [])
+
+    const shopDropdownItems = categories.map(cat => ({
+        name: cat.category,
+        href: `/products?category=${encodeURIComponent(cat.category)}`,
+    }))
 
     return (
         <>
@@ -428,7 +439,7 @@ export default function Navbar() {
                         >
                             <button
                                 className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                                    pathname === '/products' || pathname === '/gourmet'
+                                    pathname === '/products'
                                         ? 'text-white'
                                         : 'text-white/80 hover:text-white'
                                 }`}
@@ -448,23 +459,21 @@ export default function Navbar() {
                                         className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-[60]"
                                     >
                                     <div className="bg-white rounded-lg shadow-xl border border-[#EBEBEB] py-2">
-                                        {shopDropdownItems.map((item) => {
-                                            const Icon = item.icon
-                                            return (
+                                        {shopDropdownItems.map((item) => (
                                                 <Link
                                                     key={item.name}
                                                     href={item.href}
                                                     className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                        pathname === item.href
+                                                        pathname + '?' + searchParams.toString() === item.href || pathname === item.href
                                                             ? 'text-[#D29B6C] bg-[#FDF8F3]'
                                                             : 'text-[#4A4A4A] hover:bg-[#F8F8F8] hover:text-[#D29B6C]'
                                                     }`}
                                                 >
-                                                    <Icon className="w-4 h-4" />
+                                                    <Tag className="w-4 h-4" />
                                                     {item.name}
                                                 </Link>
                                             )
-                                        })}
+                                        )}
                                     </div>
                                     </motion.div>
                                 )}
@@ -667,9 +676,7 @@ export default function Navbar() {
                                 <div className="px-4 py-2 text-xs font-semibold text-[#999] uppercase tracking-wider">
                                     Shop
                                 </div>
-                                {shopDropdownItems.map((item) => {
-                                    const Icon = item.icon
-                                    return (
+                                {shopDropdownItems.map((item) => (
                                         <Link
                                             key={item.name}
                                             href={item.href}
@@ -679,11 +686,11 @@ export default function Navbar() {
                                                 : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
                                                 }`}
                                         >
-                                            <Icon className="w-5 h-5" />
+                                            <Tag className="w-5 h-5" />
                                             {item.name}
                                         </Link>
                                     )
-                                })}
+                                )}
 
                                 {/* Other Nav Links */}
                                 {navLinks.filter(link => link.name !== 'Home').map((link) => {

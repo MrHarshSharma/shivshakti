@@ -63,6 +63,22 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
     const id = product.id.toString()
 
+    // Track product view interest after 5 seconds
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            try {
+                const STORAGE_KEY = 'shivshakti_recently_viewed'
+                const MAX_ITEMS = 8
+                const existing: { productId: string; viewedAt: number }[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+                const filtered = existing.filter(item => item.productId !== id)
+                filtered.unshift({ productId: id, viewedAt: Date.now() })
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered.slice(0, MAX_ITEMS)))
+            } catch {}
+        }, 5000)
+
+        return () => clearTimeout(timer)
+    }, [id])
+
     const paginate = (newDirection: number) => {
         if (!product?.images) return
         const newPage = (page + newDirection + product.images.length) % product.images.length

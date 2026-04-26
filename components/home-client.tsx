@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { ArrowRight, Truck, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
+import RecentlyViewed from '@/components/recently-viewed'
 
 export default function HomeClient({ products }: { products: Product[] }) {
     return (
@@ -83,6 +84,9 @@ export default function HomeClient({ products }: { products: Product[] }) {
                     </div>
                 </div>
             </section>
+
+            {/* Recently Viewed / You Might Be Interested In */}
+            <RecentlyViewed allProducts={products} />
 
             {/* Featured Products */}
             <section className="py-12 lg:py-16">
