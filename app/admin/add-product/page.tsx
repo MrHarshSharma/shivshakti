@@ -36,6 +36,7 @@ export default function AdminAddProductPage() {
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     // Bulk import state
+    const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false)
     const [showBulkImport, setShowBulkImport] = useState(false)
     const [importFile, setImportFile] = useState<File | null>(null)
     const [isImporting, setIsImporting] = useState(false)
@@ -334,14 +335,37 @@ export default function AdminAddProductPage() {
                                     <p className="font-playfair text-sm font-semibold text-[#2D1B1B]">Step 1: Download Template</p>
                                     <p className="text-xs text-[#4A3737]/70">Get the Excel template with correct column headers</p>
                                 </div>
-                                <a
-                                    href="/api/products/template"
-                                    download
-                                    className="flex items-center gap-2 px-4 py-2 bg-saffron text-white rounded-lg hover:bg-orange-600 transition text-sm font-bold"
+                                <button
+                                    type="button"
+                                    disabled={isDownloadingTemplate}
+                                    onClick={async () => {
+                                        setIsDownloadingTemplate(true)
+                                        try {
+                                            const res = await fetch('/api/products/template')
+                                            const blob = await res.blob()
+                                            const url = URL.createObjectURL(blob)
+                                            const a = document.createElement('a')
+                                            a.href = url
+                                            a.download = 'product-import-template.xlsx'
+                                            document.body.appendChild(a)
+                                            a.click()
+                                            a.remove()
+                                            URL.revokeObjectURL(url)
+                                        } catch {
+                                            alert('Failed to download template')
+                                        } finally {
+                                            setIsDownloadingTemplate(false)
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-saffron text-white rounded-lg hover:bg-orange-600 transition text-sm font-bold disabled:opacity-60"
                                 >
-                                    <Download className="h-4 w-4" />
-                                    Download
-                                </a>
+                                    {isDownloadingTemplate ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Download className="h-4 w-4" />
+                                    )}
+                                    {isDownloadingTemplate ? 'Preparing...' : 'Download'}
+                                </button>
                             </div>
 
                             {/* Upload Excel */}

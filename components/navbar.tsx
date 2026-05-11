@@ -151,7 +151,7 @@ export default function Navbar() {
             .then(data => {
                 if (data.success) setCategories(data.categories)
             })
-            .catch(() => {})
+            .catch(() => { })
     }, [])
 
     const shopDropdownItems = categories.map(cat => ({
@@ -169,7 +169,7 @@ export default function Navbar() {
             {/* Main Header - White Section */}
             <div className="bg-white border-b border-[#EBEBEB]">
                 <div className="container mx-auto px-4 lg:px-8">
-                    <div className="flex items-center justify-between h-24 md:h-28">
+                    <div className="relative flex items-center justify-between h-24 md:h-28">
                         {/* Left - Search Bar (Desktop) */}
                         <div className="hidden md:flex items-center flex-1">
                             <div ref={searchRef} className="relative w-72">
@@ -296,7 +296,7 @@ export default function Navbar() {
                         </button>
 
                         {/* Center - Logo */}
-                        <Link href="/" className="flex-shrink-0">
+                        <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex-shrink-0">
                             <div className="relative h-20 w-30 md:h-24 md:w-30">
                                 <Image
                                     src="/logo.png"
@@ -438,11 +438,10 @@ export default function Navbar() {
                             onMouseLeave={() => setShowShopDropdown(false)}
                         >
                             <button
-                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                                    pathname === '/products'
+                                className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === '/products'
                                         ? 'text-white'
                                         : 'text-white/80 hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <Package className="w-4 h-4" />
                                 SHOP
@@ -458,23 +457,22 @@ export default function Navbar() {
                                         transition={{ duration: 0.15 }}
                                         className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 z-[60]"
                                     >
-                                    <div className="bg-white rounded-lg shadow-xl border border-[#EBEBEB] py-2">
-                                        {shopDropdownItems.map((item) => (
+                                        <div className="bg-white rounded-lg shadow-xl border border-[#EBEBEB] py-2">
+                                            {shopDropdownItems.map((item) => (
                                                 <Link
                                                     key={item.name}
                                                     href={item.href}
-                                                    className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                        pathname + '?' + searchParams.toString() === item.href || pathname === item.href
+                                                    className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${pathname + '?' + searchParams.toString() === item.href || pathname === item.href
                                                             ? 'text-[#D29B6C] bg-[#FDF8F3]'
                                                             : 'text-[#4A4A4A] hover:bg-[#F8F8F8] hover:text-[#D29B6C]'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <Tag className="w-4 h-4" />
                                                     {item.name}
                                                 </Link>
                                             )
-                                        )}
-                                    </div>
+                                            )}
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -677,19 +675,19 @@ export default function Navbar() {
                                     Shop
                                 </div>
                                 {shopDropdownItems.map((item) => (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className={`flex items-center gap-3 px-4 py-3 pl-6 text-sm font-medium transition-colors ${pathname === item.href
-                                                ? 'text-[#D29B6C] bg-[#FDF8F3]'
-                                                : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
-                                                }`}
-                                        >
-                                            <Tag className="w-5 h-5" />
-                                            {item.name}
-                                        </Link>
-                                    )
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className={`flex items-center gap-3 px-4 py-3 pl-6 text-sm font-medium transition-colors ${pathname === item.href
+                                            ? 'text-[#D29B6C] bg-[#FDF8F3]'
+                                            : 'text-[#4A4A4A] hover:bg-[#F8F8F8]'
+                                            }`}
+                                    >
+                                        <Tag className="w-5 h-5" />
+                                        {item.name}
+                                    </Link>
+                                )
                                 )}
 
                                 {/* Other Nav Links */}
