@@ -170,6 +170,9 @@ export default function AdminOrdersPage() {
             })
 
             if (response.ok) {
+                // Immediately reflect new status in UI
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
+
                 // Send emails based on new status if changed
                 const order = orders.find(o => o.id === orderId)
                 if (order && order.status !== newStatus) {
@@ -229,8 +232,10 @@ export default function AdminOrdersPage() {
                     }
                 }
 
-                // Refresh current page
+                // Refresh current page, then re-apply optimistic update
+                // in case server returns stale data before propagation
                 await fetchOrders(pagination.page)
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
             }
         } catch (error) {
             console.error('Error updating order status:', error)

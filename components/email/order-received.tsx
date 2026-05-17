@@ -18,6 +18,9 @@ interface OrderReceivedEmailProps {
     }
     date?: string
     mode?: string
+    phone?: string
+    email?: string
+    address?: string
 }
 
 export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
@@ -27,6 +30,9 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
     cost,
     date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }),
     mode,
+    phone,
+    email,
+    address,
 }) => {
     return (
         <div style={{
@@ -50,17 +56,7 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                     padding: '40px 0',
                     textAlign: 'center',
                 }}>
-                    {/* Logo */}
-                    <img
-                        src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
-                        alt="Shivshakti"
-                        style={{
-                            width: '120px',
-                            height: 'auto',
-                            marginBottom: '20px',
-                            display: 'inline-block',
-                        }}
-                    />
+
                     <h1 style={{
                         color: '#D97706',
                         fontSize: '32px',
@@ -82,43 +78,10 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                         margin: '30px 0',
                         border: '1px solid #FED7AA',
                     }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-around !important' }}>
-                            <div>
-                                <p style={{
-                                    fontSize: '12px',
-                                    color: '#D97706',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px',
-                                    fontWeight: 'bold',
-                                    margin: '0 0 5px',
-                                }}>Order Number</p>
-                                <p style={{
-                                    fontSize: '16px',
-                                    color: '#2D1B1B',
-                                    fontWeight: 'bold',
-                                    margin: '0',
-                                }}>#{order_id}</p>
-                            </div>
-                            <div>
-                                <p style={{
-                                    fontSize: '12px',
-                                    color: '#D97706',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px',
-                                    fontWeight: 'bold',
-                                    margin: '0 0 5px',
-                                }}>Date</p>
-                                <p style={{
-                                    fontSize: '16px',
-                                    color: '#2D1B1B',
-                                    fontWeight: 'bold',
-                                    margin: '0',
-                                    marginBottom: '15px',
-                                }}>{date}</p>
-                            </div>
-                            <div>
-                                {mode && (
-                                    <>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <tbody>
+                                <tr>
+                                    <td style={{ width: '33%', verticalAlign: 'top', padding: '0' }}>
                                         <p style={{
                                             fontSize: '12px',
                                             color: '#D97706',
@@ -126,18 +89,94 @@ export const OrderReceivedEmail: React.FC<OrderReceivedEmailProps> = ({
                                             letterSpacing: '1px',
                                             fontWeight: 'bold',
                                             margin: '0 0 5px',
-                                        }}>Collection Mode</p>
+                                        }}>Order Number</p>
                                         <p style={{
                                             fontSize: '16px',
                                             color: '#2D1B1B',
                                             fontWeight: 'bold',
                                             margin: '0',
-                                        }}>{mode}</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
+                                        }}>#{order_id}</p>
+                                    </td>
+                                    <td style={{ width: '33%', verticalAlign: 'top', padding: '0' }}>
+                                        <p style={{
+                                            fontSize: '12px',
+                                            color: '#D97706',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px',
+                                            fontWeight: 'bold',
+                                            margin: '0 0 5px',
+                                        }}>Date</p>
+                                        <p style={{
+                                            fontSize: '16px',
+                                            color: '#2D1B1B',
+                                            fontWeight: 'bold',
+                                            margin: '0',
+                                        }}>{date}</p>
+                                    </td>
+                                    <td style={{ width: '33%', verticalAlign: 'top', padding: '0' }}>
+                                        {mode && (
+                                            <>
+                                                <p style={{
+                                                    fontSize: '12px',
+                                                    color: '#D97706',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '1px',
+                                                    fontWeight: 'bold',
+                                                    margin: '0 0 5px',
+                                                }}>Collection Mode</p>
+                                                <p style={{
+                                                    fontSize: '16px',
+                                                    color: '#2D1B1B',
+                                                    fontWeight: 'bold',
+                                                    margin: '0',
+                                                }}>{mode}</p>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+
+                    <hr style={{ borderColor: '#FED7AA', margin: '20px 0', borderTop: '1px solid #FED7AA', borderBottom: 'none' }} />
+
+                    {/* Customer Details */}
+                    <h3 style={{
+                        fontSize: '18px',
+                        color: '#2D1B1B',
+                        fontWeight: 'bold',
+                        margin: '30px 0 15px',
+                        borderBottom: '2px solid #D97706',
+                        paddingBottom: '5px',
+                        display: 'inline-block',
+                    }}>Customer Details</h3>
+
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px' }}>
+                        <tbody>
+                            <tr>
+                                <td style={{ padding: '6px 0', fontSize: '14px', color: '#666666', width: '30%' }}>Name</td>
+                                <td style={{ padding: '6px 0', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>{name}</td>
+                            </tr>
+                            {phone && (
+                                <tr>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#666666' }}>Phone</td>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>{phone}</td>
+                                </tr>
+                            )}
+                            {email && (
+                                <tr>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#666666' }}>Email</td>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>{email}</td>
+                                </tr>
+                            )}
+                            {address && (
+                                <tr>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#666666' }}>Address</td>
+                                    <td style={{ padding: '6px 0', fontSize: '14px', color: '#2D1B1B', fontWeight: 'bold' }}>{address}</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
 
                     <hr style={{ borderColor: '#FED7AA', margin: '20px 0', borderTop: '1px solid #FED7AA', borderBottom: 'none' }} />
 

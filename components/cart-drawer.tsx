@@ -219,9 +219,11 @@ export default function CartDrawer() {
                         shipping: 0,
                         tax: 0
                     },
-                    from_name: customerData.name,
                     reply_to: user.email,
                     mode: 'Store Pickup',
+                    phone: customerData.phone,
+                    email: user.email,
+                    address: 'Store Pickup',
                 }).catch(err => console.error('Email sending failed:', err))
 
                 localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
@@ -344,9 +346,11 @@ export default function CartDrawer() {
                                 shipping: 0,
                                 tax: 0
                             },
-                            from_name: customerData.name,
                             reply_to: user.email,
                             mode: 'Doorstep Delivery',
+                            phone: customerData.phone,
+                            email: user.email,
+                            address: customerData.address,
                         }).catch(err => console.error('Email sending failed:', err))
 
                         localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))

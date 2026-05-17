@@ -53,16 +53,7 @@ export const OrderDeliveredEmail: React.FC<OrderDeliveredEmailProps> = ({
                     textAlign: 'center',
                 }}>
                     {/* Logo */}
-                    <img
-                        src={`${process.env.NEXT_PUBLIC_APP_URL}/logo.png`}
-                        alt="Shivshakti"
-                        style={{
-                            width: '120px',
-                            height: 'auto',
-                            marginBottom: '10px',
-                            display: 'inline-block',
-                        }}
-                    />
+
                     <p style={{
                         color: '#ffffff',
                         fontSize: '12px',

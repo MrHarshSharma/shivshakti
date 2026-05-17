@@ -26,6 +26,9 @@ interface OrderEmailData {
     from_name?: string
     reply_to?: string
     mode?: string
+    phone?: string
+    email?: string
+    address?: string
 }
 
 export async function sendOrderReceivedEmail(data: OrderEmailData): Promise<boolean> {
