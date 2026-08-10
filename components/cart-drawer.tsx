@@ -177,75 +177,8 @@ export default function CartDrawer() {
         setIsSubmitting(true)
         setSubmitError('')
 
-        if (customerData.isDelivery === false) {
-            try {
-                const createOrderResponse = await fetch('/api/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: customerData.name,
-                        phone: customerData.phone,
-                        address: 'Store Pickup',
-                        email: user.email,
-                        user_id: user.id,
-                        items: items,
-                        discount: discountAmount,
-                        coupon_code: appliedCoupon?.code || null,
-                        total: finalTotal,
-                        payment_status: 'store payment',
-                        is_delivery: false,
-                    }),
-                })
-
-                const createOrderData = await createOrderResponse.json()
-
-                if (!createOrderResponse.ok) {
-                    throw new Error(createOrderData.error || 'Failed to create order')
-                }
-
-                sendOrderReceivedEmail({
-                    name: customerData.name,
-                    order_id: createOrderData.orderId,
-                    orders: items.map(item => ({
-                        name: item.selectedVariation ? `${item.name} (${item.selectedVariation.name})` : item.name,
-                        price: item.selectedVariation ? item.selectedVariation.price : item.price,
-                        units: item.quantity,
-                        image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
-                    })),
-                    cost: {
-                        total: finalTotal,
-                        subtotal: cartTotal,
-                        discount: discountAmount,
-                        shipping: 0,
-                        tax: 0
-                    },
-                    reply_to: user.email,
-                    mode: 'Store Pickup',
-                    phone: customerData.phone,
-                    email: user.email,
-                    address: 'Store Pickup',
-                }).catch(err => console.error('Email sending failed:', err))
-
-                localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
-                localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
-                window.dispatchEvent(new Event('customerDataUpdated'))
-
-                setIsOrderPlaced(true)
-                setIsSubmitting(false)
-                clearCart()
-                setTimeout(() => {
-                    setIsOrderPlaced(false)
-                    setShowCustomerForm(false)
-                    toggleCart()
-                }, 3000)
-
-            } catch (error) {
-                console.error('Order creation error:', error)
-                setSubmitError(error instanceof Error ? error.message : 'Failed to complete order. Please contact support.')
-                setIsSubmitting(false)
-            }
-            return
-        }
+        const isPickup = customerData.isDelivery === false
+        const orderAddress = isPickup ? 'Store Pickup' : customerData.address
 
         try {
             const scriptLoaded = await loadRazorpayScript()
@@ -276,7 +209,7 @@ export default function CartDrawer() {
                 amount: orderData.amount,
                 currency: orderData.currency,
                 name: 'Shivshakti',
-                description: 'Order Payment',
+                description: isPickup ? 'Store Pickup Order' : 'Order Payment',
                 order_id: orderData.orderId,
                 prefill: {
                     name: customerData.name,
@@ -310,14 +243,14 @@ export default function CartDrawer() {
                             body: JSON.stringify({
                                 name: customerData.name,
                                 phone: customerData.phone,
-                                address: customerData.address,
+                                address: orderAddress,
                                 email: user.email,
                                 user_id: user.id,
                                 items: items,
                                 discount: discountAmount,
                                 coupon_code: appliedCoupon?.code || null,
                                 total: finalTotal,
-                                is_delivery: true,
+                                is_delivery: !isPickup,
                                 payment_status: 'completed',
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
@@ -347,10 +280,10 @@ export default function CartDrawer() {
                                 tax: 0
                             },
                             reply_to: user.email,
-                            mode: 'Doorstep Delivery',
+                            mode: isPickup ? 'Store Pickup' : 'Doorstep Delivery',
                             phone: customerData.phone,
                             email: user.email,
-                            address: customerData.address,
+                            address: orderAddress,
                         }).catch(err => console.error('Email sending failed:', err))
 
                         localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
@@ -592,7 +525,7 @@ export default function CartDrawer() {
                                                                 Processing...
                                                             </>
                                                         ) : (
-                                                            'Place Order'
+                                                            `Pay ₹${finalTotal.toLocaleString()}`
                                                         )}
                                                     </button>
                                                 </div>

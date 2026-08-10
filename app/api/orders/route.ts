@@ -14,8 +14,9 @@ export async function POST(request: Request) {
             )
         }
 
-        // Validate payment information (Only if not store payment)
-        if (payment_status !== 'store payment' && (!razorpay_order_id || !razorpay_payment_id)) {
+        // Validate payment information. Every order — delivery or store pickup — is
+        // paid online up front, so Razorpay details are always required.
+        if (!razorpay_order_id || !razorpay_payment_id) {
             return NextResponse.json(
                 { error: 'Payment information is required' },
                 { status: 400 }

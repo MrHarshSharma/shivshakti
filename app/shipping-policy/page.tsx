@@ -32,7 +32,6 @@ export default function ShippingPolicyPage() {
                         <ul className="list-disc pl-6 space-y-2">
                             <li><strong>Standard Delivery:</strong> 5-7 business days.</li>
                             <li><strong>Express Delivery:</strong> 2-3 business days (available at extra cost in select cities).</li>
-                            <li><strong>Free Shipping:</strong> Enjoy free standard shipping on all orders above ₹4,999.</li>
                         </ul>
                     </section>
 

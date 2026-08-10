@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Truck, Shield, Gift, Clock } from 'lucide-react'
+import { ArrowRight, Ticket, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 import RecentlyViewed from '@/components/recently-viewed'
@@ -66,7 +66,7 @@ export default function HomeClient({ products }: { products: Product[] }) {
                 <div className="container mx-auto px-4 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6">
                         {[
-                            { icon: Truck, title: 'Free Shipping', desc: 'On orders ₹999+' },
+                            { icon: Ticket, title: 'WELCOME10', desc: '10% off orders ₹999+' },
                             { icon: Shield, title: 'Secure Payment', desc: '100% protected' },
                             { icon: Gift, title: 'Gift Wrapping', desc: 'Premium packaging' },
                             { icon: Clock, title: 'Fast Delivery', desc: '3-5 business days' },

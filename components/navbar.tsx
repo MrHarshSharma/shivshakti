@@ -163,7 +163,7 @@ export default function Navbar() {
         <>
             {/* Top Banner */}
             <div className="bg-[#D29B6C] text-white text-center py-2 text-xs font-medium tracking-wide">
-                Free Shipping on orders above ₹999 | Use code WELCOME10 for 10% off
+                Use code WELCOME10 for 10% off
             </div>
 
             {/* Main Header - White Section */}

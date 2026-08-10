@@ -11,6 +11,7 @@ interface Order {
     id: number
     status: string
     payment_status: string
+    is_delivery: boolean
     order: {
         total: number
         itemCount: number
@@ -187,7 +188,9 @@ export default function MyOrdersPage() {
                             <div className="space-y-4">
                                 {orders.map((order, idx) => {
                                     const theme = getStatusTheme(order.status)
-                                    const isStorePickup = order.payment_status === 'store payment'
+                                    // Derived from is_delivery, not payment_status: pickup orders are
+                                    // now paid online too, so their payment_status is 'completed'.
+                                    const isStorePickup = order.is_delivery === false
 
                                     return (
                                         <motion.div
