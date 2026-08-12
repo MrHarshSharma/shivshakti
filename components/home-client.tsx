@@ -2,13 +2,26 @@
 
 import React from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowRight, Ticket, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
 import ProductCard from '@/components/product-card'
 import RecentlyViewed from '@/components/recently-viewed'
 
 export default function HomeClient({ products }: { products: Product[] }) {
+    const heroVideoRef = React.useRef<HTMLVideoElement>(null)
+
+    React.useEffect(() => {
+        const video = heroVideoRef.current
+        if (!video) return
+
+        // React does not reliably reflect `muted` into the server-rendered HTML, and
+        // browsers refuse to autoplay anything that isn't muted at play() time. Set
+        // it on the element itself before asking, then swallow a refusal — a hero
+        // that won't play is not worth an unhandled rejection.
+        video.muted = true
+        video.play().catch(() => { })
+    }, [])
+
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
@@ -18,22 +31,22 @@ export default function HomeClient({ products }: { products: Product[] }) {
                         {/* Content */}
                         <div className="text-center lg:text-left">
                             <span className="inline-block px-3 py-1 bg-[#D29B6C] text-white text-xs font-medium rounded-full mb-4">
-                                New Collection
+                                Rakhi Special
                             </span>
                             <h1 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-semibold text-[#1A1A1A] mb-4 leading-tight">
-                                Premium Gift Hampers
+                                Raksha Bandhan Hampers
                                 <br />
-                                <span className="text-[#D29B6C]">Made with Love</span>
+                                <span className="text-[#D29B6C]">Tied with Love</span>
                             </h1>
                             <p className="text-base text-[#4A4A4A] mb-8 max-w-md mx-auto lg:mx-0">
-                                Discover our handcrafted collection of luxury gift hampers, perfect for every occasion and celebration.
+                                Celebrate the bond you cherish with handcrafted rakhi hampers — sweets, treats and thoughtful little touches, packed and ready to gift.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                                 <Link
                                     href="/products"
                                     className="w-full sm:w-auto px-8 py-3 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors flex items-center justify-center gap-2"
                                 >
-                                    Shop Now
+                                    Shop Rakhi Hampers
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
                                 <Link
@@ -45,15 +58,23 @@ export default function HomeClient({ products }: { products: Product[] }) {
                             </div>
                         </div>
 
-                        {/* Image */}
+                        {/* Video */}
                         <div className="relative">
-                            <div className="relative aspect-square max-w-md mx-auto lg:max-w-none">
-                                <Image
-                                    src="/hero-hamper.png"
-                                    alt="Premium Gift Hamper"
-                                    fill
-                                    className="object-contain"
-                                    priority
+                            <div className="relative max-w-md mx-auto lg:max-w-none">
+                                {/* The clip is portrait, so width drives the box and height
+                                    follows its own ratio. No max-height: capping the height is
+                                    what letterboxed it into a thin strip, since object-contain
+                                    then had to shrink the width to match. */}
+                                <video
+                                    ref={heroVideoRef}
+                                    src="/rakhivideo.mp4"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    controls={false}
+                                    aria-label="Raksha Bandhan gift hampers by Shivshakti"
+                                    className="w-full h-auto rounded-2xl"
                                 />
                             </div>
                         </div>
