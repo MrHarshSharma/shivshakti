@@ -9,6 +9,9 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { sendOrderReceivedEmail } from '@/utils/emailjs'
 import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
+import AddressAutocomplete, { type SelectedPlace } from '@/components/address-autocomplete'
+import DeliveryZoneNotice from '@/components/delivery-zone-notice'
+import { assessDelivery, FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
 
 export default function CartDrawer() {
     const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
@@ -21,14 +24,55 @@ export default function CartDrawer() {
         name: '',
         phone: '',
         address: '',
+        // Flat / house number / landmark. Kept separate from the geocoded place
+        // because Places gives us a locality, never a doorstep.
+        addressLine: '',
+        place: null as SelectedPlace | null,
         isDelivery: null as boolean | null
     })
     const [errors, setErrors] = useState({
         name: '',
         phone: '',
-        address: ''
+        address: '',
+        addressLine: '',
+        acknowledgement: ''
     })
     const [submitError, setSubmitError] = useState('')
+
+    // Set when GOOGLE_MAPS_API_KEY isn't configured — we then fall back to the
+    // plain address box so checkout still works, treating the zone as unknown.
+    const [placesUnavailable, setPlacesUnavailable] = useState(false)
+    const [placesChecked, setPlacesChecked] = useState(false)
+    const [feeAcknowledged, setFeeAcknowledged] = useState(false)
+
+    // Resolve this once, up front. Deciding on the first keystroke instead would
+    // swap the field out mid-typing and throw away what the customer had entered.
+    useEffect(() => {
+        let cancelled = false
+        fetch('/api/places/autocomplete')
+            .then(res => res.json())
+            .then(data => { if (!cancelled) setPlacesUnavailable(!data.available) })
+            .catch(() => { if (!cancelled) setPlacesUnavailable(true) })
+            .finally(() => { if (!cancelled) setPlacesChecked(true) })
+        return () => { cancelled = true }
+    }, [])
+
+    const isDeliveryOrder = customerData.isDelivery === true
+
+    const delivery = useMemo(
+        () => assessDelivery(customerData.place),
+        [customerData.place]
+    )
+
+    // In fallback mode there's no place to inspect, so an address counts as entered
+    // once they've typed one. Nothing about delivery cost is shown before that.
+    const hasDeliveryAddress = placesUnavailable
+        ? customerData.address.trim().length > 0
+        : !!customerData.place
+
+    // Only chargeable delivery needs an explicit opt-in; pickup and free delivery
+    // have nothing to consent to.
+    const needsFeeAcknowledgement = isDeliveryOrder && hasDeliveryAddress && !delivery.isFree
 
     // Coupon logic
     const [couponCode, setCouponCode] = useState('')
@@ -63,15 +107,30 @@ export default function CartDrawer() {
 
     // Load customer data from localStorage on mount and when user changes
     useEffect(() => {
+        // Entries saved before the address fields existed lack `addressLine`/`place`,
+        // so fill the gaps rather than trusting the stored shape.
+        const normalize = (stored: unknown) => {
+            const source = (stored && typeof stored === 'object' ? stored : {}) as Record<string, unknown>
+            const place = source.place as SelectedPlace | undefined
+            return {
+                name: typeof source.name === 'string' ? source.name : '',
+                phone: typeof source.phone === 'string' ? source.phone : '',
+                address: typeof source.address === 'string' ? source.address : '',
+                addressLine: typeof source.addressLine === 'string' ? source.addressLine : '',
+                place: place && typeof place.lat === 'number' ? place : null,
+                isDelivery: typeof source.isDelivery === 'boolean' ? source.isDelivery : null,
+            }
+        }
+
         if (user) {
             const savedUserData = localStorage.getItem(`shivshakti_customer_${user.email}`)
             if (savedUserData) {
                 try {
-                    const parsedData = JSON.parse(savedUserData)
-                    setCustomerData(prev => ({
+                    const parsedData = normalize(JSON.parse(savedUserData))
+                    setCustomerData({
                         ...parsedData,
                         name: user.user_metadata.full_name || parsedData.name || ''
-                    }))
+                    })
                     return
                 } catch (e) { console.error(e) }
             }
@@ -83,14 +142,14 @@ export default function CartDrawer() {
             const globalData = localStorage.getItem('shivshakti_customer_data')
             if (globalData) {
                 try {
-                    setCustomerData(JSON.parse(globalData))
+                    setCustomerData(normalize(JSON.parse(globalData)))
                 } catch (e) { console.error(e) }
             }
         }
     }, [user])
 
     const validateForm = () => {
-        const newErrors = { name: '', phone: '', address: '' }
+        const newErrors = { name: '', phone: '', address: '', addressLine: '', acknowledgement: '' }
         let isValid = true
 
         if (!customerData.name.trim()) {
@@ -106,9 +165,27 @@ export default function CartDrawer() {
             isValid = false
         }
 
-        if (customerData.isDelivery && !customerData.address.trim()) {
-            newErrors.address = 'Address is required'
-            isValid = false
+        if (isDeliveryOrder) {
+            if (placesUnavailable) {
+                if (!customerData.address.trim()) {
+                    newErrors.address = 'Address is required'
+                    isValid = false
+                }
+            } else {
+                if (!customerData.place) {
+                    newErrors.address = 'Please search for and select your area'
+                    isValid = false
+                }
+                if (!customerData.addressLine.trim()) {
+                    newErrors.addressLine = 'Flat / house number is required'
+                    isValid = false
+                }
+            }
+
+            if (needsFeeAcknowledgement && !feeAcknowledged) {
+                newErrors.acknowledgement = 'Please confirm you understand the delivery charges'
+                isValid = false
+            }
         }
 
         setErrors(newErrors)
@@ -126,8 +203,14 @@ export default function CartDrawer() {
 
     const handleBackToCart = () => {
         setShowCustomerForm(false)
-        setErrors({ name: '', phone: '', address: '' })
+        setErrors({ name: '', phone: '', address: '', addressLine: '', acknowledgement: '' })
         setSubmitError('')
+    }
+
+    const handleSwitchToPickup = () => {
+        setCustomerData(prev => ({ ...prev, isDelivery: false }))
+        setFeeAcknowledged(false)
+        setErrors(prev => ({ ...prev, address: '', addressLine: '', acknowledgement: '' }))
     }
 
     const handleApplyCoupon = async () => {
@@ -178,7 +261,14 @@ export default function CartDrawer() {
         setSubmitError('')
 
         const isPickup = customerData.isDelivery === false
-        const orderAddress = isPickup ? 'Store Pickup' : customerData.address
+        // Places resolves to a locality; the flat/house number the customer typed is
+        // what actually gets the parcel to the door, so it leads the address.
+        const composedAddress = placesUnavailable
+            ? customerData.address
+            : [customerData.addressLine.trim(), customerData.place?.formattedAddress]
+                .filter(Boolean)
+                .join(', ')
+        const orderAddress = isPickup ? 'Store Pickup' : composedAddress
 
         try {
             const scriptLoaded = await loadRazorpayScript()
@@ -251,6 +341,11 @@ export default function CartDrawer() {
                                 coupon_code: appliedCoupon?.code || null,
                                 total: finalTotal,
                                 is_delivery: !isPickup,
+                                // The server re-resolves this place ID with Google and
+                                // derives the zone itself — we intentionally do not send
+                                // the zone or the distance from here.
+                                delivery_place_id: isPickup ? null : customerData.place?.placeId || null,
+                                delivery_fee_acknowledged: needsFeeAcknowledgement ? feeAcknowledged : null,
                                 payment_status: 'completed',
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
@@ -280,7 +375,11 @@ export default function CartDrawer() {
                                 tax: 0
                             },
                             reply_to: user.email,
-                            mode: isPickup ? 'Store Pickup' : 'Doorstep Delivery',
+                            mode: isPickup
+                                ? 'Store Pickup'
+                                : delivery.isFree
+                                    ? `Doorstep Delivery (free — within ${FREE_DELIVERY_RADIUS_KM} km)`
+                                    : 'Doorstep Delivery — DELIVERY FEE PENDING, call customer to confirm',
                             phone: customerData.phone,
                             email: user.email,
                             address: orderAddress,
@@ -404,6 +503,11 @@ export default function CartDrawer() {
                                             <Truck className={`h-6 w-6 mb-2 ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#717171]'}`} />
                                             <span className={`font-medium text-sm ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#1A1A1A]'}`}>Delivery</span>
                                             <span className="text-xs text-[#717171] mt-0.5">To your doorstep</span>
+                                            {/* Sets the expectation before they commit to the delivery path,
+                                                which is the cheapest place to set it. */}
+                                            <span className="text-[10px] font-medium text-emerald-600 mt-1">
+                                                Free within {FREE_DELIVERY_RADIUS_KM} km
+                                            </span>
                                         </button>
 
                                         <button
@@ -474,30 +578,134 @@ export default function CartDrawer() {
                                                 </div>
 
                                                 {/* Address Field - Only show for delivery */}
-                                                {customerData.isDelivery && (
+                                                {isDeliveryOrder && (
                                                     <motion.div
                                                         initial={{ opacity: 0, height: 0 }}
                                                         animate={{ opacity: 1, height: 'auto' }}
                                                         exit={{ opacity: 0, height: 0 }}
+                                                        className="space-y-4"
                                                     >
-                                                        <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                                                            Delivery Address
-                                                        </label>
-                                                        <textarea
-                                                            value={customerData.address}
-                                                            onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
-                                                            className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
-                                                                ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                                : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
-                                                                }`}
-                                                            placeholder="Enter your complete delivery address"
-                                                            rows={3}
-                                                        />
-                                                        {errors.address && (
-                                                            <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                                                                Delivery Address
+                                                            </label>
+
+                                                            {!placesChecked ? (
+                                                                <div className="w-full px-4 py-3 border border-[#EBEBEB] rounded-lg bg-[#F8F8F8] text-sm text-[#717171] flex items-center gap-2">
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                    Loading address search…
+                                                                </div>
+                                                            ) : placesUnavailable ? (
+                                                                <textarea
+                                                                    value={customerData.address}
+                                                                    onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
+                                                                    className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
+                                                                        ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                                        : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
+                                                                        }`}
+                                                                    placeholder="Enter your complete delivery address"
+                                                                    rows={3}
+                                                                />
+                                                            ) : (
+                                                                <AddressAutocomplete
+                                                                    value={customerData.place}
+                                                                    onSelect={(place) => {
+                                                                        setCustomerData(prev => ({ ...prev, place }))
+                                                                        setFeeAcknowledged(false)
+                                                                        setErrors(prev => ({ ...prev, address: '', acknowledgement: '' }))
+                                                                    }}
+                                                                    onClear={() => {
+                                                                        setCustomerData(prev => ({ ...prev, place: null }))
+                                                                        setFeeAcknowledged(false)
+                                                                    }}
+                                                                    onUnavailable={(typed) => {
+                                                                        // Safety net if the key dies mid-session — carry their
+                                                                        // typing across so the swap costs them nothing.
+                                                                        setPlacesUnavailable(true)
+                                                                        setCustomerData(prev => ({ ...prev, address: prev.address || typed }))
+                                                                    }}
+                                                                    hasError={!!errors.address}
+                                                                />
+                                                            )}
+
+                                                            {errors.address && (
+                                                                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Places gives us the locality; this is what gets it to the door. */}
+                                                        {!placesUnavailable && customerData.place && (
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
+                                                                    Flat / House No. &amp; Landmark
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={customerData.addressLine}
+                                                                    onChange={(e) => setCustomerData({ ...customerData, addressLine: e.target.value })}
+                                                                    className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.addressLine
+                                                                        ? 'border-red-400 focus:ring-red-200 bg-red-50'
+                                                                        : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
+                                                                        }`}
+                                                                    placeholder="e.g. Flat 302, Wanjari Complex, near Kamal Chowk"
+                                                                />
+                                                                {errors.addressLine && (
+                                                                    <p className="text-red-500 text-xs mt-1">{errors.addressLine}</p>
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                        {/* The verdict — shown the moment we can measure, never at the Pay button. */}
+                                                        {hasDeliveryAddress && (
+                                                            <div className="space-y-1">
+                                                                <DeliveryZoneNotice
+                                                                    zone={placesUnavailable ? 'unknown' : delivery.zone}
+                                                                    distanceKm={delivery.distanceKm}
+                                                                    acknowledged={feeAcknowledged}
+                                                                    onAcknowledge={(checked) => {
+                                                                        setFeeAcknowledged(checked)
+                                                                        if (checked) setErrors(prev => ({ ...prev, acknowledgement: '' }))
+                                                                    }}
+                                                                    onSwitchToPickup={handleSwitchToPickup}
+                                                                />
+                                                                {errors.acknowledgement && (
+                                                                    <p className="text-red-500 text-xs">{errors.acknowledgement}</p>
+                                                                )}
+                                                            </div>
                                                         )}
                                                     </motion.div>
                                                 )}
+
+                                                {/* Order summary — the delivery cost belongs next to the other
+                                                    numbers, not tucked away in a banner. */}
+                                                <div className="p-3 bg-[#F8F8F8] rounded-lg space-y-2">
+                                                    <div className="flex justify-between items-center text-sm text-[#717171]">
+                                                        <span>Subtotal</span>
+                                                        <span>₹{cartTotal.toLocaleString()}</span>
+                                                    </div>
+                                                    {appliedCoupon && (
+                                                        <div className="flex justify-between items-center text-sm text-emerald-600">
+                                                            <span>Discount ({appliedCoupon.code})</span>
+                                                            <span>-₹{discountAmount.toLocaleString()}</span>
+                                                        </div>
+                                                    )}
+                                                    {isDeliveryOrder && (
+                                                        <div className="flex justify-between items-center text-sm">
+                                                            <span className="text-[#717171]">Delivery</span>
+                                                            {!hasDeliveryAddress ? (
+                                                                <span className="text-[#717171]">Enter address</span>
+                                                            ) : delivery.isFree ? (
+                                                                <span className="font-medium text-emerald-600">FREE</span>
+                                                            ) : (
+                                                                <span className="font-medium text-amber-700">To be confirmed</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex justify-between items-center pt-2 border-t border-[#EBEBEB]">
+                                                        <span className="font-medium text-[#1A1A1A]">Paying now</span>
+                                                        <span className="text-lg font-bold text-[#1A1A1A]">₹{finalTotal.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
 
                                                 {/* Error Message */}
                                                 {submitError && (
@@ -525,7 +733,9 @@ export default function CartDrawer() {
                                                                 Processing...
                                                             </>
                                                         ) : (
-                                                            `Pay ₹${finalTotal.toLocaleString()}`
+                                                            // "+ delivery" is the whole point: the button must never be
+                                                            // the first place a customer learns there's more to pay.
+                                                            `Pay ₹${finalTotal.toLocaleString()}${needsFeeAcknowledgement ? ' + delivery' : ''}`
                                                         )}
                                                     </button>
                                                 </div>

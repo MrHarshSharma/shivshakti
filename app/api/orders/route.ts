@@ -1,10 +1,12 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
+import { resolvePlace } from '@/utils/places'
+import { assessDelivery, FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
 
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id, is_delivery, payment_status, discount, coupon_code, total } = body
+        const { name, phone, address, items, razorpay_order_id, razorpay_payment_id, email, user_id, is_delivery, payment_status, discount, coupon_code, total, delivery_place_id, delivery_fee_acknowledged } = body
 
         // Validate required fields
         if (!name || !phone || !address || !items || items.length === 0) {
@@ -35,6 +37,33 @@ export async function POST(request: Request) {
         // Use provided total (with discount) or calculate from subtotal
         const finalTotal = total !== undefined ? total : subtotal
 
+        // Work out the delivery zone here rather than trusting the client — this
+        // decides whether the shop absorbs a delivery cost, so the browser doesn't
+        // get a vote. We re-resolve the place ID with Google and measure ourselves.
+        const isDeliveryOrder = is_delivery !== undefined ? is_delivery : true
+        let deliveryMeta: Record<string, unknown>
+
+        if (!isDeliveryOrder) {
+            deliveryMeta = { mode: 'pickup', zone: 'pickup', fee_status: 'not_applicable' }
+        } else {
+            const resolved = delivery_place_id ? await resolvePlace(delivery_place_id) : null
+            const assessment = assessDelivery(resolved)
+
+            deliveryMeta = {
+                mode: 'delivery',
+                // 'unknown' when the address was typed free-hand or Google was
+                // unreachable. Deliberately falls to the chargeable side.
+                zone: assessment.zone,
+                distance_km: assessment.distanceKm,
+                free_radius_km: FREE_DELIVERY_RADIUS_KM,
+                place_id: delivery_place_id || null,
+                pincode: resolved?.pincode || null,
+                resolved_address: resolved?.formattedAddress || null,
+                fee_status: assessment.isFree ? 'free' : 'pending_confirmation',
+                fee_acknowledged: delivery_fee_acknowledged ?? null,
+            }
+        }
+
         // Prepare order data
         const orderData = {
             name,
@@ -56,11 +85,12 @@ export async function POST(request: Request) {
                 discount: discount || 0,
                 coupon_code: coupon_code || null,
                 total: finalTotal,
-                itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+                itemCount: items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+                delivery: deliveryMeta
             },
             status: 'pending',
             payment_status: payment_status || 'completed', // Default to completed for old flow, or use provided
-            is_delivery: is_delivery !== undefined ? is_delivery : true, // Default to true if missing
+            is_delivery: isDeliveryOrder,
             razorpay_order_id: razorpay_order_id || null,
             razorpay_payment_id: razorpay_payment_id || null
         }

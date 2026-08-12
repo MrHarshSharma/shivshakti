@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Truck, Globe, Shield } from 'lucide-react'
+import { FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
 
 export default function ShippingPolicyPage() {
     return (
@@ -33,6 +34,24 @@ export default function ShippingPolicyPage() {
                             <li><strong>Standard Delivery:</strong> 5-7 business days.</li>
                             <li><strong>Express Delivery:</strong> 2-3 business days (available at extra cost in select cities).</li>
                         </ul>
+                    </section>
+
+                    <section className="space-y-4">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Truck className="h-6 w-6 text-saffron" />
+                            <h2 className="font-cinzel text-2xl text-[#2D1B1B]">Local Delivery &amp; Free Radius</h2>
+                        </div>
+                        <p>
+                            Delivery is <strong>free of charge within a {FREE_DELIVERY_RADIUS_KM} km radius</strong> of our
+                            Kamal Chowk store in Nagpur. We measure this from the address you select at checkout, and you
+                            will see whether you qualify before you pay.
+                        </p>
+                        <p className="text-sm italic">
+                            Note: For addresses beyond {FREE_DELIVERY_RADIUS_KM} km, delivery charges are borne by the
+                            customer. You pay for your items at checkout as usual, and our team will call you with the exact
+                            delivery amount for your area before your order is dispatched. You are free to cancel at that
+                            point at no cost. Store Pickup is always free.
+                        </p>
                     </section>
 
                     <section className="space-y-4">

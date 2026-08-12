@@ -14,6 +14,7 @@ interface Order {
     email?: string
     phone: string
     address: string
+    is_delivery?: boolean
     status: string
     payment_status: string
     razorpay_order_id: string
@@ -28,6 +29,13 @@ interface Order {
             quantity: number
             category: string
         }>
+        delivery?: {
+            mode?: string
+            zone?: string
+            distance_km?: number | null
+            fee_status?: string
+            pincode?: string | null
+        }
     }
     created_at: string
 }
@@ -130,6 +138,23 @@ export default function AdminOrdersPage() {
         return 'bg-emerald-50 text-emerald-700 border-emerald-100'
     }
 
+    // Mirrors the latch the PATCH route applies server-side, so the "fee pending"
+    // chip disappears the moment an order is marked shipped rather than on the next
+    // refetch. Once settled it stays settled, whatever the status becomes later.
+    const applyStatus = (order: Order, newStatus: string): Order => {
+        if (newStatus !== 'shipped' || order.order?.delivery?.fee_status !== 'pending_confirmation') {
+            return { ...order, status: newStatus }
+        }
+        return {
+            ...order,
+            status: newStatus,
+            order: {
+                ...order.order,
+                delivery: { ...order.order.delivery, fee_status: 'settled' }
+            }
+        }
+    }
+
     const handleStatusChange = (orderId: number, newStatus: string) => {
         const order = orders.find(o => o.id === orderId)
         if (!order) return
@@ -171,7 +196,7 @@ export default function AdminOrdersPage() {
 
             if (response.ok) {
                 // Immediately reflect new status in UI
-                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
+                setOrders(prev => prev.map(o => o.id === orderId ? applyStatus(o, newStatus) : o))
 
                 // Send emails based on new status if changed
                 const order = orders.find(o => o.id === orderId)
@@ -235,7 +260,7 @@ export default function AdminOrdersPage() {
                 // Refresh current page, then re-apply optimistic update
                 // in case server returns stale data before propagation
                 await fetchOrders(pagination.page)
-                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
+                setOrders(prev => prev.map(o => o.id === orderId ? applyStatus(o, newStatus) : o))
             }
         } catch (error) {
             console.error('Error updating order status:', error)
@@ -344,14 +369,14 @@ export default function AdminOrdersPage() {
                             <table className="w-full">
                                 <thead className="bg-orange-50">
                                     <tr>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Order ID</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Customer</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Product Name</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Quantity</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Total</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Date</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Payment</th>
-                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B]">Status</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Order ID</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Customer</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Address</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Product Name</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Quantity</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Total</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Payment</th>
+                                        <th className="text-left py-4 px-6 font-playfair text-sm font-semibold text-[#2D1B1B] whitespace-nowrap">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -372,6 +397,29 @@ export default function AdminOrdersPage() {
                                                     {order.email && <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider ">{order.email}</p>}
                                                     <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider ">{order.phone}</p>
                                                 </div>
+                                            </td>
+                                            <td className="py-6 px-6 align-top">
+                                                {order.is_delivery === false || order.address === 'Store Pickup' ? (
+                                                    <span className="inline-block px-2.5 py-1 bg-[#F8F8F8] border border-[#EBEBEB] rounded-full font-playfair text-[11px] font-bold text-[#4A3737] tracking-wide">
+                                                        Store Pickup
+                                                    </span>
+                                                ) : (
+                                                    <div className="max-w-[240px] space-y-1">
+                                                        {/* Full text on hover — addresses are too long for a table cell
+                                                            but truncating without an escape hatch makes them useless. */}
+                                                        <p
+                                                            title={order.address}
+                                                            className="font-playfair text-xs text-[#2D1B1B] leading-relaxed line-clamp-3"
+                                                        >
+                                                            {order.address || '—'}
+                                                        </p>
+                                                        {order.order?.delivery?.pincode && (
+                                                            <p className="font-playfair text-[10px] text-[#4A3737]/50 tracking-wider">
+                                                                PIN {order.order.delivery.pincode}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="py-6 px-6">
                                                 {order.order?.items && order.order.items.length > 0 ? (
@@ -408,21 +456,28 @@ export default function AdminOrdersPage() {
                                             </td>
 
                                             <td className="py-6 px-6 font-cinzel text-sm text-[#2D1B1B] font-bold">₹{order.order?.total || 0}</td>
-                                            <td className="py-6 px-6 font-playfair text-xs text-[#4A3737]/60 italic font-medium">
-                                                {formatDate(order.created_at)}
+                                            <td className="py-6 px-6 whitespace-nowrap">
+                                                <div className="flex flex-col items-start gap-1.5">
+                                                    <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm backdrop-blur-sm ${getPaymentStatusBadge(order.payment_status)}`}>
+                                                        {order.payment_status}
+                                                    </span>
+                                                    <span className="font-playfair text-xs text-[#4A3737]/60 italic font-medium">
+                                                        {formatDate(order.created_at)}
+                                                    </span>
+                                                </div>
                                             </td>
-                                            <td className="py-6 px-6">
-                                                <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm backdrop-blur-sm ${getPaymentStatusBadge(order.payment_status)}`}>
-                                                    {order.payment_status}
-                                                </span>
-                                            </td>
-                                            <td className="py-6 px-6">
+                                            <td className="py-6 px-6 whitespace-nowrap">
+                                                <div className="flex flex-col items-start gap-2">
                                                 <div className="relative inline-flex items-center group">
+                                                    {/* min-w rather than w: the global `select { width: 100% }` in
+                                                        globals.css is unlayered and outranks Tailwind's width
+                                                        utilities, so the control would otherwise collapse to the
+                                                        column and clip "PREPARING" to "PREP". */}
                                                     <select
                                                         value={order.status}
                                                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
                                                         disabled={updatingOrderId === order.id}
-                                                        className={`pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                        className={`min-w-[140px] pr-8 pl-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all cursor-pointer appearance-none ${getStatusBadge(order.status)} focus:outline-none focus:ring-2 focus:ring-saffron/20 shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
                                                     >
                                                         <option value="pending">Pending</option>
                                                         <option value="preparing">Preparing</option>
@@ -437,6 +492,26 @@ export default function AdminOrdersPage() {
                                                             <ChevronDown className="h-3 w-3 text-current opacity-50 group-hover:opacity-100 transition-opacity" />
                                                         )}
                                                     </div>
+                                                </div>
+
+                                                {/* Delivery-fee state sits under the order status: both are
+                                                    things staff act on, and the cell's nowrap keeps the chip
+                                                    on one line instead of stacking into three. */}
+                                                {order.order?.delivery?.fee_status === 'pending_confirmation' ? (
+                                                    <span className="inline-block px-2.5 py-0.5 bg-amber-50 border border-amber-200 rounded-full font-playfair text-[10px] font-bold text-amber-800 tracking-wide">
+                                                        Delivery fee pending
+                                                        {typeof order.order.delivery.distance_km === 'number'
+                                                            ? ` · ${order.order.delivery.distance_km} km`
+                                                            : ''}
+                                                    </span>
+                                                ) : order.order?.delivery?.fee_status === 'free' ? (
+                                                    <span className="inline-block px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full font-playfair text-[10px] font-bold text-emerald-700 tracking-wide">
+                                                        Free delivery
+                                                        {typeof order.order.delivery.distance_km === 'number'
+                                                            ? ` · ${order.order.delivery.distance_km} km`
+                                                            : ''}
+                                                    </span>
+                                                ) : null}
                                                 </div>
                                             </td>
                                         </motion.tr>

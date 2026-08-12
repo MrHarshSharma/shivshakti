@@ -20,9 +20,31 @@ export async function PATCH(
         const supabase = createServiceRoleClient()
 
         // Build update object
-        const updateData: { status: string; tracking_id?: string } = { status }
+        const updateData: { status: string; tracking_id?: string; order?: Record<string, unknown> } = { status }
         if (tracking_id) {
             updateData.tracking_id = tracking_id
+        }
+
+        // Dispatch settles the delivery fee: the team rings the customer with the
+        // amount before shipping, so by this point the question is closed. Latch it
+        // in the stored order rather than hiding it in the UI — that way the "fee
+        // pending" flag cannot reappear if the status later moves on again.
+        if (status === 'shipped') {
+            const { data: existing } = await supabase
+                .from('orders')
+                .select('order')
+                .eq('id', id)
+                .single()
+
+            const currentOrder = existing?.order as Record<string, unknown> | undefined
+            const delivery = currentOrder?.delivery as Record<string, unknown> | undefined
+
+            if (delivery?.fee_status === 'pending_confirmation') {
+                updateData.order = {
+                    ...currentOrder,
+                    delivery: { ...delivery, fee_status: 'settled' }
+                }
+            }
         }
 
         const { data, error } = await supabase
