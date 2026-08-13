@@ -48,9 +48,18 @@ export async function middleware(request: NextRequest) {
     // Protect all /admin routes and sensitive admin APIs
     const isAdminRoute = nextUrl.pathname.startsWith('/admin')
     const isUserOrderRoute = nextUrl.pathname.startsWith('/my-orders')
+    // These routes all run on the service role, which bypasses RLS — so this check
+    // is the only thing standing between the public internet and a write. GET stays
+    // open everywhere: the storefront needs to read products and categories.
+    const isCouponValidation = nextUrl.pathname.startsWith('/api/coupons/validate')
+
     const isAdminApi = nextUrl.pathname.startsWith('/api/orders/list') ||
         (nextUrl.pathname.startsWith('/api/orders/') && request.method === 'PATCH') ||
         (nextUrl.pathname.startsWith('/api/products') && request.method !== 'GET') ||
+        (nextUrl.pathname.startsWith('/api/categories') && request.method !== 'GET') ||
+        // Customers must still be able to apply a coupon at checkout, so the
+        // validate endpoint is deliberately excluded from the admin gate.
+        (nextUrl.pathname.startsWith('/api/coupons') && !isCouponValidation && request.method !== 'GET') ||
         nextUrl.pathname.startsWith('/api/upload-images')
 
     if (isAdminRoute || isAdminApi || isUserOrderRoute) {
