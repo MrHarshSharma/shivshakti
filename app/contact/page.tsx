@@ -1,16 +1,21 @@
 import type { Metadata } from 'next'
 import ContactClient from './contact-client'
+import { absoluteUrl, DEFAULT_OG_IMAGE, SITE_URL } from '@/utils/site'
+import { STORE_LOCATION } from '@/utils/delivery'
 
 export const metadata: Metadata = {
-    title: 'Contact Us | Shivshakti Heritage & Luxury',
-    description: 'Get in touch with Shivshakti for inquiries about our premium Indian artifacts, textiles, and shipping. Visit our Nagpur studio or contact us online.',
+    // `absolute` — this title already carries the brand, so skip the layout template.
+    title: { absolute: 'Contact Us | Shivshakti Heritage & Luxury' },
+    description: 'Get in touch with Shivshakti for inquiries about our premium Indian artifacts, textiles, and shipping. Visit our Nagpur store or contact us online.',
+    alternates: { canonical: '/contact' },
     openGraph: {
-        title: 'Contact Shivshakti | Heritage & Luxury Studio',
-        description: 'Visit our Nagpur studio or contact us for inquiries about heritage artifacts and premium gifting.',
-        url: 'https://shivshakti.vercel.app/contact',
+        title: 'Contact Shivshakti | Heritage & Luxury Store',
+        description: 'Visit our Nagpur store or contact us for inquiries about heritage artifacts and premium gifting.',
+        url: '/contact',
         siteName: 'Shivshakti',
         locale: 'en_IN',
         type: 'website',
+        images: [DEFAULT_OG_IMAGE],
     },
 }
 
@@ -19,23 +24,25 @@ export default function ContactPage() {
         '@context': 'https://schema.org',
         '@type': 'Store',
         name: 'Shivshakti Heritage',
-        image: 'https://shivshakti.vercel.app/icon.png',
-        '@id': 'https://shivshakti.vercel.app',
-        url: 'https://shivshakti.vercel.app/contact',
-        telephone: '9890379728',
+        image: absoluteUrl('/icon.png'),
+        '@id': SITE_URL,
+        url: absoluteUrl('/contact'),
+        telephone: '+919890379728',
         priceRange: '₹₹₹',
         address: {
             '@type': 'PostalAddress',
-            streetAddress: 'Shivshakti Heritage Studio',
+            streetAddress: '362, Wanjari Complex, Dr Ambedkar Rd, Kamal Chowk, Gurunanakpura, Balabhaupeth',
             addressLocality: 'Nagpur',
             addressRegion: 'Maharashtra',
-            postalCode: '440001',
+            postalCode: '440017',
             addressCountry: 'IN',
         },
+        // Shared with the delivery-radius calculation so the shop only has one set
+        // of coordinates. The previous values pointed at Jaipur.
         geo: {
             '@type': 'GeoCoordinates',
-            latitude: 26.9124,
-            longitude: 75.7873,
+            latitude: STORE_LOCATION.lat,
+            longitude: STORE_LOCATION.lng,
         },
         openingHoursSpecification: [
             {

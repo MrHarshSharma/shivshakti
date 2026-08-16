@@ -1,8 +1,24 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import ProductsClient from './products-client'
+import type { Metadata } from 'next'
+import { DEFAULT_OG_IMAGE } from '@/utils/site'
 
 // Cache this page and revalidate every 60 seconds
 export const revalidate = 60
+
+export const metadata: Metadata = {
+    title: 'Shop All Products',
+    description: 'Browse the full Shivshakti collection — luxury gift hampers, festive rakhi gifts, artisanal decor and premium gourmet treats, handcrafted in Nagpur, Maharashtra.',
+    keywords: ['gift hampers online', 'rakhi gifts', 'luxury hampers Nagpur', 'Indian handicrafts', 'corporate gifting India'],
+    alternates: { canonical: '/products' },
+    openGraph: {
+        title: 'Shop All Products | Shivshakti',
+        description: 'Luxury gift hampers, festive gifts and artisanal decor, handcrafted in Maharashtra.',
+        url: '/products',
+        type: 'website',
+        images: [DEFAULT_OG_IMAGE],
+    },
+}
 
 const PRODUCTS_PER_PAGE = 12
 

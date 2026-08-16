@@ -1,8 +1,24 @@
 import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import GourmetClient from './gourmet-client'
+import type { Metadata } from 'next'
+import { DEFAULT_OG_IMAGE } from '@/utils/site'
 
 // Cache this page and revalidate every 60 seconds
 export const revalidate = 60
+
+export const metadata: Metadata = {
+    title: 'Gourmet Collection',
+    description: 'Shivshakti gourmet hampers — premium chocolates, dry fruits, roasted nuts and artisanal treats, curated for gifting and delivered across Nagpur.',
+    keywords: ['gourmet hampers', 'dry fruits gift box', 'chocolate hamper India', 'premium snacks Nagpur'],
+    alternates: { canonical: '/gourmet' },
+    openGraph: {
+        title: 'Gourmet Collection | Shivshakti',
+        description: 'Premium chocolates, dry fruits and artisanal treats, curated for gifting.',
+        url: '/gourmet',
+        type: 'website',
+        images: [DEFAULT_OG_IMAGE],
+    },
+}
 
 const PRODUCTS_PER_PAGE = 12
 

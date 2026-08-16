@@ -2,18 +2,23 @@ import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import HomeClient from '@/components/home-client'
 import { Product } from '@/data/products'
 import type { Metadata } from 'next'
+import { SITE_URL, absoluteUrl } from '@/utils/site'
 
 // ISR: Revalidate every 5 minutes - page is cached and served instantly from edge
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Shivshakti | Heritage Indian Artifacts & Luxuryampers',
+  // `absolute` opts out of the layout's "%s | Shivshakti" template, since this
+  // title already carries the brand.
+  title: { absolute: 'Shivshakti | Heritage Indian Artifacts & Luxury Hampers' },
   description: 'Discover authentic Indian heritage with Shivshakti. Curated luxury hampers, artisanal decor, and premium gifts handcrafted in Maharashtra.',
   keywords: ['Indian luxury artifacts', 'heritage gifts', 'premium hampers', 'Nagpur', 'Maharashtra handicrafts', 'corporate gifting', 'Shivshakti'],
+  alternates: { canonical: '/' },
   openGraph: {
     title: 'Shivshakti | Indian Heritage & Luxury Gifting',
     description: 'Authentic handcrafted artifacts and premium gourmet hampers from Maharashtra.',
-    url: 'https://shivshakti.vercel.app',
+    // Relative — resolved against metadataBase so it always tracks the live domain.
+    url: '/',
     siteName: 'Shivshakti',
     locale: 'en_IN',
     type: 'website',
@@ -56,8 +61,8 @@ export default async function Home() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Shivshakti Heritage & Luxury',
-    url: 'https://shivshakti.vercel.app',
-    logo: 'https://shivshakti.vercel.app/icon.png',
+    url: SITE_URL,
+    logo: absoluteUrl('/icon.png'),
     description: 'Curated collection of premium Indian artifacts and textiles.',
     sameAs: [
       'https://instagram.com/shivshakti',
@@ -65,7 +70,8 @@ export default async function Home() {
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '9890379728',
+      // E.164 — schema.org consumers expect the country code.
+      telephone: '+919890379728',
       contactType: 'customer service',
       email: 'shivshaktiprovision18@gmail.com',
     },

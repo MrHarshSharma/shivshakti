@@ -1,6 +1,7 @@
 
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Cinzel } from 'next/font/google'
+import { SITE_URL, SITE_NAME } from '@/utils/site'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { CartProvider } from '@/context/cart-context'
@@ -14,8 +15,36 @@ const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel' })
 import { Suspense } from 'react'
 
 export const metadata: Metadata = {
-  title: 'Shivshakti | Heritage & Luxury',
-  description: 'Curated collection of premium Indian artifacts and textiles.',
+  // Without metadataBase, Next resolves relative og:image paths against
+  // localhost:3000 — which is exactly what shipped, breaking every social preview.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Shivshakti | Heritage & Luxury Gifting in Nagpur',
+    // Child pages set only their own title; the brand is appended here.
+    template: '%s | Shivshakti',
+  },
+  description: 'Curated collection of premium Indian artifacts, gourmet hampers and festive gifts, handcrafted in Maharashtra.',
+  applicationName: SITE_NAME,
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    locale: 'en_IN',
+    url: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   icons: {
     icon: '/icon.png',
     apple: '/icon.png',
