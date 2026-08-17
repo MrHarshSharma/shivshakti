@@ -10,7 +10,10 @@ export default function robots(): MetadataRoute.Robots {
                 // Nothing here is secret — middleware already blocks these — but
                 // keeping them out of the index avoids wasting crawl budget on
                 // pages that only ever redirect.
-                disallow: ['/admin', '/admin/', '/my-orders', '/api/', '/auth/', '/blocked'],
+                disallow: [
+                    '/admin', '/admin/', '/my-orders', '/cart', '/checkout',
+                    '/api/', '/auth/', '/blocked',
+                ],
             },
         ],
         sitemap: `${SITE_URL}/sitemap.xml`,

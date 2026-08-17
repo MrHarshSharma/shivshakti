@@ -1,99 +1,30 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Minus, Plus, ShoppingBag, Check, Ticket, Loader2, Truck, Store, Trash2 } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, Ticket, Loader2, Trash2, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from '@/context/cart-context'
 import { useAuth } from '@/context/auth-context'
-import { useState, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { sendOrderReceivedEmail } from '@/utils/emailjs'
-import { loadRazorpayScript, type RazorpayResponse } from '@/utils/razorpay'
-import AddressAutocomplete, { type SelectedPlace } from '@/components/address-autocomplete'
-import DeliveryZoneNotice from '@/components/delivery-zone-notice'
-import { assessDelivery, FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
 
+/**
+ * The bag. Reviewing and adjusting items happens here; everything that needs the
+ * customer's details — address, fulfilment choice, payment — lives on /checkout.
+ */
 export default function CartDrawer() {
-    const { isCartOpen, toggleCart, items, removeFromCart, updateQuantity, clearCart, cartTotal } = useCart()
+    const {
+        isCartOpen, toggleCart, items, removeFromCart, updateQuantity, cartTotal,
+        appliedCoupon, setAppliedCoupon, discountAmount, finalTotal,
+    } = useCart()
     const { user, loginWithGoogle } = useAuth()
     const searchParams = useSearchParams()
-    const [isOrderPlaced, setIsOrderPlaced] = useState(false)
-    const [showCustomerForm, setShowCustomerForm] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [customerData, setCustomerData] = useState({
-        name: '',
-        phone: '',
-        address: '',
-        // Flat / house number / landmark. Kept separate from the geocoded place
-        // because Places gives us a locality, never a doorstep.
-        addressLine: '',
-        place: null as SelectedPlace | null,
-        isDelivery: null as boolean | null
-    })
-    const [errors, setErrors] = useState({
-        name: '',
-        phone: '',
-        address: '',
-        addressLine: '',
-        acknowledgement: ''
-    })
-    const [submitError, setSubmitError] = useState('')
+    const router = useRouter()
 
-    // Set when GOOGLE_MAPS_API_KEY isn't configured — we then fall back to the
-    // plain address box so checkout still works, treating the zone as unknown.
-    const [placesUnavailable, setPlacesUnavailable] = useState(false)
-    const [placesChecked, setPlacesChecked] = useState(false)
-    const [feeAcknowledged, setFeeAcknowledged] = useState(false)
-
-    // Resolve this once, up front. Deciding on the first keystroke instead would
-    // swap the field out mid-typing and throw away what the customer had entered.
-    useEffect(() => {
-        let cancelled = false
-        fetch('/api/places/autocomplete')
-            .then(res => res.json())
-            .then(data => { if (!cancelled) setPlacesUnavailable(!data.available) })
-            .catch(() => { if (!cancelled) setPlacesUnavailable(true) })
-            .finally(() => { if (!cancelled) setPlacesChecked(true) })
-        return () => { cancelled = true }
-    }, [])
-
-    const isDeliveryOrder = customerData.isDelivery === true
-
-    const delivery = useMemo(
-        () => assessDelivery(customerData.place),
-        [customerData.place]
-    )
-
-    // In fallback mode there's no place to inspect, so an address counts as entered
-    // once they've typed one. Nothing about delivery cost is shown before that.
-    const hasDeliveryAddress = placesUnavailable
-        ? customerData.address.trim().length > 0
-        : !!customerData.place
-
-    // Only chargeable delivery needs an explicit opt-in; pickup and free delivery
-    // have nothing to consent to.
-    const needsFeeAcknowledgement = isDeliveryOrder && hasDeliveryAddress && !delivery.isFree
-
-    // Coupon logic
     const [couponCode, setCouponCode] = useState('')
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false)
-    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; off_percent: number; min_cost: number } | null>(null)
     const [couponError, setCouponError] = useState('')
-
-    const discountAmount = useMemo(() => {
-        if (!appliedCoupon) return 0
-        return Math.round((cartTotal * appliedCoupon.off_percent) / 100)
-    }, [cartTotal, appliedCoupon])
-
-    // Validate coupon minimum spend on cart change
-    useEffect(() => {
-        if (appliedCoupon && cartTotal < appliedCoupon.min_cost) {
-            setAppliedCoupon(null)
-            setCouponError(`Coupon removed: Minimum spend of ₹${appliedCoupon.min_cost} not met`)
-        }
-    }, [cartTotal, appliedCoupon])
-
-    const finalTotal = cartTotal - discountAmount
 
     // Auto-open cart if redirected with cart=open
     useEffect(() => {
@@ -105,125 +36,16 @@ export default function CartDrawer() {
         }
     }, [searchParams, isCartOpen, toggleCart])
 
-    // Load customer data from localStorage on mount and when user changes
-    useEffect(() => {
-        // Entries saved before the address fields existed lack `addressLine`/`place`,
-        // so fill the gaps rather than trusting the stored shape.
-        const normalize = (stored: unknown) => {
-            const source = (stored && typeof stored === 'object' ? stored : {}) as Record<string, unknown>
-            const place = source.place as SelectedPlace | undefined
-            return {
-                name: typeof source.name === 'string' ? source.name : '',
-                phone: typeof source.phone === 'string' ? source.phone : '',
-                address: typeof source.address === 'string' ? source.address : '',
-                addressLine: typeof source.addressLine === 'string' ? source.addressLine : '',
-                place: place && typeof place.lat === 'number' ? place : null,
-                isDelivery: typeof source.isDelivery === 'boolean' ? source.isDelivery : null,
-            }
-        }
-
-        if (user) {
-            const savedUserData = localStorage.getItem(`shivshakti_customer_${user.email}`)
-            if (savedUserData) {
-                try {
-                    const parsedData = normalize(JSON.parse(savedUserData))
-                    setCustomerData({
-                        ...parsedData,
-                        name: user.user_metadata.full_name || parsedData.name || ''
-                    })
-                    return
-                } catch (e) { console.error(e) }
-            }
-            setCustomerData(prev => ({
-                ...prev,
-                name: user.user_metadata.full_name || ''
-            }))
-        } else {
-            const globalData = localStorage.getItem('shivshakti_customer_data')
-            if (globalData) {
-                try {
-                    setCustomerData(normalize(JSON.parse(globalData)))
-                } catch (e) { console.error(e) }
-            }
-        }
-    }, [user])
-
-    const validateForm = () => {
-        const newErrors = { name: '', phone: '', address: '', addressLine: '', acknowledgement: '' }
-        let isValid = true
-
-        if (!customerData.name.trim()) {
-            newErrors.name = 'Name is required'
-            isValid = false
-        }
-
-        if (!customerData.phone.trim()) {
-            newErrors.phone = 'Phone number is required'
-            isValid = false
-        } else if (!/^\d{10}$/.test(customerData.phone)) {
-            newErrors.phone = 'Phone number must be exactly 10 digits'
-            isValid = false
-        }
-
-        if (isDeliveryOrder) {
-            if (placesUnavailable) {
-                if (!customerData.address.trim()) {
-                    newErrors.address = 'Address is required'
-                    isValid = false
-                }
-            } else {
-                if (!customerData.place) {
-                    newErrors.address = 'Please search for and select your area'
-                    isValid = false
-                }
-                if (!customerData.addressLine.trim()) {
-                    newErrors.addressLine = 'Flat / house number is required'
-                    isValid = false
-                }
-            }
-
-            if (needsFeeAcknowledgement && !feeAcknowledged) {
-                newErrors.acknowledgement = 'Please confirm you understand the delivery charges'
-                isValid = false
-            }
-        }
-
-        setErrors(newErrors)
-        return isValid
-    }
-
-    const handleProceedToCheckout = () => {
-        if (!user) {
-            loginWithGoogle(window.location.pathname + '?cart=open')
-            return
-        }
-        setCustomerData(prev => ({ ...prev, isDelivery: null }))
-        setShowCustomerForm(true)
-    }
-
-    const handleBackToCart = () => {
-        setShowCustomerForm(false)
-        setErrors({ name: '', phone: '', address: '', addressLine: '', acknowledgement: '' })
-        setSubmitError('')
-    }
-
-    const handleSwitchToPickup = () => {
-        setCustomerData(prev => ({ ...prev, isDelivery: false }))
-        setFeeAcknowledged(false)
-        setErrors(prev => ({ ...prev, address: '', addressLine: '', acknowledgement: '' }))
-    }
-
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) return
         setIsApplyingCoupon(true)
         setCouponError('')
-        setAppliedCoupon(null)
 
         try {
             const response = await fetch('/api/coupons/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: couponCode, cartTotal, user_id: user?.id })
+                body: JSON.stringify({ code: couponCode, cartTotal, user_id: user?.id }),
             })
             const data = await response.json()
 
@@ -231,7 +53,7 @@ export default function CartDrawer() {
                 setAppliedCoupon({
                     code: data.coupon.code,
                     off_percent: parseFloat(data.coupon.off_percent),
-                    min_cost: data.coupon.min_cost
+                    min_cost: data.coupon.min_cost,
                 })
                 setCouponCode('')
             } else {
@@ -245,181 +67,15 @@ export default function CartDrawer() {
         }
     }
 
-    const removeCoupon = () => {
-        setAppliedCoupon(null)
-        setCouponError('')
-    }
-
-    const handleCheckout = async () => {
-        if (!validateForm()) return
+    const handleProceedToCheckout = () => {
+        // Sign-in is required to place an order, so ask for it before the customer
+        // invests time in the checkout form. /checkout guards this again anyway.
         if (!user) {
-            setSubmitError('Please login to place an order')
+            loginWithGoogle('/checkout')
             return
         }
-
-        setIsSubmitting(true)
-        setSubmitError('')
-
-        const isPickup = customerData.isDelivery === false
-        // Places resolves to a locality; the flat/house number the customer typed is
-        // what actually gets the parcel to the door, so it leads the address.
-        const composedAddress = placesUnavailable
-            ? customerData.address
-            : [customerData.addressLine.trim(), customerData.place?.formattedAddress]
-                .filter(Boolean)
-                .join(', ')
-        const orderAddress = isPickup ? 'Store Pickup' : composedAddress
-
-        try {
-            const scriptLoaded = await loadRazorpayScript()
-            if (!scriptLoaded) {
-                throw new Error('Failed to load Razorpay. Please try again.')
-            }
-
-            const orderResponse = await fetch('/api/razorpay/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: finalTotal,
-                    currency: 'INR',
-                    customerName: customerData.name,
-                    customerPhone: customerData.phone,
-                    customerEmail: user.email,
-                }),
-            })
-
-            const orderData = await orderResponse.json()
-
-            if (!orderResponse.ok) {
-                throw new Error(orderData.error || 'Failed to create payment order')
-            }
-
-            const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-                amount: orderData.amount,
-                currency: orderData.currency,
-                name: 'Shivshakti',
-                description: isPickup ? 'Store Pickup Order' : 'Order Payment',
-                order_id: orderData.orderId,
-                prefill: {
-                    name: customerData.name,
-                    contact: customerData.phone,
-                    email: user.email,
-                },
-                theme: {
-                    color: '#D29B6C',
-                },
-                handler: async (response: RazorpayResponse) => {
-                    try {
-                        const verifyResponse = await fetch('/api/razorpay/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                            }),
-                        })
-
-                        const verifyData = await verifyResponse.json()
-
-                        if (!verifyResponse.ok || !verifyData.verified) {
-                            throw new Error('Payment verification failed')
-                        }
-
-                        const createOrderResponse = await fetch('/api/orders', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                name: customerData.name,
-                                phone: customerData.phone,
-                                address: orderAddress,
-                                email: user.email,
-                                user_id: user.id,
-                                items: items,
-                                discount: discountAmount,
-                                coupon_code: appliedCoupon?.code || null,
-                                total: finalTotal,
-                                is_delivery: !isPickup,
-                                // The server re-resolves this place ID with Google and
-                                // derives the zone itself — we intentionally do not send
-                                // the zone or the distance from here.
-                                delivery_place_id: isPickup ? null : customerData.place?.placeId || null,
-                                delivery_fee_acknowledged: needsFeeAcknowledgement ? feeAcknowledged : null,
-                                payment_status: 'completed',
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                            }),
-                        })
-
-                        const createOrderData = await createOrderResponse.json()
-
-                        if (!createOrderResponse.ok) {
-                            throw new Error(createOrderData.error || 'Failed to create order')
-                        }
-
-                        sendOrderReceivedEmail({
-                            name: customerData.name,
-                            order_id: createOrderData.orderId,
-                            orders: items.map(item => ({
-                                name: item.selectedVariation ? `${item.name} (${item.selectedVariation.name})` : item.name,
-                                price: item.selectedVariation ? item.selectedVariation.price : item.price,
-                                units: item.quantity,
-                                image: (item.images && item.images.length > 0) ? item.images[0] : (item as any).image || '/placeholder-product.png'
-                            })),
-                            cost: {
-                                total: finalTotal,
-                                subtotal: cartTotal,
-                                discount: discountAmount,
-                                shipping: 0,
-                                tax: 0
-                            },
-                            reply_to: user.email,
-                            mode: isPickup
-                                ? 'Store Pickup'
-                                : delivery.isFree
-                                    ? `Doorstep Delivery (free — within ${FREE_DELIVERY_RADIUS_KM} km)`
-                                    : 'Doorstep Delivery — DELIVERY FEE PENDING, call customer to confirm',
-                            phone: customerData.phone,
-                            email: user.email,
-                            address: orderAddress,
-                        }).catch(err => console.error('Email sending failed:', err))
-
-                        localStorage.setItem('shivshakti_customer_data', JSON.stringify(customerData))
-                        localStorage.setItem(`shivshakti_customer_${user.email}`, JSON.stringify(customerData))
-                        window.dispatchEvent(new Event('customerDataUpdated'))
-
-                        setIsOrderPlaced(true)
-                        setIsSubmitting(false)
-                        clearCart()
-                        setTimeout(() => {
-                            setIsOrderPlaced(false)
-                            setShowCustomerForm(false)
-                            toggleCart()
-                        }, 3000)
-
-                    } catch (error) {
-                        console.error('Order creation error:', error)
-                        setSubmitError(error instanceof Error ? error.message : 'Failed to complete order. Please contact support.')
-                        setIsSubmitting(false)
-                    }
-                },
-                modal: {
-                    ondismiss: () => {
-                        setIsSubmitting(false)
-                        setSubmitError('Payment cancelled. Please try again.')
-                    }
-                }
-            }
-
-            const razorpay = new (window as any).Razorpay(options)
-            razorpay.open()
-
-        } catch (error) {
-            console.error('Payment initialization error:', error)
-            setSubmitError(error instanceof Error ? error.message : 'Failed to initialize payment. Please try again.')
-            setIsSubmitting(false)
-        }
+        toggleCart()
+        router.push('/checkout')
     }
 
     return (
@@ -464,295 +120,7 @@ export default function CartDrawer() {
 
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto">
-                            {isOrderPlaced ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                                    <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                                        className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center"
-                                    >
-                                        <Check className="h-10 w-10 text-emerald-500" />
-                                    </motion.div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-[#1A1A1A] mb-1">Order Placed!</h3>
-                                        <p className="text-[#717171]">Thank you for shopping with Shivshakti.</p>
-                                    </div>
-                                </div>
-                            ) : showCustomerForm ? (
-                                <div className="p-6 space-y-6">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-[#1A1A1A] mb-1">Checkout</h3>
-                                        <p className="text-sm text-[#717171]">How would you like to receive your order?</p>
-                                    </div>
-
-                                    {/* Order Type Selection */}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            onClick={() => setCustomerData({ ...customerData, isDelivery: true })}
-                                            className={`relative flex flex-col items-center justify-center p-4 border rounded-xl transition-all ${customerData.isDelivery === true
-                                                ? 'border-[#D29B6C] bg-[#EBDDC4]'
-                                                : 'border-[#EBEBEB] bg-white hover:border-[#D29B6C]/50'
-                                                }`}
-                                        >
-                                            {customerData.isDelivery === true && (
-                                                <div className="absolute top-2 right-2">
-                                                    <Check className="h-4 w-4 text-[#D29B6C]" />
-                                                </div>
-                                            )}
-                                            <Truck className={`h-6 w-6 mb-2 ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#717171]'}`} />
-                                            <span className={`font-medium text-sm ${customerData.isDelivery === true ? 'text-[#D29B6C]' : 'text-[#1A1A1A]'}`}>Delivery</span>
-                                            <span className="text-xs text-[#717171] mt-0.5">To your doorstep</span>
-                                            {/* Sets the expectation before they commit to the delivery path,
-                                                which is the cheapest place to set it. */}
-                                            <span className="text-[10px] font-medium text-emerald-600 mt-1">
-                                                Free within {FREE_DELIVERY_RADIUS_KM} km
-                                            </span>
-                                        </button>
-
-                                        <button
-                                            onClick={() => setCustomerData({ ...customerData, isDelivery: false })}
-                                            className={`relative flex flex-col items-center justify-center p-4 border rounded-xl transition-all ${customerData.isDelivery === false
-                                                ? 'border-[#D29B6C] bg-[#EBDDC4]'
-                                                : 'border-[#EBEBEB] bg-white hover:border-[#D29B6C]/50'
-                                                }`}
-                                        >
-                                            {customerData.isDelivery === false && (
-                                                <div className="absolute top-2 right-2">
-                                                    <Check className="h-4 w-4 text-[#D29B6C]" />
-                                                </div>
-                                            )}
-                                            <Store className={`h-6 w-6 mb-2 ${customerData.isDelivery === false ? 'text-[#D29B6C]' : 'text-[#717171]'}`} />
-                                            <span className={`font-medium text-sm ${customerData.isDelivery === false ? 'text-[#D29B6C]' : 'text-[#1A1A1A]'}`}>Store Pickup</span>
-                                            <span className="text-xs text-[#717171] mt-0.5">Visit our store</span>
-                                        </button>
-                                    </div>
-
-                                    <AnimatePresence>
-                                        {customerData.isDelivery !== null && (
-                                            <motion.div
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="space-y-4"
-                                            >
-                                                {/* Name Field */}
-                                                <div>
-                                                    <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                                                        Full Name
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        value={customerData.name}
-                                                        onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
-                                                        className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.name
-                                                            ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                            : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
-                                                            }`}
-                                                        placeholder="Enter your full name"
-                                                    />
-                                                    {errors.name && (
-                                                        <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                                                    )}
-                                                </div>
-
-                                                {/* Phone Field */}
-                                                <div>
-                                                    <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                                                        Phone Number
-                                                    </label>
-                                                    <input
-                                                        type="tel"
-                                                        value={customerData.phone}
-                                                        onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                                                        className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.phone
-                                                            ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                            : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
-                                                            }`}
-                                                        placeholder="10-digit phone number"
-                                                        maxLength={10}
-                                                    />
-                                                    {errors.phone && (
-                                                        <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                                                    )}
-                                                </div>
-
-                                                {/* Address Field - Only show for delivery */}
-                                                {isDeliveryOrder && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, height: 0 }}
-                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                        exit={{ opacity: 0, height: 0 }}
-                                                        className="space-y-4"
-                                                    >
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                                                                Delivery Address
-                                                            </label>
-
-                                                            {!placesChecked ? (
-                                                                <div className="w-full px-4 py-3 border border-[#EBEBEB] rounded-lg bg-[#F8F8F8] text-sm text-[#717171] flex items-center gap-2">
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                    Loading address search…
-                                                                </div>
-                                                            ) : placesUnavailable ? (
-                                                                <textarea
-                                                                    value={customerData.address}
-                                                                    onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
-                                                                    className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all resize-none ${errors.address
-                                                                        ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                                        : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
-                                                                        }`}
-                                                                    placeholder="Enter your complete delivery address"
-                                                                    rows={3}
-                                                                />
-                                                            ) : (
-                                                                <AddressAutocomplete
-                                                                    value={customerData.place}
-                                                                    onSelect={(place) => {
-                                                                        setCustomerData(prev => ({ ...prev, place }))
-                                                                        setFeeAcknowledged(false)
-                                                                        setErrors(prev => ({ ...prev, address: '', acknowledgement: '' }))
-                                                                    }}
-                                                                    onClear={() => {
-                                                                        setCustomerData(prev => ({ ...prev, place: null }))
-                                                                        setFeeAcknowledged(false)
-                                                                    }}
-                                                                    onUnavailable={(typed) => {
-                                                                        // Safety net if the key dies mid-session — carry their
-                                                                        // typing across so the swap costs them nothing.
-                                                                        setPlacesUnavailable(true)
-                                                                        setCustomerData(prev => ({ ...prev, address: prev.address || typed }))
-                                                                    }}
-                                                                    hasError={!!errors.address}
-                                                                />
-                                                            )}
-
-                                                            {errors.address && (
-                                                                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
-                                                            )}
-                                                        </div>
-
-                                                        {/* Places gives us the locality; this is what gets it to the door. */}
-                                                        {!placesUnavailable && customerData.place && (
-                                                            <div>
-                                                                <label className="block text-sm font-medium text-[#1A1A1A] mb-1.5">
-                                                                    Flat / House No. &amp; Landmark
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={customerData.addressLine}
-                                                                    onChange={(e) => setCustomerData({ ...customerData, addressLine: e.target.value })}
-                                                                    className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all ${errors.addressLine
-                                                                        ? 'border-red-400 focus:ring-red-200 bg-red-50'
-                                                                        : 'border-[#EBEBEB] focus:ring-[#D29B6C]/20 focus:border-[#D29B6C]'
-                                                                        }`}
-                                                                    placeholder="e.g. Flat 302, Wanjari Complex, near Kamal Chowk"
-                                                                />
-                                                                {errors.addressLine && (
-                                                                    <p className="text-red-500 text-xs mt-1">{errors.addressLine}</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-
-                                                        {/* The verdict — shown the moment we can measure, never at the Pay button. */}
-                                                        {hasDeliveryAddress && (
-                                                            <div className="space-y-1">
-                                                                <DeliveryZoneNotice
-                                                                    zone={placesUnavailable ? 'unknown' : delivery.zone}
-                                                                    distanceKm={delivery.distanceKm}
-                                                                    acknowledged={feeAcknowledged}
-                                                                    onAcknowledge={(checked) => {
-                                                                        setFeeAcknowledged(checked)
-                                                                        if (checked) setErrors(prev => ({ ...prev, acknowledgement: '' }))
-                                                                    }}
-                                                                    onSwitchToPickup={handleSwitchToPickup}
-                                                                />
-                                                                {errors.acknowledgement && (
-                                                                    <p className="text-red-500 text-xs">{errors.acknowledgement}</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </motion.div>
-                                                )}
-
-                                                {/* Order summary — the delivery cost belongs next to the other
-                                                    numbers, not tucked away in a banner. */}
-                                                <div className="p-3 bg-[#F8F8F8] rounded-lg space-y-2">
-                                                    <div className="flex justify-between items-center text-sm text-[#717171]">
-                                                        <span>Subtotal</span>
-                                                        <span>₹{cartTotal.toLocaleString()}</span>
-                                                    </div>
-                                                    {appliedCoupon && (
-                                                        <div className="flex justify-between items-center text-sm text-emerald-600">
-                                                            <span>Discount ({appliedCoupon.code})</span>
-                                                            <span>-₹{discountAmount.toLocaleString()}</span>
-                                                        </div>
-                                                    )}
-                                                    {isDeliveryOrder && (
-                                                        <div className="flex justify-between items-center text-sm">
-                                                            <span className="text-[#717171]">Delivery</span>
-                                                            {!hasDeliveryAddress ? (
-                                                                <span className="text-[#717171]">Enter address</span>
-                                                            ) : delivery.isFree ? (
-                                                                <span className="font-medium text-emerald-600">FREE</span>
-                                                            ) : (
-                                                                <span className="font-medium text-amber-700">To be confirmed</span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <div className="flex justify-between items-center pt-2 border-t border-[#EBEBEB]">
-                                                        <span className="font-medium text-[#1A1A1A]">Paying now</span>
-                                                        <span className="text-lg font-bold text-[#1A1A1A]">₹{finalTotal.toLocaleString()}</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Error Message */}
-                                                {submitError && (
-                                                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                                        <p className="text-red-600 text-sm">{submitError}</p>
-                                                    </div>
-                                                )}
-
-                                                <div className="flex gap-3 pt-2">
-                                                    <button
-                                                        onClick={handleBackToCart}
-                                                        disabled={isSubmitting}
-                                                        className="flex-1 py-3 border border-[#EBEBEB] text-[#4A4A4A] font-medium rounded-lg hover:bg-[#F8F8F8] transition-colors disabled:opacity-50"
-                                                    >
-                                                        Back
-                                                    </button>
-                                                    <button
-                                                        onClick={handleCheckout}
-                                                        disabled={isSubmitting}
-                                                        className="flex-1 py-3 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                                                    >
-                                                        {isSubmitting ? (
-                                                            <>
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                                Processing...
-                                                            </>
-                                                        ) : (
-                                                            // "+ delivery" is the whole point: the button must never be
-                                                            // the first place a customer learns there's more to pay.
-                                                            `Pay ₹${finalTotal.toLocaleString()}${needsFeeAcknowledgement ? ' + delivery' : ''}`
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-
-                                    {customerData.isDelivery === null && (
-                                        <button
-                                            onClick={handleBackToCart}
-                                            className="w-full py-3 border border-[#EBEBEB] text-[#4A4A4A] font-medium rounded-lg hover:bg-[#F8F8F8] transition-colors"
-                                        >
-                                            Back to Bag
-                                        </button>
-                                    )}
-                                </div>
-                            ) : items.length === 0 ? (
+                            {items.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                                     <div className="w-20 h-20 bg-[#F8F8F8] rounded-full flex items-center justify-center">
                                         <ShoppingBag className="h-8 w-8 text-[#717171]" />
@@ -824,9 +192,9 @@ export default function CartDrawer() {
                         </div>
 
                         {/* Footer */}
-                        {!isOrderPlaced && !showCustomerForm && items.length > 0 && (
+                        {items.length > 0 && (
                             <div className="p-4 border-t border-[#EBEBEB] bg-white space-y-4">
-                                {/* Coupon Section */}
+                                {/* Coupon */}
                                 {!appliedCoupon ? (
                                     <div className="space-y-2">
                                         <div className="flex gap-2">
@@ -861,7 +229,7 @@ export default function CartDrawer() {
                                             </div>
                                         </div>
                                         <button
-                                            onClick={removeCoupon}
+                                            onClick={() => { setAppliedCoupon(null); setCouponError('') }}
                                             className="text-xs font-medium text-red-500 hover:text-red-600"
                                         >
                                             Remove
@@ -885,6 +253,9 @@ export default function CartDrawer() {
                                         <span className="font-medium text-[#1A1A1A]">Total</span>
                                         <span className="text-xl font-bold text-[#1A1A1A]">₹{finalTotal.toLocaleString()}</span>
                                     </div>
+                                    <p className="text-xs text-[#717171]">
+                                        Delivery is free within {FREE_DELIVERY_RADIUS_KM} km — confirmed at checkout.
+                                    </p>
                                 </div>
 
                                 <button
@@ -900,7 +271,17 @@ export default function CartDrawer() {
                                         </svg>
                                     )}
                                     {user ? 'Proceed to Checkout' : 'Sign in to Checkout'}
+                                    {user && <ArrowRight className="h-4 w-4" />}
                                 </button>
+
+                                {user && (
+                                    <button
+                                        onClick={() => { toggleCart(); router.push('/cart') }}
+                                        className="w-full text-center text-sm text-[#717171] hover:text-[#1A1A1A] transition-colors"
+                                    >
+                                        View full cart
+                                    </button>
+                                )}
                             </div>
                         )}
                     </motion.div>

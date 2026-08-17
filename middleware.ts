@@ -47,7 +47,11 @@ export async function middleware(request: NextRequest) {
 
     // Protect all /admin routes and sensitive admin APIs
     const isAdminRoute = nextUrl.pathname.startsWith('/admin')
+    // Signed-in-only customer routes. The pages guard themselves too, but doing it
+    // here means a signed-out visitor never downloads them at all.
     const isUserOrderRoute = nextUrl.pathname.startsWith('/my-orders')
+        || nextUrl.pathname.startsWith('/cart')
+        || nextUrl.pathname.startsWith('/checkout')
     // These routes all run on the service role, which bypasses RLS — so this check
     // is the only thing standing between the public internet and a write. GET stays
     // open everywhere: the storefront needs to read products and categories.
@@ -85,7 +89,12 @@ export async function middleware(request: NextRequest) {
 
         // 1. Basic Auth Check for User Routes
         if (!user && isUserOrderRoute) {
-            return NextResponse.redirect(new URL('/', request.url))
+            // Someone whose session expired mid-purchase shouldn't be dumped on a
+            // bare home page — send them back with the bag open, where the
+            // sign-in-to-checkout button is one tap away.
+            const isCartFlow = nextUrl.pathname.startsWith('/cart')
+                || nextUrl.pathname.startsWith('/checkout')
+            return NextResponse.redirect(new URL(isCartFlow ? '/?cart=open' : '/', request.url))
         }
 
         // 2. Admin Check for Admin Routes/APIs
