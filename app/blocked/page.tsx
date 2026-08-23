@@ -1,5 +1,20 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Ban } from 'lucide-react'
+
+// robots.txt disallows /blocked, but that only stops crawling — a page linked from
+// elsewhere can still be indexed URL-only. Without this the page also inherited the
+// root layout's `canonical: '/'`, pointing search engines at the homepage from a
+// dead-end account screen.
+export const metadata: Metadata = {
+    title: 'Account Blocked',
+    alternates: { canonical: '/blocked' },
+    robots: {
+        index: false,
+        follow: false,
+        googleBot: { index: false, follow: false },
+    },
+}
 
 export default function BlockedPage() {
     return (

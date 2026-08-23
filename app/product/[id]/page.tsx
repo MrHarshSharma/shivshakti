@@ -84,11 +84,21 @@ export default async function ProductPage({ params }: PageProps) {
     // Product schema — this is what earns the price / availability snippet in
     // Google results. Variations carry their own prices, so the offer is expressed
     // as a range when they exist.
-    const variationPrices: number[] = Array.isArray(product.variations)
-        ? product.variations
-            .map((v: { price?: number }) => Number(v?.price))
-            .filter((n: number) => Number.isFinite(n) && n > 0)
-        : []
+    // The shop does not track stock quantity. The `stock` field exists on variations but
+    // is never maintained, and the storefront sells regardless of it, so everything is
+    // always available: 0, null and NaN alike mean "still sellable", not "sold out".
+    // Deliberate — don't derive this from `stock` without changing that business rule
+    // first, or products go OutOfStock in search results while the site still sells them.
+    const availability = 'https://schema.org/InStock'
+
+    // Widened past the `Product` type on purpose: `price` is nullable on the product row
+    // and the admin form posts strings, so what arrives here is number | string | null.
+    type Variation = { price?: number | string | null }
+    const variations: Variation[] = Array.isArray(product.variations) ? product.variations : []
+
+    const variationPrices = variations
+        .map(v => Number(v?.price))
+        .filter(n => Number.isFinite(n) && n > 0)
 
     const basePrice = Number(product.price)
     const prices = variationPrices.length > 0
@@ -112,7 +122,7 @@ export default async function ProductPage({ params }: PageProps) {
             lowPrice: Math.min(...prices),
             highPrice: Math.max(...prices),
             offerCount: prices.length,
-            availability: 'https://schema.org/InStock',
+            availability,
             url: absoluteUrl(`/product/${id}`),
         }
         : prices.length === 1
@@ -120,7 +130,7 @@ export default async function ProductPage({ params }: PageProps) {
                 '@type': 'Offer',
                 priceCurrency: 'INR',
                 price: prices[0],
-                availability: 'https://schema.org/InStock',
+                availability,
                 url: absoluteUrl(`/product/${id}`),
                 seller: { '@type': 'Organization', name: SITE_NAME },
             }
