@@ -22,6 +22,11 @@ export const DEFAULT_OG_IMAGE = {
     alt: 'Shivshakti luxury gift hampers',
 }
 
+// GA4 measurement ID. Overridable per environment so a staging copy doesn't report
+// into the production property; falls back to the live ID for normal deploys.
+export const GA_MEASUREMENT_ID =
+    process.env.NEXT_PUBLIC_GA_ID || 'G-L1CXPRVFF3'
+
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = '/'): string {
     return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`

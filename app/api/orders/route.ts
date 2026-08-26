@@ -2,6 +2,7 @@ import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import { NextResponse } from 'next/server'
 import { resolvePlace } from '@/utils/places'
 import { assessDelivery, FREE_DELIVERY_RADIUS_KM } from '@/utils/delivery'
+import { notifyOwnerOfNewOrder } from '@/utils/whatsapp'
 
 export async function POST(request: Request) {
     try {
@@ -108,6 +109,17 @@ export async function POST(request: Request) {
                 { error: 'Failed to create order', details: error.message },
                 { status: 500 }
             )
+        }
+
+        // Alert the owner here rather than from the browser. The previous client-side
+        // call ran after the payment had already succeeded and the row was committed,
+        // so closing the tab lost the notification while keeping the money and the
+        // order — a silent failure nobody would see. Never let it fail the response:
+        // the order is paid for and saved regardless of whether the alert lands.
+        try {
+            await notifyOwnerOfNewOrder(data)
+        } catch (notifyError) {
+            console.error(`Order ${data.id} created but owner alert failed`, notifyError)
         }
 
         return NextResponse.json(

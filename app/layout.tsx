@@ -1,7 +1,8 @@
 
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Inter, Playfair_Display, Cinzel } from 'next/font/google'
-import { SITE_URL, SITE_NAME } from '@/utils/site'
+import { SITE_URL, SITE_NAME, GA_MEASUREMENT_ID } from '@/utils/site'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { CartProvider } from '@/context/cart-context'
@@ -77,6 +78,21 @@ export default function RootLayout({
             <WhatsAppButton />
           </CartProvider>
         </AuthProvider>
+
+        {/* GA4. `afterInteractive` keeps the tag off the critical path — pasting raw
+            <script> tags into the App Router instead would break hydration. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
       </body>
     </html>
   )
