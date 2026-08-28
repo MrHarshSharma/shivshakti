@@ -4,10 +4,17 @@ import React from 'react'
 import Link from 'next/link'
 import { ArrowRight, Ticket, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
+import Testimonials, { type PublishedFeedback } from '@/components/testimonials'
 import ProductCard from '@/components/product-card'
 import RecentlyViewed from '@/components/recently-viewed'
 
-export default function HomeClient({ products }: { products: Product[] }) {
+export default function HomeClient({
+    products,
+    reviews = [],
+}: {
+    products: Product[]
+    reviews?: PublishedFeedback[]
+}) {
     const heroVideoRef = React.useRef<HTMLVideoElement>(null)
 
     React.useEffect(() => {
@@ -248,6 +255,9 @@ export default function HomeClient({ products }: { products: Product[] }) {
                     </div>
                 </div>
             </section>
+
+            {/* What People Say — renders nothing until an admin publishes feedback */}
+            <Testimonials reviews={reviews} />
 
             {/* Instagram CTA */}
             <section className="py-16 lg:py-20 bg-[#EBDDC4] relative overflow-hidden">

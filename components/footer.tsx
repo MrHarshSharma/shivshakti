@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Instagram, Mail, Phone, MapPin } from 'lucide-react'
+import { Instagram, Mail, Phone, MapPin, MessageSquareHeart } from 'lucide-react'
+import FeedbackDialog from '@/components/feedback-dialog'
 
 export default function Footer() {
     const currentYear = new Date().getFullYear()
@@ -10,6 +11,27 @@ export default function Footer() {
     return (
         <footer className="bg-[#F8F8F8] border-t border-[#EBEBEB]">
             <div className="container mx-auto px-4 lg:px-8">
+                {/* Feedback CTA — first thing in the footer, on a warm tint so it reads as
+                    an invitation instead of disappearing into the grey link columns. */}
+                <div className="mt-8 rounded-2xl bg-[#EBDDC4]/50 border border-[#E0B08A]/40 px-6 py-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:flex w-12 h-12 rounded-full bg-white/70 items-center justify-center flex-shrink-0">
+                            <MessageSquareHeart className="w-6 h-6 text-[#B8845A]" />
+                        </div>
+                        <div>
+                            <h4 className="text-base font-semibold text-[#1A1A1A] mb-0.5">
+                                How are we doing?
+                            </h4>
+                            <p className="text-sm text-[#4A4A4A]">
+                                Tell us what you loved, or what we could do better.
+                            </p>
+                        </div>
+                    </div>
+                    <FeedbackDialog
+                        triggerClassName="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm whitespace-nowrap shadow-sm"
+                    />
+                </div>
+
                 {/* Main Footer */}
                 <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand */}

@@ -14,7 +14,8 @@ import {
     Ticket,
     Tag,
     Users,
-    Loader2
+    Loader2,
+    MessageSquareHeart
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -231,6 +232,24 @@ export default function AdminDashboard() {
                                 <div>
                                     <h3 className="font-cinzel text-2xl font-bold mb-1 text-[#2D1B1B]">Manage Coupons</h3>
                                     <p className="text-white/80 text-sm font-playfair">Promotional treasures</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </Link>
+
+                    <Link href="/admin/feedback">
+                        <motion.div
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            className="relative h-48 bg-gradient-to-br from-rose-400 via-pink-500 to-fuchsia-600 rounded-[2.5rem] shadow-xl overflow-hidden group cursor-pointer"
+                        >
+                            <div className="absolute top-0 left-0 w-32 h-32 bg-white/30 rounded-full -ml-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
+                            <div className="relative h-full p-7 flex flex-col justify-between text-white">
+                                <div className="bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                                    <MessageSquareHeart className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="font-cinzel text-2xl font-bold mb-1 text-[#2D1B1B]">Customer Feedback</h3>
+                                    <p className="text-white/80 text-sm font-playfair">Choose what appears on the site</p>
                                 </div>
                             </div>
                         </motion.div>

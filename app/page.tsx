@@ -47,8 +47,27 @@ async function getProducts() {
   return (data || []) as Product[]
 }
 
+async function getPublishedFeedback() {
+  const supabase = createServiceRoleClient()
+  const { data, error } = await supabase
+    .from('feedback')
+    .select('id, name, rating, message, created_at')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false })
+    .limit(6)
+
+  if (error) {
+    // A missing or unreachable feedback table must not take the homepage down —
+    // the widget simply renders nothing.
+    console.error('Error fetching published feedback:', error)
+    return []
+  }
+
+  return data || []
+}
+
 export default async function Home() {
-  const products = await getProducts()
+  const [products, reviews] = await Promise.all([getProducts(), getPublishedFeedback()])
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -76,7 +95,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomeClient products={products} />
+      <HomeClient products={products} reviews={reviews} />
     </>
   )
 }

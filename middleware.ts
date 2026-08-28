@@ -64,6 +64,13 @@ export async function middleware(request: NextRequest) {
         // Customers must still be able to apply a coupon at checkout, so the
         // validate endpoint is deliberately excluded from the admin gate.
         (nextUrl.pathname.startsWith('/api/coupons') && !isCouponValidation && request.method !== 'GET') ||
+        // Feedback inverts the usual rule: POST is the public one (anybody may leave
+        // feedback) while GET is privileged, because listing includes unpublished rows
+        // that nobody has approved for display yet. The exemption is pinned to the exact
+        // path — a bare `method !== 'POST'` check would leave POST open on every
+        // /api/feedback/* route, including any added later.
+        (nextUrl.pathname.startsWith('/api/feedback') &&
+            !(nextUrl.pathname === '/api/feedback' && request.method === 'POST')) ||
         nextUrl.pathname.startsWith('/api/upload-images')
 
     if (isAdminRoute || isAdminApi || isUserOrderRoute) {
