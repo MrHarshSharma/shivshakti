@@ -12,12 +12,20 @@ export const SITE_NAME = 'Shivshakti'
 // Next.js shallow-merges metadata: a page that declares `openGraph` replaces the
 // layout's block outright rather than merging into it. So any page setting its own
 // openGraph must restate the image, or the social preview comes out empty.
+// Must be a real 1200x630 file: the previous image was a 1024x1024 square that
+// merely *claimed* these dimensions, so every social preview cropped it badly.
 export const DEFAULT_OG_IMAGE = {
-    url: '/hero-hamper.png',
+    url: '/og-image.jpg',
     width: 1200,
     height: 630,
+    type: 'image/jpeg',
     alt: 'Shivshakti luxury gift hampers',
 }
+
+// GA4 measurement ID. Overridable per environment so a staging copy doesn't report
+// into the production property; falls back to the live ID for normal deploys.
+export const GA_MEASUREMENT_ID =
+    process.env.NEXT_PUBLIC_GA_ID || 'G-L1CXPRVFF3'
 
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = '/'): string {

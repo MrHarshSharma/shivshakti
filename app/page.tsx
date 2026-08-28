@@ -2,7 +2,7 @@ import { createServiceRoleClient } from '@/utils/supabase/service-role'
 import HomeClient from '@/components/home-client'
 import { Product } from '@/data/products'
 import type { Metadata } from 'next'
-import { SITE_URL, absoluteUrl } from '@/utils/site'
+import { SITE_URL, absoluteUrl, DEFAULT_OG_IMAGE } from '@/utils/site'
 
 // ISR: Revalidate every 5 minutes - page is cached and served instantly from edge
 export const revalidate = 300
@@ -22,20 +22,13 @@ export const metadata: Metadata = {
     siteName: 'Shivshakti',
     locale: 'en_IN',
     type: 'website',
-    images: [
-      {
-        url: '/hero-hamper.png',
-        width: 1200,
-        height: 630,
-        alt: 'Shivshakti Luxury Hamper',
-      },
-    ],
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Shivshakti | Heritage & Luxury',
     description: 'Curated premium Indian artifacts and luxury hampers.',
-    images: ['/hero-hamper.png'],
+    images: [DEFAULT_OG_IMAGE.url],
   },
 }
 
