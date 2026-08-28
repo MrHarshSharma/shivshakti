@@ -106,13 +106,29 @@ export async function sendWhatsAppTemplate(
  * rely on, so this goes out as an approved template instead.
  */
 export async function notifyOwnerOfNewOrder(order: OrderRow): Promise<boolean> {
-    if (!OWNER_NUMBER) {
+    // Comma-separated so a second phone can be added without a code change. Every
+    // number still has to be on the test number's allowed list or it fails with 131030.
+    const recipients = (OWNER_NUMBER || '')
+        .split(',')
+        .map(n => n.trim())
+        .filter(Boolean)
+
+    if (recipients.length === 0) {
         console.warn('WhatsApp owner alert skipped — OWNER_WHATSAPP_NUMBER not set')
         return false
     }
 
-    return sendWhatsAppTemplate(OWNER_NUMBER, ORDER_TEMPLATE, [
-        order.name || 'Unknown',
-        String(order.id),
-    ])
+    const params = [order.name || 'Unknown', String(order.id)]
+
+    // Sent in parallel, and one bad number must not suppress the others — a wrong or
+    // de-allowlisted phone should still leave the remaining owners alerted.
+    const results = await Promise.all(
+        recipients.map(async to => {
+            const ok = await sendWhatsAppTemplate(to, ORDER_TEMPLATE, params)
+            if (!ok) console.error(`WhatsApp owner alert failed for ${to}`)
+            return ok
+        }),
+    )
+
+    return results.some(Boolean)
 }
