@@ -299,3 +299,24 @@ h1, h2, h3, h4, h5, h6 {
 .animate-slideUp {
   animation: slideUp 0.3s ease;
 }
+
+/* Homepage hero diyas. Purely decorative, so the flicker stands down entirely
+   when the visitor asks for less motion. */
+@keyframes diyaFlicker {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  20% { opacity: 1; transform: scale(1.015); }
+  45% { opacity: 0.84; transform: scale(0.994); }
+  70% { opacity: 0.97; transform: scale(1.008); }
+}
+
+.animate-diya-flicker {
+  /* Pivot at the flame, not the image box, so the pulse reads as light. */
+  transform-origin: 50% 30%;
+  animation: diyaFlicker 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-diya-flicker {
+    animation: none;
+  }
+}

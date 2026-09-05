@@ -2,11 +2,17 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, Ticket, Shield, Gift, Clock } from 'lucide-react'
 import { Product } from '@/data/products'
 import Testimonials, { type PublishedFeedback } from '@/components/testimonials'
 import ProductCard from '@/components/product-card'
 import RecentlyViewed from '@/components/recently-viewed'
+
+// Per-lamp flicker offsets for the hero diya row, deliberately irregular: nine
+// identical 3.2s loops started together pulse in lockstep and read as one blinking
+// sprite rather than a row of lit lamps.
+const DIYA_FLICKER_DELAYS = [0, 0.9, 2.1, 1.4, 2.8, 0.4, 1.9, 2.5, 1.1]
 
 export default function HomeClient({
     products,
@@ -32,28 +38,52 @@ export default function HomeClient({
     return (
         <div className="min-h-screen bg-white">
             {/* Hero Section */}
-            <section className="relative bg-[#EBDDC4]">
-                <div className="container mx-auto px-4 lg:px-8">
-                    <div className="grid lg:grid-cols-2 gap-8 items-center py-12 lg:py-20">
+            <section className="relative overflow-hidden bg-[#EBDDC4]">
+                {/* A row of diyas along the foot of the hero, each flickering on its
+                    own offset clock. Every other lamp drops out below `lg`, where the
+                    full nine would stand shoulder to shoulder. On phones the row is
+                    inset instead of bled, so the end lamps keep clear of the section
+                    edge rather than being sliced by it. */}
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-5 bottom-[-2] flex items-end justify-between lg:inset-x-8"
+                >
+                    {DIYA_FLICKER_DELAYS.map((delay, i) => (
+                        <Image
+                            key={i}
+                            src="/diyabg.png"
+                            alt=""
+                            width={1536}
+                            height={1024}
+                            sizes="(min-width: 1280px) 7rem, (min-width: 1024px) 6rem, (min-width: 640px) 5rem, 3.5rem"
+                            className={`h-auto w-14 shrink-0 animate-diya-flicker sm:w-20 lg:w-24 xl:w-28 ${i % 2 ? 'hidden lg:block' : ''}`}
+                            style={{ animationDelay: `${delay}s` }}
+                        />
+                    ))}
+                </div>
+                <div className="relative container mx-auto px-4 lg:px-8">
+                    {/* Extra bottom padding is the buffer the lamp row sits in, so it
+                        never crowds the CTAs or the video. */}
+                    <div className="grid lg:grid-cols-2 gap-8 items-center pt-12 pb-28 lg:pt-20 lg:pb-36">
                         {/* Content */}
                         <div className="text-center lg:text-left">
                             <span className="inline-block px-3 py-1 bg-[#D29B6C] text-white text-xs font-medium rounded-full mb-4">
-                                Rakhi Special
+                                Diwali Special
                             </span>
                             <h1 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-semibold text-[#1A1A1A] mb-4 leading-tight">
-                                Raksha Bandhan Hampers
+                                Diwali Gift Hampers
                                 <br />
-                                <span className="text-[#D29B6C]">Tied with Love</span>
+                                <span className="text-[#D29B6C]">Wrapped in Light</span>
                             </h1>
                             <p className="text-base text-[#4A4A4A] mb-8 max-w-md mx-auto lg:mx-0">
-                                Celebrate the bond you cherish with handcrafted rakhi hampers — sweets, treats and thoughtful little touches, packed and ready to gift.
+                                Light up the festival of lights with handcrafted Diwali hampers — dry fruits, chocolates, diyas and thoughtful little touches, packed and ready to gift.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                                 <Link
                                     href="/products"
                                     className="w-full sm:w-auto px-8 py-3 bg-[#D29B6C] text-white font-medium rounded-lg hover:bg-[#B8845A] transition-colors flex items-center justify-center gap-2"
                                 >
-                                    Shop Rakhi Hampers
+                                    Shop Diwali Hampers
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
                                 <Link
@@ -68,19 +98,19 @@ export default function HomeClient({
                         {/* Video */}
                         <div className="relative">
                             <div className="relative max-w-md mx-auto lg:max-w-none">
-                                {/* The clip is portrait, so width drives the box and height
-                                    follows its own ratio. No max-height: capping the height is
-                                    what letterboxed it into a thin strip, since object-contain
-                                    then had to shrink the width to match. */}
+                                {/* Width drives the box and height follows the clip's own
+                                    ratio (this one is 16:9 landscape). No max-height: capping
+                                    the height letterboxes it into a thin strip, since
+                                    object-contain then has to shrink the width to match. */}
                                 <video
                                     ref={heroVideoRef}
-                                    src="/rakhivideo.mp4"
+                                    src="/diwali-video.mp4"
                                     autoPlay
                                     loop
                                     muted
                                     playsInline
                                     controls={false}
-                                    aria-label="Raksha Bandhan gift hampers by Shivshakti"
+                                    aria-label="Diwali gift hampers by Shivshakti"
                                     className="w-full h-auto rounded-2xl"
                                 />
                             </div>

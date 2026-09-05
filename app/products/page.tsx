@@ -8,8 +8,8 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
     title: 'Shop All Products',
-    description: 'Browse the full Shivshakti collection — luxury gift hampers, festive rakhi gifts, artisanal decor and premium gourmet treats, handcrafted in Nagpur, Maharashtra.',
-    keywords: ['gift hampers online', 'rakhi gifts', 'luxury hampers Nagpur', 'Indian handicrafts', 'corporate gifting India'],
+    description: 'Browse the full Shivshakti collection — luxury gift hampers, festive Diwali gifts, artisanal decor and premium gourmet treats, handcrafted in Nagpur, Maharashtra.',
+    keywords: ['gift hampers online', 'diwali gifts', 'luxury hampers Nagpur', 'Indian handicrafts', 'corporate gifting India'],
     alternates: { canonical: '/products' },
     openGraph: {
         title: 'Shop All Products | Shivshakti',
